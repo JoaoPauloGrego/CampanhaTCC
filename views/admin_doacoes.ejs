@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8" />
+  <link rel="icon" href="/logo.png" type="image/x-icon">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Montserrat:wght@700;800&display=swap" rel="stylesheet">
+  <title>Doações Registradas - Admin</title>
+  <style>
+    :root {
+      --primary: #3498db;
+      --secondary: #e74c3c;
+      --accent: #f39c12;
+      --dark: #2c3e50;
+      --light: #ecf0f1;
+      --success: #27ae60;
+    }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, #1a2980, #26d0ce);
+      color: var(--light);
+      min-height: 100vh;
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    body::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-size: cover;
+      z-index: -1;
+    }
+
+    h1 {
+      margin-bottom: 16px;
+    }
+
+    .success {
+      background-color: #d4edda;
+      color: #155724;
+      padding: 12px;
+      border-radius: 4px;
+      margin-bottom: 20px;
+    }
+
+    /* Container responsivo para a tabela */
+    .table-container {
+      width: 100%;
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 600px;
+      /* força rolagem em telas muito estreitas */
+    }
+
+    thead {
+      background-color: var(--accent);
+    }
+
+    th,
+    td {
+      padding: 12px 8px;
+      text-align: left;
+      border: 1px solid #ddd;
+    }
+
+    tr:nth-child(even) {
+      background-color: var(--accent);
+    }
+
+    .turma-cell {
+      min-width: 200px;
+      /* opcional: word-wrap para quebras */
+      word-wrap: break-word;
+    }
+
+    /* Links de navegação */
+    .actions {
+      margin-top: 20px;
+    }
+
+    .actions a {
+      color: #bababa;
+      text-decoration: none;
+      margin-right: 12px;
+    }
+
+    .actions a:hover {
+      text-decoration: underline;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    /* Header */
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px 0;
+      animation: fadeInDown 1s ease;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .logo i {
+      font-size: 2.5rem;
+      color: var(--accent);
+    }
+
+    .logo h1 {
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: white;
+    }
+
+    nav ul {
+      display: flex;
+      list-style: none;
+      gap: 30px;
+    }
+
+    nav a {
+      color: white;
+      text-decoration: none;
+      font-weight: 500;
+      transition: all 0.3s ease;
+      position: relative;
+      padding: 5px 0;
+    }
+
+    nav a::after {
+      content: "";
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 0;
+      height: 2px;
+      background: var(--accent);
+      transition: width 0.3s ease;
+    }
+
+    nav a:hover::after {
+      width: 100%;
+    }
+
+    footer {
+    text-align: center;
+    padding: 30px 0;
+    margin-top: 50px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    animation: fadeInUp 1s ease;
+  }
+  </style>
+</head>
+
+<body>
+  <!-- <h1>Doações Registradas</h1> -->
+
+  <% if(success) { %>
+  <div class="success">Doação registrada com sucesso!</div>
+  <% } %>
+
+  <div class="container">
+    <!-- Header -->
+    <header>
+      <div class="logo">
+        <i class="fas fa-tshirt"></i>
+        <h1>Campanha do Agasalho</h1>
+      </div>
+      <nav>
+        <ul>
+          <li><a href="/"><i class="fas fa-home"></i> Início</a></li>
+          <li><a href="/doar"><i class="fas fa-hands-helping"></i> Como Ajudar</a></li>
+          <li><a href="/sobre"><i class="fas fa-info-circle"></i> Sobre</a></li>
+        </ul>
+      </nav>
+    </header>
+
+    <div class="table-container">
+      <table>
+        <thead>
+          <tr>
+            <th class="turma-cell">Turma e Docente</th>
+            <th>Tipo de Roupa</th>
+            <th>Pontuação Unitária</th>
+            <th>Quantidade</th>
+            <th>Pontos Totais</th>
+            <th>Data</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% doacoes.forEach(d => { %>
+          <tr>
+            <td class="turma-cell"><%= d.turma_docente %></td>
+            <td><%= d.tipo %></td>
+            <td><%= d.pontuacao %></td>
+            <td><%= d.quantidade %></td>
+            <td><%= d.pontos %></td>
+            <td><%= d.data %></td>
+          </tr>
+          <% }); %>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="actions">
+      <a href="/admin">← Voltar para o painel</a><BR></BR>
+      <i id="sair" class="fas fa-sign-in-alt" style="color:#bababa"></i>         <a href="/logout">Sair</a>
+    </div>
+
+    <footer>
+      <p class="copyright">© 2025 Campanha do Agasalho. Todos os direitos reservados.</p>
+    </footer>
+  </div>
+</body>
+
+</html>

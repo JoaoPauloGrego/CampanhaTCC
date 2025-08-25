@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Montserrat:wght@700;800&display=swap" rel="stylesheet">
+  <title>Document</title>
+</head>
+<style>
+  :root {
+    --primary: #3498db;
+    --secondary: #e74c3c;
+    --accent: #f39c12;
+    --dark: #2c3e50;
+    --light: #ecf0f1;
+    --success: #27ae60;
+  }
+
+  body {
+    font-family: 'Poppins', sans-serif;
+    background: linear-gradient(135deg, #1a2980, #26d0ce);
+    color: var(--light);
+    min-height: 100vh;
+    overflow-x: hidden;
+    position: relative;
+  }
+
+  body::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    z-index: -1;
+  }
+
+  .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+  }
+
+  /* Header */
+  header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 0;
+    animation: fadeInDown 1s ease;
+  }
+
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .logo i {
+    font-size: 2.5rem;
+    color: var(--accent);
+  }
+
+  .logo h1 {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: white;
+  }
+
+  nav ul {
+    display: flex;
+    list-style: none;
+    gap: 30px;
+  }
+
+  nav a {
+    color: white;
+    text-decoration: none;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    position: relative;
+    padding: 5px 0;
+  }
+
+  nav a::after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background: var(--accent);
+    transition: width 0.3s ease;
+  }
+
+  nav a:hover::after {
+    width: 100%;
+  }
+
+  h1 {
+    /* color: black; */
+    text-align: center;
+    margin-bottom: 20px;
+    font-weight: 700px;
+  }
+
+  .highlight {
+    color: var(--accent);
+    font-weight: bold;
+    font-size: 19px;
+  }
+
+  ul {
+    list-style: none;
+    padding: 0;
+  }
+
+  ul li::before {
+    margin-right: 6px;
+  }
+
+  .info {
+    margin-top: 20px;
+    /* background-color: #eaeaea; */
+    padding: 15px;
+    border-radius: 5px;
+  }
+
+  .info p {
+    margin: 10px 0;
+  }
+
+  .doac {
+    flex-direction: column;
+    gap: 0;
+  }
+
+  /*equipe*/
+  .comeco {
+    background-color: #1e88e5;
+    color: white;
+    padding: 40px 20px;
+    text-align: center;
+  }
+
+  .donos {
+    max-width: 350px;
+    margin-left: 90px;
+    padding: 40px;
+    box-shadow: 0 5px 15px rgba(255, 255, 255, 0.1);
+    margin-bottom: 100px;
+    height: 200px;
+    margin-top: 50px;
+    align-items: center;
+  }
+
+  .equipe {
+    max-width: 450px;
+    margin-left: 600px;
+    margin-top: -390px;
+    padding: 30px;
+    box-shadow: 0 5px 15px rgba(255, 255, 255, 0.1);
+  }
+
+  .comeco h1 {
+    /* color: black; */
+    font-weight: 700px;
+    font-size: 2.5em;
+  }
+
+  .comeco p {
+    font-size: 1.2em;
+  }
+
+  .sobre {
+    padding: 25px 30px;
+    max-width: 920px;
+    margin: 0 auto;
+    margin-top: 20px;
+    margin-bottom: 20px;
+    margin-left: 150px;
+  }
+
+  h2 {
+    /* color: black; */
+    font-weight: 700px;
+    margin-bottom: 15px;
+  }
+
+  ul {
+    /* list-style: disc inside; */
+    padding-left: 20px;
+  }
+
+  .container1 {
+    margin-left: 40px;
+  }
+
+  .frio {
+    max-width: 650px;
+  }
+
+  footer {
+    text-align: center;
+    padding: 30px 0;
+    margin-top: 50px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    animation: fadeInUp 1s ease;
+  }
+</style>
+
+<body>
+  <div class="container">
+    <!-- Header -->
+    <header>
+      <div class="logo">
+        <i class="fas fa-tshirt"></i>
+        <h1>Campanha do Agasalho</h1>
+      </div>
+      <nav>
+        <ul>
+          <li><a href="/"><i class="fas fa-home"></i> Início</a></li>
+          <li><a href="/doar"><i class="fas fa-hands-helping"></i> Como Ajudar</a></li>
+          <li><a href="/sobre"><i class="fas fa-info-circle"></i> Sobre</a></li>
+        </ul>
+      </nav>
+    </header>
+
+    <div class="container1">
+      <p class="frio">O frio está chegando, e muitas pessoas precisam da nossa ajuda. Doe roupas de inverno em bom
+        estado e aqueça o coração de quem mais precisa!
+      </p>
+
+      <p class="highlight">Estamos arrecadando:</p>
+      <ul class="doac">
+        <p>- Agasalhos</p>
+        <p>- Cobertores</p>
+        <p>- Meias</p>
+        <p>- Calçados de inverno</p>
+        <p>- Roupas infantis e adultas</p>
+      </ul>
+
+      <div class="info">
+        <p class="highlight">Ponto de Doação</p>
+        <p>Escola “Celso Charuri”</p>
+        <p>Data limite: 10/06/2025</p>
+        <p>Horário: das 8h às 21h</p>
+        <p>Endereço: Av. Rebouças, 3965 - Jardim São Carlos, Sumaré - SP, 13170-023</p>
+        <p>Contato: (19) 3828-9450</p>
+      </div>
+    </div>
+
+    <section class="donos">
+      <h2>Responsáveis</h2>
+      <ul>
+        <p>👨🏻‍💼 Ricardo Correa</p>
+        <p>👩🏻‍💼 Ana Caroline</p>
+        <p>📚 Disciplina: Projetos de Software</p>
+      </ul>
+    </section>
+
+    <section class="equipe">
+      <h2>Desenvolvedores</h2>
+      <ul>
+        <p> 👩🏻‍💻 Jade Lisboa - 17 anos, natural de Sumaré-SP</p>
+        <p> 👨🏻‍💻 João Paulo - 17 anos, natural de Sumaré-SP</p>
+        <p> 👨🏻‍💻 João Pacheco - 17 anos, natural de Campinas-SP</p>
+        <p> 👨🏻‍💻 Murilo Ferreira - 17 anos, natural de Campinas-SP</p>
+      </ul>
+    </section>
+
+    <footer>
+      <p class="copyright">© 2025 Campanha do Agasalho. Todos os direitos reservados.</p>
+    </footer>
+
+  </div>
+</body>
+
+</html>

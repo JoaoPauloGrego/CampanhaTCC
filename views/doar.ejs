@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Montserrat:wght@700;800&display=swap" rel="stylesheet">
+  <title>Document</title>
+</head>
+
+
+
+<body>
+  <div class="container">
+    <!-- Header -->
+    <header>
+      <div class="logo">
+        <i class="fas fa-tshirt"></i>
+        <h1>Campanha do Agasalho</h1>
+      </div>
+      <nav>
+        <ul>
+          <li><a href="/"><i class="fas fa-home"></i> Início</a></li>
+          <li><a href="/doar"><i class="fas fa-hands-helping"></i> Como Ajudar</a></li>
+          <li><a href="/sobre"><i class="fas fa-info-circle"></i> Sobre</a></li>
+        </ul>
+      </nav>
+    </header>
+
+    <main>
+      <section>
+        <h2>Sobre a Campanha</h2>
+        <p>A Campanha do Agasalho 2025 tem como objetivo arrecadar roupas de inverno para ajudar lares, instituições e escolas carentes que necessitam de apoio social.</p>
+      </section>
+
+      <section>
+        <h2>O que Doar?</h2>
+        <ul>
+          <p>✔️ Aceitas: Roupas usadas em bom estado ou novas, tamanhos infantil a adulto.</p>
+          <p>🚫 Não aceitas: Roupas íntimas, rasgadas ou mofadas.</p>
+        </ul>
+      </section>
+
+      <section>
+        <h2>Local e Prazo de Doação</h2>
+        <p>Até: 10 de junho de 2025</p>
+        <a href="https://www.google.com.br/maps/place/Escola+SENAI+%22Dr.+Celso+Charuri%22/@-22.8340875,-47.2655777,17z/data=!3m1!4b1!4m6!3m5!1s0x94c8bd1ab1fc77f3:0xf2ff0cd47cdcb7d8!8m2!3d-22.8340925!4d-47.2630028!16s%2Fg%2F1tj53q4q?hl=pt-BR&entry=ttu&g_ep=EgoyMDI1MDYwMS4wIKXMDSoASAFQAw%3D%3D">
+          <p>Endereço: Av. Rebouças, 3965 - Jardim São Carlos, Sumaré - SP, 13170-023</p>
+        </a>
+        <p>Horário: Das 8h às 21h</p>
+      </section>
+
+      <section>
+        <h2>Sistema de Pontos</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>Item</th>
+              <th>Pontos</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Camiseta, camisa, calça, bermuda, vestido, sapato fechado</td>
+              <td>1</td>
+            </tr>
+            <tr>
+              <td>Agasalho (blusa de lã, casaco, moletom)</td>
+              <td>2</td>
+            </tr>
+            <tr>
+              <td>Roupas novas com etiqueta</td>
+              <td>5</td>
+            </tr>
+            <tr>
+              <td>Cobertores, mantas, edredons, colchas (usados)</td>
+              <td>10</td>
+            </tr>
+            <tr>
+              <td>Cobertores, mantas, edredons, colchas (novos)</td>
+              <td>20</td>
+            </tr>
+          </tbody>
+        </table><br>
+        <p>Pontuação registrada no ato da entrega.</p>
+      </section>
+
+      <section>
+        <h2>Premiação</h2>
+        <p>Premiação para quem alcançar maior média de pontos, com patrocínio da AAPM da escola. Em caso de empate, vence quem doar mais agasalhos.</p>
+      </section>
+
+      <section>
+        <h2>Contato</h2>
+        <p>📍 Escola Celso Charuri.</p>
+        <p>📞 (19) 3828-9450</p>
+      </section>
+    </main>
+    <footer>
+      <p class="copyright">© 2025 Campanha do Agasalho. Todos os direitos reservados.</p>
+    </footer>
+  </div>
+</body><style>
+  :root {
+    --primary: #3498db;
+    --secondary: #e74c3c;
+    --accent: #f39c12;
+    --dark: #2c3e50;
+    --light: #ecf0f1;
+    --success: #27ae60;
+  }
+
+  body {
+    font-family: 'Poppins', sans-serif;
+    background: linear-gradient(135deg, #1a2980, #26d0ce);
+    color: var(--light);
+    min-height: 100vh;
+    overflow-x: hidden;
+    position: relative;
+    color: white;
+  }
+
+  body::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    z-index: -1;
+  }
+
+  .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+  }
+
+  /* Header */
+  header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 0;
+    animation: fadeInDown 1s ease;
+  }
+
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .logo i {
+    font-size: 2.5rem;
+    color: var(--accent);
+  }
+
+  .logo h1 {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: white;
+  }
+
+  nav ul {
+    display: flex;
+    list-style: none;
+    gap: 30px;
+  }
+
+  nav a {
+    color: white;
+    text-decoration: none;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    position: relative;
+    padding: 5px 0;
+  }
+
+  nav a::after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background: var(--accent);
+    transition: width 0.3s ease;
+  }
+
+  nav a:hover::after {
+    width: 100%;
+  }
+
+  main {
+    padding: 20px;
+    max-width: 1000px;
+    margin: auto;
+  }
+
+  section {
+    margin-bottom: 30px;
+    /* background-color: #fff; */
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(255, 255, 255, 0.1);
+  }
+
+  section a{
+    color: #babaec;
+  }
+
+  h2 {
+    /* color: black; */
+    font-weight: 700px;
+    margin-bottom: 10px;
+  }
+
+  ul {
+    list-style-type: none;
+    padding-left: 0;
+  }
+
+  ul li {
+    margin-bottom: 10px;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+  }
+
+  table th,
+  table td {
+    padding: 12px;
+    border: 1px solid #ccc;
+    text-align: left;
+  }
+
+  table th {
+    background-color: var(--accent);
+    color: #fff;
+  }
+
+  footer {
+    text-align: center;
+    padding: 30px 0;
+    margin-top: 50px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    animation: fadeInUp 1s ease;
+  }
+</style>
