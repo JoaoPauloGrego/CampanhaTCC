@@ -32,6 +32,9 @@ app.get("/", (req, res) => res.render("index"));
 app.get("/login", (req, res) => res.render("login"));
 app.get("/sobre", (req, res) => res.render("sobre"));
 app.get("/doar", (req, res) => res.render("doar"));
+app.get("/admin_edit_campanha", (req, res) => res.render("admin_edit_campanha"));
+app.get("/admin_edit_turmas", (req, res) => res.render("admin_edit_turmas"));
+
 
 // Processar login
 app.post("/login", (req, res) => {
@@ -59,8 +62,9 @@ app.post("/login", (req, res) => {
       name: "sAdmin",
     };
     return res.redirect("/sAdmin");
+  } else {
+    res.redirect("/login?error=1");
   }
-  res.redirect("/login?error=1");
 });
 
 // Middleware de autenticação
@@ -195,9 +199,116 @@ app.post("/doacao", requireAuth("admin"), (req, res) => {
   );
 });
 
+// Rota para a página do Super Admin
 app.get("/sAdmin", requireAuth("sAdmin"), (req, res) => {
+  res.render("sAdmin");
+});
+
+// Rota principal - Listar turmas
+app.get('/admin_edit_turmas', requireAuth('sAdmin'), (req, res) => {
+  db2.all('SELECT * FROM TURMAS', (err, turmas) => {
+    if (err) {
+      console.error(err);
+      return res.render('admin_edit_turmas', { 
+        turmas: [], 
+        error: 'Erro ao carregar turmas',
+        user: req.session.user 
+      });
+    }
+
+    res.render('admin_edit_turmas', { 
+      turmas: turmas, 
+      user: req.session.user,
+      success: req.query.success,
+      error: req.query.error
+    });
+  });
+});
+
+// Criar nova turma
+app.post('/admin_edit_turmas/create', requireAuth('sAdmin'), (req, res) => {
+  const { TURMA, DOCENTE, D_TOTAL, D_ATUAL, STATUS } = req.body;
   
-})
+  db2.run(
+    `INSERT INTO TURMAS (TURMA, DOCENTE, D_TOTAL, D_ATUAL, STATUS) 
+     VALUES (?, ?, ?, ?, ?)`,
+    [TURMA, DOCENTE, D_TOTAL || 0, D_ATUAL || 0, STATUS],
+    function(err) {
+      if (err) {
+        console.error(err);
+        return res.redirect('/admin_edit_turmas?error=Erro ao criar turma');
+      }
+      
+      res.redirect('/admin_edit_turmas?success=Turma criada com sucesso');
+    }
+  );
+});
+
+// Atualizar turma
+app.post('/admin_edit_turmas/update', requireAuth('sAdmin'), (req, res) => {
+  const { ID_TURMAS, TURMA, DOCENTE, D_TOTAL, D_ATUAL, STATUS } = req.body;
+  
+  db2.run(
+    `UPDATE TURMAS SET TURMA = ?, DOCENTE = ?, D_TOTAL = ?, D_ATUAL = ?, STATUS = ? 
+     WHERE ID_TURMAS = ?`,
+    [TURMA, DOCENTE, D_TOTAL, D_ATUAL, STATUS, ID_TURMAS],
+    function(err) {
+      if (err) {
+        console.error(err);
+        return res.redirect('/admin_edit_turmas?error=Erro ao atualizar turma');
+      }
+      
+      res.redirect('/admin_edit_turmas?success=Turma atualizada com sucesso');
+    }
+  );
+});
+
+// Desativar turma
+app.get('/admin_edit_turmas/deactivate/:id', requireAuth('sAdmin'), (req, res) => {
+  const id = req.params.id;
+  
+  db2.run(
+    'UPDATE TURMAS SET STATUS = 0 WHERE ID_TURMAS = ?',
+    [id],
+    function(err) {
+      if (err) {
+        console.error(err);
+        return res.redirect('/admin_edit_turmas?error=Erro ao desativar turma');
+      }
+      
+      res.redirect('/admin_edit_turmas?success=Turma desativada com sucesso');
+    }
+  );
+});
+
+// Ativar turma
+app.get('/admin_edit_turmas/activate/:id', requireAuth('sAdmin'), (req, res) => {
+  const id = req.params.id;
+  
+  db2.run(
+    'UPDATE TURMAS SET STATUS = 1 WHERE ID_TURMAS = ?',
+    [id],
+    function(err) {
+      if (err) {
+        console.error(err);
+        return res.redirect('/admin_edit_turmas?error=Erro ao ativar turma');
+      }
+      
+      res.redirect('/admin_edit_turmas?success=Turma ativada com sucesso');
+    }
+  );
+});
+
+app.get("/admin_edit_campanha", requireAuth("sAdmin"), (req, res) => {
+  // Lógica para buscar dados das campanhas e renderizar a página de edição
+  db.all("SELECT * FROM campanhas", (err, campanhas) => {
+    if (err) {
+      console.error(err);
+      return res.render("admin_edit_campanha", { error: "Erro ao carregar campanhas" });
+    }
+    res.render("admin_edit_campanha", { campanhas });
+  });
+});
 // Visualização de doações
 app.get("/admin/doacoes", requireAuth("admin"), (req, res) => {
   const query = `
