@@ -1,6 +1,6 @@
 const express = require("express");
 const session = require("express-session");
-const db = require("./db/database");
+const { db, db2 } = require("./db/database");
 const app = express();
 const port = 3000;
 
@@ -32,9 +32,6 @@ app.get("/", (req, res) => res.render("index"));
 app.get("/login", (req, res) => res.render("login"));
 app.get("/sobre", (req, res) => res.render("sobre"));
 app.get("/doar", (req, res) => res.render("doar"));
-app.get("/admin_edit_campanha", (req, res) => res.render("admin_edit_campanha"));
-app.get("/admin_edit_turmas", (req, res) => res.render("admin_edit_turmas"));
-
 
 // Processar login
 app.post("/login", (req, res) => {
@@ -75,7 +72,7 @@ const requireAuth = (role) => (req, res, next) => {
   res.redirect("/login");
 };
 
-// Painel Admin
+// Painel Admin (usa db - campanha.db)
 app.get("/admin", requireAuth("admin"), (req, res) => {
   db.parallelize(() => {
     db.all(
@@ -98,7 +95,7 @@ app.get("/admin", requireAuth("admin"), (req, res) => {
   });
 });
 
-// Painel Aluno
+// Painel Aluno (usa db - campanha.db)
 app.get("/aluno", requireAuth("aluno"), (req, res) => {
   // Consulta para todas as turmas (não apenas as top 3)
   const allTurmasQuery =
@@ -204,7 +201,7 @@ app.get("/sAdmin", requireAuth("sAdmin"), (req, res) => {
   res.render("sAdmin");
 });
 
-// Rota principal - Listar turmas
+// Rota principal - Listar turmas (usa db2 - TCC.db)
 app.get('/admin_edit_turmas', requireAuth('sAdmin'), (req, res) => {
   db2.all('SELECT * FROM TURMAS', (err, turmas) => {
     if (err) {
@@ -225,14 +222,14 @@ app.get('/admin_edit_turmas', requireAuth('sAdmin'), (req, res) => {
   });
 });
 
-// Criar nova turma
+// Criar nova turma (usa db2 - TCC.db)
 app.post('/admin_edit_turmas/create', requireAuth('sAdmin'), (req, res) => {
-  const { TURMA, DOCENTE, D_TOTAL, D_ATUAL, STATUS } = req.body;
+  const { TURMA, DOCENTE, D_TOTAL, D_ATUAL, STATUS, DT_INICIAL, DT_FINAL } = req.body;
   
   db2.run(
-    `INSERT INTO TURMAS (TURMA, DOCENTE, D_TOTAL, D_ATUAL, STATUS) 
-     VALUES (?, ?, ?, ?, ?)`,
-    [TURMA, DOCENTE, D_TOTAL || 0, D_ATUAL || 0, STATUS],
+    `INSERT INTO TURMAS (TURMA, DOCENTE, D_TOTAL, D_ATUAL, STATUS, DT_INICIAL, DT_FINAL) 
+     VALUES (?, ?, ?, ?, ?, ?, ?)`,
+    [TURMA, DOCENTE, D_TOTAL || 0, D_ATUAL || 0, STATUS, DT_INICIAL, DT_FINAL],
     function(err) {
       if (err) {
         console.error(err);
@@ -244,14 +241,14 @@ app.post('/admin_edit_turmas/create', requireAuth('sAdmin'), (req, res) => {
   );
 });
 
-// Atualizar turma
+// Atualizar turma (usa db2 - TCC.db)
 app.post('/admin_edit_turmas/update', requireAuth('sAdmin'), (req, res) => {
-  const { ID_TURMAS, TURMA, DOCENTE, D_TOTAL, D_ATUAL, STATUS } = req.body;
+  const { ID_TURMAS, TURMA, DOCENTE, D_TOTAL, D_ATUAL, STATUS, DT_INICIAL, DT_FINAL } = req.body;
   
   db2.run(
-    `UPDATE TURMAS SET TURMA = ?, DOCENTE = ?, D_TOTAL = ?, D_ATUAL = ?, STATUS = ? 
+    `UPDATE TURMAS SET TURMA = ?, DOCENTE = ?, D_TOTAL = ?, D_ATUAL = ?, STATUS = ?, DT_INICIAL = ?, DT_FINAL = ? 
      WHERE ID_TURMAS = ?`,
-    [TURMA, DOCENTE, D_TOTAL, D_ATUAL, STATUS, ID_TURMAS],
+    [TURMA, DOCENTE, D_TOTAL, D_ATUAL, STATUS, DT_INICIAL, DT_FINAL, ID_TURMAS],
     function(err) {
       if (err) {
         console.error(err);
@@ -263,7 +260,7 @@ app.post('/admin_edit_turmas/update', requireAuth('sAdmin'), (req, res) => {
   );
 });
 
-// Desativar turma
+// Desativar turma (usa db2 - TCC.db)
 app.get('/admin_edit_turmas/deactivate/:id', requireAuth('sAdmin'), (req, res) => {
   const id = req.params.id;
   
@@ -281,7 +278,7 @@ app.get('/admin_edit_turmas/deactivate/:id', requireAuth('sAdmin'), (req, res) =
   );
 });
 
-// Ativar turma
+// Ativar turma (usa db2 - TCC.db)
 app.get('/admin_edit_turmas/activate/:id', requireAuth('sAdmin'), (req, res) => {
   const id = req.params.id;
   
@@ -299,17 +296,105 @@ app.get('/admin_edit_turmas/activate/:id', requireAuth('sAdmin'), (req, res) => 
   );
 });
 
+// Rota para gerenciar campanhas (usa db2 - TCC.db) - CORRIGIDA
 app.get("/admin_edit_campanha", requireAuth("sAdmin"), (req, res) => {
-  // Lógica para buscar dados das campanhas e renderizar a página de edição
-  db.all("SELECT * FROM campanhas", (err, campanhas) => {
+  // Buscar campanhas do db2
+  db2.all("SELECT * FROM CAMPANHAS", (err, campanhas) => {
     if (err) {
-      console.error(err);
-      return res.render("admin_edit_campanha", { error: "Erro ao carregar campanhas" });
+      console.error("Erro ao buscar campanhas:", err);
+      return res.render("admin_edit_campanha", {
+        campanhas: [],
+        turmas: [],
+        itens: [],
+        roupas: [],
+        error: "Erro ao carregar campanhas",
+        user: req.session.user
+      });
     }
-    res.render("admin_edit_campanha", { campanhas });
+
+    // Buscar turmas do db2 para associar à campanha
+    db2.all("SELECT * FROM TURMAS WHERE STATUS = 1", (err, turmas, roupas) => {
+      if (err) {
+        console.error("Erro ao buscar turmas:", err);
+        return res.render("admin_edit_campanha", {
+          campanhas: [],
+          turmas: [],
+          itens: [],
+          roupas: [],
+          error: "Erro ao carregar turmas",
+          user: req.session.user
+        });
+      }
+
+      // Buscar itens do db2
+      db2.all("SELECT * FROM ITENS", (err, itens) => {
+        if (err) {
+          console.error("Erro ao buscar itens:", err);
+          return res.render("admin_edit_campanha", {
+            campanhas: [],
+            turmas: [],
+            itens: [],
+            roupas: [],
+            error: "Erro ao carregar itens",
+            user: req.session.user
+          });
+        }
+
+        res.render("admin_edit_campanha", {
+          campanhas: campanhas,
+          turmas: turmas,
+          itens: itens,
+          roupas: roupas,
+          success: req.query.success,
+          error: req.query.error,
+          user: req.session.user
+        });
+      });
+    });
   });
 });
-// Visualização de doações
+
+// Rota para processar a criação de campanhas (usa db2 - TCC.db)
+app.post('/admin_edit_campanha/create', requireAuth('sAdmin'), (req, res) => {
+  const { nome_campanha, dt_inicial, dt_final, turmas_selecionadas, itens } = req.body;
+  
+  db2.run(
+    `INSERT INTO CAMPANHAS (nome_campanha, dt_inicial, dt_final) 
+     VALUES (?, ?, ?)`,
+    [nome_campanha, dt_inicial, dt_final],
+    function(err) {
+      if (err) {
+        console.error(err);
+        return res.redirect('/admin_edit_campanha?error=Erro ao criar campanha');
+      }
+      
+      const campanhaId = this.lastID;
+      
+      // Associar turmas selecionadas à campanha
+      if (turmas_selecionadas && turmas_selecionadas.length) {
+        if (typeof turmas_selecionadas === 'string') {
+          // Se apenas uma turma foi selecionada
+          db2.run(
+            `INSERT INTO CAMPANHA_TURMAS (id_campanha, id_turmas) VALUES (?, ?)`,
+            [campanhaId, turmas_selecionadas]
+          );
+        } else {
+          // Se várias turmas foram selecionadas
+          turmas_selecionadas.forEach(turmaId => {
+            db2.run(
+              `INSERT INTO CAMPANHA_TURMAS (id_campanha, id_turmas) VALUES (?, ?)`,
+              [campanhaId, turmaId]
+            );
+          });
+        }
+      }
+      
+      res.redirect('/admin_edit_campanha?success=Campanha criada com sucesso');
+    }
+  );
+});
+
+// Visualização de doações (usa db - campanha.db)
 app.get("/admin/doacoes", requireAuth("admin"), (req, res) => {
   const query = `
     SELECT d.id, 
@@ -342,7 +427,7 @@ app.get("/admin/doacoes", requireAuth("admin"), (req, res) => {
   });
 });
 
-// Relatório de turmas (top 3)
+// Relatório de turmas (top 3) (usa db - campanha.db)
 app.get("/admin/turmas", requireAuth("admin"), (req, res) => {
   // Consulta para todas as turmas
   const allTurmasQuery =
