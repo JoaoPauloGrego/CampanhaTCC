@@ -375,7 +375,7 @@
 
             <div class="form-group">
               <label><i class="fas fa-tshirt"></i> Itens da Campanha:</label>
-              <% roupas.forEach(roupas => { %>
+              <% itens.forEach(itens => { %>
               <div class="form-check">
                 <input
                   class="form-check-input"
@@ -385,7 +385,7 @@
                   id="item<%= roupa.id %>"
                 />
                 <label class="form-check-label" for="item<%= roupa.id %>">
-                  <%= roupa.tipo %> (<%= roupa.pontuacao %> pontos)
+                  <%= itens.tipo %> (<%= itens.pontuacao %> pontos)
                 </label>
               </div>
               <% }); %>
