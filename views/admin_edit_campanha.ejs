@@ -1,477 +1,755 @@
 <!DOCTYPE html>
-<html>
-  <head>
-    <title>Painel Admin</title>
-    <link rel="icon" href="/logo.png" type="image/x-icon" />
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
-    />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Montserrat:wght@700;800&display=swap"
-      rel="stylesheet"
-    />
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerenciamento de Campanhas - Super Admin</title>
+    <link rel="icon" href="/logo.png" type="image/x-icon">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Montserrat:wght@700;800&display=swap" rel="stylesheet">
     <style>
-      :root {
-        --primary: #3498db;
-        --secondary: #e74c3c;
-        --accent: #f39c12;
-        --dark: #2c3e50;
-        --light: #ecf0f1;
-        --success: #27ae60;
-      }
+        :root {
+            --primary: #3498db;
+            --secondary: #e74c3c;
+            --accent: #f39c12;
+            --dark: #2c3e50;
+            --light: #ecf0f1;
+            --success: #27ae60;
+            --warning: #f39c12;
+            --danger: #e74c3c;
+        }
 
-      body {
-        font-family: "Poppins", sans-serif;
-        background: linear-gradient(135deg, #1a2980, #26d0ce);
-        color: var(--light);
-        min-height: 100vh;
-        overflow-x: hidden;
-        position: relative;
-        margin: 0;
-        padding: 0;
-      }
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #1a2980, #26d0ce);
+            color: var(--light);
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+            margin: 0;
+            padding: 0;
+        }
 
-      body::before {
-        content: "";
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0, 0, 0, 0.3);
-        z-index: -1;
-      }
+        body::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.3);
+            z-index: -1;
+        }
 
-      .container {
-        max-width: 1200px;
-        margin: 0 auto;
-        padding: 20px;
-      }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
 
-      /* Header */
-      header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 20px 0;
-      }
+        /* Header */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0;
+        }
 
-      .logo {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-      }
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
 
-      .logo i {
-        font-size: 2.5rem;
-        color: var(--accent);
-      }
+        .logo i {
+            font-size: 2.5rem;
+            color: var(--accent);
+        }
 
-      .logo h1 {
-        font-size: 1.8rem;
-        font-weight: 700;
-        color: white;
-        margin: 0;
-      }
+        .logo h1 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: white;
+            margin: 0;
+        }
 
-      nav ul {
-        display: flex;
-        list-style: none;
-        gap: 30px;
-        margin: 0;
-        padding: 0;
-      }
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 30px;
+            margin: 0;
+            padding: 0;
+        }
 
-      nav a {
-        color: white;
-        text-decoration: none;
-        font-weight: 500;
-        transition: all 0.3s ease;
-        position: relative;
-        padding: 5px 0;
-      }
+        nav a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            position: relative;
+            padding: 5px 0;
+        }
 
-      nav a::after {
-        content: "";
-        position: absolute;
-        bottom: 0;
-        left: 0;
-        width: 0;
-        height: 2px;
-        background: var(--accent);
-        transition: width 0.3s ease;
-      }
+        nav a::after {
+            content: "";
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--accent);
+            transition: width 0.3s ease;
+        }
 
-      nav a:hover::after {
-        width: 100%;
-      }
+        nav a:hover::after {
+            width: 100%;
+        }
 
-      .user-info {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        background: rgba(255, 255, 255, 0.1);
-        padding: 8px 15px;
-        border-radius: 20px;
-      }
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 8px 15px;
+            border-radius: 20px;
+        }
 
-      .user-info i {
-        font-size: 1.2rem;
-      }
+        .user-info i {
+            font-size: 1.2rem;
+        }
 
-      /* Main Content */
-      .main-content {
-        display: flex;
-        gap: 40px;
-        margin-top: 30px;
-      }
+        /* Main Content */
+        .main-content {
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+            margin-top: 30px;
+        }
 
-      .form-container {
-        flex: 1;
-        background: rgba(255, 255, 255, 0.1);
-        backdrop-filter: blur(10px);
-        border-radius: 15px;
-        padding: 30px;
-        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
-      }
+        .page-title {
+            font-size: 2rem;
+            color: white;
+            margin-bottom: 20px;
+            text-align: center;
+        }
 
-      .info-container {
-        flex: 1;
-      }
+        .card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+        }
 
-      .form-title {
-        font-size: 1.8rem;
-        color: var(--accent);
-        margin-bottom: 25px;
-        text-align: center;
-      }
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
 
-      .form-group {
-        margin-bottom: 25px;
-      }
+        .card-title {
+            font-size: 1.5rem;
+            color: var(--accent);
+            margin: 0;
+        }
 
-      label {
-        display: block;
-        margin-bottom: 10px;
-        font-weight: 600;
-        font-size: 1.1rem;
-      }
+        .btn {
+            padding: 10px 20px;
+            border-radius: 8px;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
 
-      select,
-      input {
-        width: 100%;
-        padding: 14px;
-        border-radius: 8px;
-        border: 1px solid rgba(255, 255, 255, 0.3);
-        background: rgba(0, 0, 0, 0.2);
-        color: white;
-        font-size: 1rem;
-        transition: all 0.3s ease;
-      }
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
 
-      select:focus,
-      input:focus {
-        outline: none;
-        border-color: var(--accent);
-        box-shadow: 0 0 0 3px rgba(243, 156, 18, 0.3);
-      }
+        .btn-primary:hover {
+            background: #2980b9;
+            transform: translateY(-2px);
+        }
 
-      option {
-        background: #2c3e50;
-      }
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
 
-      .btn-submit {
-        background: var(--accent);
-        color: white;
-        border: none;
-        padding: 15px 30px;
-        font-size: 1.1rem;
-        font-weight: 600;
-        border-radius: 8px;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        width: 100%;
-        margin-top: 20px;
-        box-shadow: 0 5px 15px rgba(243, 156, 18, 0.4);
-      }
+        .btn-success:hover {
+            background: #219653;
+            transform: translateY(-2px);
+        }
 
-      .btn-submit:hover {
-        background: #e67e22;
-        transform: translateY(-3px);
-        box-shadow: 0 8px 20px rgba(243, 156, 18, 0.6);
-      }
+        .btn-danger {
+            background: var(--danger);
+            color: white;
+        }
 
-      .quick-links {
-        display: flex;
-        flex-direction: column;
-        gap: 20px;
-        margin-top: 30px;
-      }
+        .btn-danger:hover {
+            background: #c0392b;
+            transform: translateY(-2px);
+        }
 
-      .link-card {
-        background: rgba(255, 255, 255, 0.1);
-        border-radius: 10px;
-        padding: 20px;
-        transition: all 0.3s ease;
-        text-decoration: none;
-        color: white;
-        display: flex;
-        align-items: center;
-        gap: 15px;
-      }
+        .btn-warning {
+            background: var(--warning);
+            color: white;
+        }
 
-      .link-card:hover {
-        background: rgba(255, 255, 255, 0.2);
-        transform: translateX(10px);
-      }
+        .btn-warning:hover {
+            background: #e67e22;
+            transform: translateY(-2px);
+        }
 
-      .link-card i {
-        font-size: 1.8rem;
-        color: var(--accent);
-      }
+        .btn-sm {
+            padding: 6px 12px;
+            font-size: 0.9rem;
+        }
 
-      .link-text h3 {
-        margin: 0;
-        font-size: 1.3rem;
-      }
+        /* Form Styles */
+        .form-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
 
-      .link-text p {
-        margin: 5px 0 0;
-        opacity: 0.8;
-      }
+        .form-section {
+            margin-bottom: 25px;
+        }
 
-      .messages {
-        margin: 20px 0;
-      }
+        .form-section-title {
+            font-size: 1.2rem;
+            color: var(--accent);
+            margin-bottom: 15px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.2);
+        }
 
-      .success-message {
-        background: rgba(46, 204, 113, 0.2);
-        color: #fff;
-        padding: 15px;
-        border-radius: 8px;
-        border-left: 4px solid #27ae60;
-        margin-bottom: 20px;
-      }
+        .form-group {
+            margin-bottom: 20px;
+        }
 
-      .error-message {
-        background: rgba(231, 76, 60, 0.2);
-        color: #fff;
-        padding: 15px;
-        border-radius: 8px;
-        border-left: 4px solid #c0392b;
-        margin-bottom: 20px;
-      }
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
 
-      footer {
-        text-align: center;
-        padding: 30px 0;
-        margin-top: 50px;
-        border-top: 1px solid rgba(255, 255, 255, 0.1);
-      }
+        .form-control {
+            width: 100%;
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            background: rgba(0, 0, 0, 0.2);
+            color: white;
+            font-size: 1rem;
+        }
 
-      .logout-btn {
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        color: white;
-        text-decoration: none;
-        font-weight: 600;
-        transition: all 0.3s ease;
-      }
+        .form-control:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(243, 156, 18, 0.3);
+        }
 
-      .logout-btn:hover {
-        color: var(--accent);
-      }
+        .form-select {
+            width: 100%;
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            background: rgba(0, 0, 0, 0.2);
+            color: white;
+            font-size: 1rem;
+        }
+
+        .checkbox-group {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .form-check {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .form-check-input {
+            width: 18px;
+            height: 18px;
+        }
+
+        .item-form {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .item-form input {
+            flex: 1;
+        }
+
+        /* Table Styles */
+        .table-responsive {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        th {
+            background-color: rgba(0, 0, 0, 0.2);
+            font-weight: 600;
+        }
+
+        tr:hover {
+            background-color: rgba(255, 255, 255, 0.05);
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        .status-active {
+            background-color: rgba(46, 204, 113, 0.2);
+            color: #27ae60;
+        }
+
+        .status-inactive {
+            background-color: rgba(231, 76, 60, 0.2);
+            color: #e74c3c;
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            overflow: auto;
+        }
+
+        .modal-content {
+            background: linear-gradient(135deg, #1a2980, #26d0ce);
+            margin: 5% auto;
+            padding: 25px;
+            border-radius: 15px;
+            width: 80%;
+            max-width: 600px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            position: relative;
+        }
+
+        .close {
+            color: #aaa;
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .close:hover {
+            color: white;
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 30px 0;
+            margin-top: 50px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .logout-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: white;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .logout-btn:hover {
+            color: var(--accent);
+        }
+
+        .messages {
+            margin: 20px 0;
+        }
+
+        .success-message {
+            background: rgba(46, 204, 113, 0.2);
+            color: #fff;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #27ae60;
+            margin-bottom: 20px;
+        }
+
+        .error-message {
+            background: rgba(231, 76, 60, 0.2);
+            color: #fff;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #c0392b;
+            margin-bottom: 20px;
+        }
+
+        /* Responsividade */
+        @media (max-width: 768px) {
+            .form-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .card-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+            
+            nav ul {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            header {
+                flex-direction: column;
+                gap: 20px;
+            }
+            
+            .modal-content {
+                width: 95%;
+                margin: 10% auto;
+            }
+        }
     </style>
-  </head>
-
-  <body>
+</head>
+<body>
     <div class="container">
-      <!-- Header -->
-      <header>
-        <div class="logo">
-          <i class="fas fa-tshirt"></i>
-          <h1>Campanhas</h1>
+        <!-- Header -->
+        <header>
+            <div class="logo">
+                <i class="fas fa-tshirt"></i>
+                <h1>Campanha do Agasalho</h1>
+            </div>
+            
+            <div class="user-info">
+                <i class="fas fa-user-shield"></i>
+                <span>Super Admin: <%= user.name %></span>
+            </div>
+            
+            <nav>
+                <ul>
+                    <li><a href="/sAdmin"><i class="fas fa-arrow-left"></i> Voltar</a></li>
+                    <li><a href="/admin_edit_turmas"><i class="fas fa-users"></i> Gerenciar Turmas</a></li>
+                    <li><a href="/logout" class="logout-btn">
+                        <i class="fas fa-sign-out-alt"></i> Sair
+                    </a></li>
+                </ul>
+            </nav>
+        </header>
+
+        <div class="main-content">
+            <h2 class="page-title">Gerenciamento de Campanhas</h2>
+            
+            <!-- Mensagens de sucesso/erro -->
+            <div class="messages">
+                <% if(typeof success !== 'undefined') { %>
+                    <div class="success-message">
+                        <i class="fas fa-check-circle"></i> <%= success %>
+                    </div>
+                <% } %>
+                
+                <% if(typeof error !== 'undefined') { %>
+                    <div class="error-message">
+                        <i class="fas fa-exclamation-circle"></i> <%= error %>
+                    </div>
+                <% } %>
+            </div>
+            
+            <!-- Card de Criação de Campanha -->
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Criar Nova Campanha</h3>
+                </div>
+                
+                <form action="/admin_edit_campanha/create" method="POST">
+                    <div class="form-container">
+                        <div class="form-section">
+                            <h4 class="form-section-title">Informações da Campanha</h4>
+                            
+                            <div class="form-group">
+                                <label class="form-label" for="nome_campanha">Nome da Campanha:</label>
+                                <input type="text" id="nome_campanha" name="nome_campanha" class="form-control" placeholder="Ex: Campanha de Inverno 2025" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label" for="dt_inicial">Data Inicial:</label>
+                                <input type="date" id="dt_inicial" name="dt_inicial" class="form-control" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label" for="dt_final">Data Final:</label>
+                                <input type="date" id="dt_final" name="dt_final" class="form-control" required>
+                            </div>
+                        </div>
+                        
+                        <div class="form-section">
+                            <h4 class="form-section-title">Turmas Participantes</h4>
+                            
+                            <div class="form-group">
+                                <label class="form-label">Selecione as turmas participantes:</label>
+                                <div class="checkbox-group">
+                                    <% if (typeof turmas !== 'undefined' && turmas.length > 0) { %>
+                                        <% turmas.forEach(function(turma) { %>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" name="turmas_selecionadas" value="<%= turma.ID_TURMAS %>" id="turma_<%= turma.ID_TURMAS %>">
+                                                <label class="form-check-label" for="turma_<%= turma.ID_TURMAS %>">
+                                                    <%= turma.TURMA %> - <%= turma.DOCENTE %>
+                                                </label>
+                                            </div>
+                                        <% }); %>
+                                    <% } else { %>
+                                        <p>Nenhuma turma cadastrada. <a href="/admin_edit_turmas">Cadastre turmas primeiro</a>.</p>
+                                    <% } %>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-section">
+                        <h4 class="form-section-title">Itens da Campanha</h4>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Selecione os itens aceitos na campanha:</label>
+                            <div class="checkbox-group">
+                                <% if (typeof itens !== 'undefined' && itens.length > 0) { %>
+                                    <% itens.forEach(function(item) { %>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" name="itens_selecionados" value="<%= item.ID_ITEM %>" id="item_<%= item.ID_ITEM %>">
+                                            <label class="form-check-label" for="item_<%= item.ID_ITEM %>">
+                                                <%= item.ITENS %> (<%= item.PONTO %> pontos)
+                                            </label>
+                                        </div>
+                                    <% }); %>
+                                <% } else { %>
+                                    <p>Nenhum item cadastrado. Adicione itens abaixo.</p>
+                                <% } %>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Adicionar Novo Item:</label>
+                            <div class="item-form">
+                                <input type="text" id="novo_item" name="novo_item" class="form-control" placeholder="Nome do item">
+                                <input type="number" id="pontos_item" name="pontos_item" class="form-control" placeholder="Pontos" min="1">
+                                <button type="button" class="btn btn-primary" onclick="adicionarItem()">
+                                    <i class="fas fa-plus"></i> Adicionar
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-success">
+                        <i class="fas fa-save"></i> Criar Campanha
+                    </button>
+                </form>
+            </div>
+            
+            <!-- Card de Listagem de Campanhas -->
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Campanhas Existentes</h3>
+                    <div>
+                        <span>Total: <strong><%= typeof campanhas !== 'undefined' ? campanhas.length : 0 %> campanhas</strong></span>
+                    </div>
+                </div>
+                
+                <div class="table-responsive">
+                    <table id="campanhasTable">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Nome</th>
+                                <th>Data Inicial</th>
+                                <th>Data Final</th>
+                                <th>Turmas</th>
+                                <th>Status</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% if (typeof campanhas !== 'undefined' && campanhas.length > 0) { %>
+                                <% campanhas.forEach(function(campanha) { %>
+                                    <tr>
+                                        <td><%= campanha.ID_CAMPANHA %></td>
+                                        <td><%= campanha.NOME_CAMPANHA %></td>
+                                        <td><%= new Date(campanha.DT_INICIAL).toLocaleDateString('pt-BR') %></td>
+                                        <td><%= new Date(campanha.DT_FINAL).toLocaleDateString('pt-BR') %></td>
+                                        <td><%= campanha.TURMAS_PARTICIPANTES || '0' %></td>
+                                        <td>
+                                            <span class="status-badge <%= campanha.STATUS_SALA == 1 ? 'status-active' : 'status-inactive' %>">
+                                                <%= campanha.STATUS_SALA == 1 ? 'Ativa' : 'Inativa' %>
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <button class="btn btn-primary btn-sm" onclick="editarCampanha(<%= campanha.ID_CAMPANHA %>)">
+                                                <i class="fas fa-edit"></i> Editar
+                                            </button>
+                                            <% if (campanha.STATUS_SALA == 1) { %>
+                                                <button class="btn btn-warning btn-sm" onclick="desativarCampanha(<%= campanha.ID_CAMPANHA %>, '<%= campanha.NOME_CAMPANHA %>')">
+                                                    <i class="fas fa-ban"></i> Desativar
+                                                </button>
+                                            <% } else { %>
+                                                <button class="btn btn-success btn-sm" onclick="ativarCampanha(<%= campanha.ID_CAMPANHA %>, '<%= campanha.NOME_CAMPANHA %>')">
+                                                    <i class="fas fa-check"></i> Ativar
+                                                </button>
+                                            <% } %>
+                                        </td>
+                                    </tr>
+                                <% }); %>
+                            <% } else { %>
+                                <tr>
+                                    <td colspan="7" style="text-align: center;">Nenhuma campanha cadastrada</td>
+                                </tr>
+                            <% } %>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
 
-        <div class="user-info">
-          <i class="fas fa-user-shield"></i>
-          <span>Admin: sAdmin %></span>
+        <footer>
+            <p class="copyright">© 2025 Campanha do Agasalho. Todos os direitos reservados.</p>
+        </footer>
+    </div>
+
+    <!-- Modal para Editar Campanha -->
+    <div id="editModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="fecharModal()">&times;</span>
+            <h2>Editar Campanha</h2>
+            <form id="editForm" action="/admin_edit_campanha/update" method="POST">
+                <input type="hidden" id="edit_id" name="ID_CAMPANHA">
+                
+                <div class="form-group">
+                    <label class="form-label" for="edit_nome">Nome da Campanha:</label>
+                    <input type="text" id="edit_nome" name="NOME_CAMPANHA" class="form-control" required>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label" for="edit_dt_inicial">Data Inicial:</label>
+                    <input type="date" id="edit_dt_inicial" name="DT_INICIAL" class="form-control" required>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label" for="edit_dt_final">Data Final:</label>
+                    <input type="date" id="edit_dt_final" name="DT_FINAL" class="form-control" required>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label" for="edit_status">Status:</label>
+                    <select id="edit_status" name="STATUS_SALA" class="form-control" required>
+                        <option value="1">Ativa</option>
+                        <option value="0">Inativa</option>
+                    </select>
+                </div>
+                
+                <button type="submit" class="btn btn-success">
+                    <i class="fas fa-save"></i> Salvar Alterações
+                </button>
+            </form>
         </div>
-
-        <nav>
-          <ul>
-            <li>
-              <a href="/"><i class="fas fa-home"></i> Início</a>
-            </li>
-            <li>
-              <a href="/doar"
-                ><i class="fas fa-hands-helping"></i> Como Ajudar</a
-              >
-            </li>
-            <li>
-              <a href="/sobre"><i class="fas fa-info-circle"></i> Sobre</a>
-            </li>
-            <li>
-              <a href="/logout" class="logout-btn">
-                <i class="fas fa-sign-out-alt"></i> Sair
-              </a>
-            </li>
-          </ul>
-        </nav>
-      </header>
-
-      <div class="main-content">
-        <div class="form-container">
-          <h2 class="form-title">Registrar Nova Campanha</h2>
-
-          <div class="messages">
-            <% if(typeof success !== 'undefined') { %>
-            <div class="success-message">
-              <i class="fas fa-check-circle"></i> Doação registrada com sucesso!
-            </div>
-            <% } %> <% if(typeof error !== 'undefined') { %>
-            <div class="error-message">
-              <i class="fas fa-exclamation-circle"></i> <%= error %>
-            </div>
-            <% } %>
-          </div>
-
-          <form action="/admin_edit_campanha/create" method="POST">
-            <div class="form-group">
-              <label for="nome_campanha"
-                ><i class="fas fa-campaign"></i> Nome da Campanha:</label
-              >
-              <input
-                type="text"
-                id="nome_campanha"
-                name="nome_campanha"
-                class="form-control"
-                placeholder="Ex: Campanha de Inverno 2025"
-                required
-              />
-            </div>
-
-            <div class="form-group">
-              <label for="turmas_selecionadas"
-                ><i class="fas fa-users"></i> Turmas Participantes:</label
-              >
-              <select
-                multiple
-                id="turmas_selecionadas"
-                name="turmas_selecionadas"
-                class="form-control"
-                required
-              >
-                <% turmas.forEach(turmas => { %>
-                <option value="<%= turma.ID_TURMAS %>">
-                  <%= turmas.TURMA %> - <%= turmas.DOCENTE %>
-                </option>
-                <% }); %>
-              </select>
-              <small>Segure Ctrl para selecionar múltiplas turmas</small>
-            </div>
-
-            <div class="form-group">
-              <label><i class="fas fa-tshirt"></i> Itens da Campanha:</label>
-              <% itens.forEach(itens => { %>
-              <div class="form-check">
-                <input
-                  class="form-check-input"
-                  type="checkbox"
-                  name="itens"
-                  value="<%= roupa.id %>"
-                  id="item<%= roupa.id %>"
-                />
-                <label class="form-check-label" for="item<%= roupa.id %>">
-                  <%= itens.tipo %> (<%= itens.pontuacao %> pontos)
-                </label>
-              </div>
-              <% }); %>
-            </div>
-
-            <button type="submit" class="btn btn-success">
-              <i class="fas fa-save"></i> Criar Campanha
-            </button>
-          </form>
-        </div>
-
-        <!-- Links Rápidos -->
-        <div class="info-container">
-          <div class="quick-links">
-            <a href="/sAdmin/doacoes" class="link-card">
-              <i class="fas fa-list"></i>
-              <div class="link-text">
-                <h3>Ver Todas as Doações</h3>
-                <p>Acesse o histórico completo de doações registradas</p>
-              </div>
-            </a>
-
-            <a href="/sAdmin/turmas" class="link-card">
-              <i class="fas fa-chart-bar"></i>
-              <div class="link-text">
-                <h3>Relatório de Turmas</h3>
-                <p>Visualize o ranking e desempenho das turmas</p>
-              </div>
-            </a>
-
-            <a href="/sAdmin" class="link-card">
-              <i class="fas fa-sync-alt"></i>
-              <div class="link-text">
-                <h3>Recarregar Página</h3>
-                <p>Atualize os dados mais recentes</p>
-              </div>
-            </a>
-          </div>
-
-          <div
-            class="stats-card"
-            style="
-              background: rgba(255, 255, 255, 0.1);
-              border-radius: 10px;
-              padding: 20px;
-              margin-top: 30px;
-            "
-          >
-            <h3 style="color: var(--accent); margin-top: 0">Dicas Rápidas</h3>
-            <ul style="padding-left: 20px">
-              <li>Verifique a data antes de registrar</li>
-              <li>Confira se selecionou a turma correta</li>
-              <li>Atualize a página após registrar doações</li>
-              <li>Use o relatório para acompanhar o progresso</li>
-            </ul>
-          </div>
-        </div>
-      </div>
-
-      <footer>
-        <p class="copyright">
-          © 2025 Campanha do Agasalho. Todos os direitos reservados.
-        </p>
-      </footer>
     </div>
 
     <script>
-      // Definir a data atual como padrão
-      document.addEventListener("DOMContentLoaded", function () {
-        const today = new Date();
-        const formattedDate = today.toISOString().split("T")[0];
-        document.getElementById("data").value = formattedDate;
-
-        // Debug: verificar envio do formulário
-        const form = document.querySelector("form");
-        form.addEventListener("submit", function () {
-          console.log("Formulário enviado");
-          console.log("Turma ID:", document.getElementById("turma_id").value);
-          console.log("Roupa ID:", document.getElementById("roupa_id").value);
-          console.log(
-            "Quantidade:",
-            document.getElementById("quantidade").value
-          );
-          console.log("Data:", document.getElementById("data").value);
+        // Função para adicionar novo item
+        function adicionarItem() {
+            const nomeItem = document.getElementById('novo_item').value;
+            const pontosItem = document.getElementById('pontos_item').value;
+            
+            if (!nomeItem || !pontosItem) {
+                alert('Por favor, preencha o nome e os pontos do item.');
+                return;
+            }
+            
+            // Aqui você pode implementar a lógica para adicionar o item via AJAX
+            // ou simplesmente adicionar ao formulário como um campo oculto
+            alert(`Item "${nomeItem}" com ${pontosItem} pontos será adicionado à campanha.`);
+            
+            // Limpar os campos
+            document.getElementById('novo_item').value = '';
+            document.getElementById('pontos_item').value = '';
+        }
+        
+        // Funções para modais
+        function abrirModal(modalId) {
+            document.getElementById(modalId).style.display = 'block';
+        }
+        
+        function fecharModal() {
+            document.getElementById('editModal').style.display = 'none';
+        }
+        
+        // Fechar modais ao clicar fora deles
+        window.onclick = function(event) {
+            if (event.target.classList.contains('modal')) {
+                event.target.style.display = 'none';
+            }
+        }
+        
+        // Função para editar campanha
+        function editarCampanha(id) {
+            // Aqui você implementaria a busca dos dados da campanha
+            // Por enquanto, vamos apenas abrir o modal
+            abrirModal('editModal');
+        }
+        
+        // Função para confirmar desativação de campanha
+        function desativarCampanha(id, nome) {
+            if (confirm(`Tem certeza que deseja desativar a campanha "${nome}"?`)) {
+                window.location.href = `/admin_edit_campanha/deactivate/${id}`;
+            }
+        }
+        
+        // Função para confirmar ativação de campanha
+        function ativarCampanha(id, nome) {
+            if (confirm(`Tem certeza que deseja ativar a campanha "${nome}"?`)) {
+                window.location.href = `/admin_edit_campanha/activate/${id}`;
+            }
+        }
+        
+        // Definir data mínima para os campos de data (hoje)
+        document.addEventListener('DOMContentLoaded', function() {
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('dt_inicial').min = today;
+            document.getElementById('dt_final').min = today;
         });
-      });
     </script>
-  </body>
+</body>
 </html>

@@ -430,7 +430,7 @@
             
             <div class="user-info">
                 <i class="fas fa-user-shield"></i>
-                <span>Super Admin: sAdmin %></span>
+                <span>Super Admin: <%= user.name %></span>
             </div>
             
             <nav>
@@ -488,10 +488,10 @@
                     <div class="filter-group">
                         <span class="filter-label">Ordenar por:</span>
                         <select class="filter-select" id="sortFilter" onchange="filterTable()">
-                            <option value="TURMA">Turma (A-Z)</option>
-                            <option value="DOCENTE">Docente (A-Z)</option>
-                            <option value="D_TOTAL">Doações totais (Maior)</option>
-                            <option value="D_ATUAL">Doações atuais (Maior)</option>
+                            <option value="nome_turma">Turma (A-Z)</option>
+                            <option value="docente">Docente (A-Z)</option>
+                            <option value="dt_inicial">Data Inicial (Mais Recente)</option>
+                            <option value="dt_final">Data Final (Mais Recente)</option>
                         </select>
                     </div>
                 </div>
@@ -513,8 +513,8 @@
                                 <th>ID</th>
                                 <th>Turma</th>
                                 <th>Docente</th>
-                                <th>Doações Totais</th>
-                                <th>Doações Atuais</th>
+                                <th>Data Inicial</th>
+                                <th>Data Final</th>
                                 <th>Status</th>
                                 <th>Ações</th>
                             </tr>
@@ -522,34 +522,34 @@
                         <tbody>
                             <% if (typeof turmas !== 'undefined' && turmas.length > 0) { %>
                                 <% turmas.forEach(function(turma) { %>
-                                    <tr data-status="<%= turma.STATUS %>">
-                                        <td><%= turma.ID_TURMAS %></td>
-                                        <td><%= turma.TURMA %></td>
-                                        <td><%= turma.DOCENTE %></td>
-                                        <td><%= turma.D_TOTAL %></td>
-                                        <td><%= turma.D_ATUAL %></td>
+                                    <tr data-status="<%= turma.status %>">
+                                        <td><%= turma.id_turma %></td>
+                                        <td><%= turma.nome_turma %></td>
+                                        <td><%= turma.docente %></td>
+                                        <td><%= turma.dt_inicial ? new Date(turma.dt_inicial).toLocaleDateString('pt-BR') : 'Não definida' %></td>
+                                        <td><%= turma.dt_final ? new Date(turma.dt_final).toLocaleDateString('pt-BR') : 'Não definida' %></td>
                                         <td>
-                                            <span class="status-badge <%= turma.STATUS == 1 ? 'status-active' : 'status-inactive' %>">
-                                                <%= turma.STATUS == 1 ? 'Ativa' : 'Inativa' %>
+                                            <span class="status-badge <%= turma.status == 1 ? 'status-active' : 'status-inactive' %>">
+                                                <%= turma.status == 1 ? 'Ativa' : 'Inativa' %>
                                             </span>
                                         </td>
                                         <td>
                                             <button class="btn btn-primary btn-sm" onclick="openEditModal(
-                                                '<%= turma.ID_TURMAS %>', 
-                                                '<%= turma.TURMA %>', 
-                                                '<%= turma.DOCENTE %>',
-                                                '<%= turma.D_TOTAL %>',
-                                                '<%= turma.D_ATUAL %>',
-                                                '<%= turma.STATUS %>'
+                                                '<%= turma.id_turma %>', 
+                                                '<%= turma.nome_turma %>', 
+                                                '<%= turma.docente %>',
+                                                '<%= turma.dt_inicial %>',
+                                                '<%= turma.dt_final %>',
+                                                '<%= turma.status %>'
                                             )">
                                                 <i class="fas fa-edit"></i> Editar
                                             </button>
-                                            <% if (turma.STATUS == 1) { %>
-                                                <button class="btn btn-warning btn-sm" onclick="confirmDeactivate('<%= turma.ID_TURMAS %>', '<%= turma.TURMA %>')">
+                                            <% if (turma.status == 1) { %>
+                                                <button class="btn btn-warning btn-sm" onclick="confirmDeactivate('<%= turma.id_turma %>', '<%= turma.nome_turma %>')">
                                                     <i class="fas fa-ban"></i> Desativar
                                                 </button>
                                             <% } else { %>
-                                                <button class="btn btn-success btn-sm" onclick="confirmActivate('<%= turma.ID_TURMAS %>', '<%= turma.TURMA %>')">
+                                                <button class="btn btn-success btn-sm" onclick="confirmActivate('<%= turma.id_turma %>', '<%= turma.nome_turma %>')">
                                                     <i class="fas fa-check"></i> Ativar
                                                 </button>
                                             <% } %>
@@ -579,24 +579,24 @@
             <h2>Nova Turma</h2>
             <form id="createForm" action="/admin_edit_turmas/create" method="POST">
                 <div class="form-group">
-                    <label class="form-label" for="turma">Nome da Turma:</label>
-                    <input type="text" id="turma" name="TURMA" class="form-control" placeholder="Ex: 5º Ano A" required>
+                    <label class="form-label" for="nome_turma">Nome da Turma:</label>
+                    <input type="text" id="nome_turma" name="nome_turma" class="form-control" placeholder="Ex: 5º Ano A" required>
                 </div>
                 <div class="form-group">
                     <label class="form-label" for="docente">Nome do Docente:</label>
-                    <input type="text" id="docente" name="DOCENTE" class="form-control" placeholder="Ex: Maria Silva" required>
+                    <input type="text" id="docente" name="docente" class="form-control" placeholder="Ex: Maria Silva" required>
                 </div>
                 <div class="form-group">
-                    <label class="form-label" for="d_total">Doações Totais:</label>
-                    <input type="number" id="d_total" name="D_TOTAL" class="form-control" value="0" min="0" required>
+                    <label class="form-label" for="dt_inicial">Data Inicial:</label>
+                    <input type="date" id="dt_inicial" name="dt_inicial" class="form-control">
                 </div>
                 <div class="form-group">
-                    <label class="form-label" for="d_atual">Doações Atuais:</label>
-                    <input type="number" id="d_atual" name="D_ATUAL" class="form-control" value="0" min="0" required>
+                    <label class="form-label" for="dt_final">Data Final:</label>
+                    <input type="date" id="dt_final" name="dt_final" class="form-control">
                 </div>
                 <div class="form-group">
                     <label class="form-label" for="status">Status:</label>
-                    <select id="status" name="STATUS" class="form-control" required>
+                    <select id="status" name="status" class="form-control" required>
                         <option value="1">Ativa</option>
                         <option value="0">Inativa</option>
                     </select>
@@ -614,26 +614,26 @@
             <span class="close" onclick="closeModal('editModal')">&times;</span>
             <h2>Editar Turma</h2>
             <form id="editForm" action="/admin_edit_turmas/update" method="POST">
-                <input type="hidden" id="edit_id" name="ID_TURMAS">
+                <input type="hidden" id="edit_id" name="id_turma">
                 <div class="form-group">
-                    <label class="form-label" for="edit_turma">Nome da Turma:</label>
-                    <input type="text" id="edit_turma" name="TURMA" class="form-control" required>
+                    <label class="form-label" for="edit_nome_turma">Nome da Turma:</label>
+                    <input type="text" id="edit_nome_turma" name="nome_turma" class="form-control" required>
                 </div>
                 <div class="form-group">
                     <label class="form-label" for="edit_docente">Nome do Docente:</label>
-                    <input type="text" id="edit_docente" name="DOCENTE" class="form-control" required>
+                    <input type="text" id="edit_docente" name="docente" class="form-control" required>
                 </div>
                 <div class="form-group">
-                    <label class="form-label" for="edit_d_total">Doações Totais:</label>
-                    <input type="number" id="edit_d_total" name="D_TOTAL" class="form-control" min="0" required>
+                    <label class="form-label" for="edit_dt_inicial">Data Inicial:</label>
+                    <input type="date" id="edit_dt_inicial" name="dt_inicial" class="form-control">
                 </div>
                 <div class="form-group">
-                    <label class="form-label" for="edit_d_atual">Doações Atuais:</label>
-                    <input type="number" id="edit_d_atual" name="D_ATUAL" class="form-control" min="0" required>
+                    <label class="form-label" for="edit_dt_final">Data Final:</label>
+                    <input type="date" id="edit_dt_final" name="dt_final" class="form-control">
                 </div>
                 <div class="form-group">
                     <label class="form-label" for="edit_status">Status:</label>
-                    <select id="edit_status" name="STATUS" class="form-control" required>
+                    <select id="edit_status" name="status" class="form-control" required>
                         <option value="1">Ativa</option>
                         <option value="0">Inativa</option>
                     </select>
@@ -663,26 +663,26 @@
         }
 
         // Função para abrir modal de edição com dados da turma
-        function openEditModal(id, turma, docente, d_total, d_atual, status) {
+        function openEditModal(id, nome_turma, docente, dt_inicial, dt_final, status) {
             document.getElementById('edit_id').value = id;
-            document.getElementById('edit_turma').value = turma;
+            document.getElementById('edit_nome_turma').value = nome_turma;
             document.getElementById('edit_docente').value = docente;
-            document.getElementById('edit_d_total').value = d_total;
-            document.getElementById('edit_d_atual').value = d_atual;
+            document.getElementById('edit_dt_inicial').value = dt_inicial;
+            document.getElementById('edit_dt_final').value = dt_final;
             document.getElementById('edit_status').value = status;
             openModal('editModal');
         }
 
         // Função para confirmar desativação de turma
-        function confirmDeactivate(id, turma) {
-            if (confirm(`Tem certeza que deseja desativar a turma "${turma}"? A turma permanecerá no sistema mas não estará disponível para novas campanhas.`)) {
+        function confirmDeactivate(id, nome_turma) {
+            if (confirm(`Tem certeza que deseja desativar a turma "${nome_turma}"? A turma permanecerá no sistema mas não estará disponível para novas campanhas.`)) {
                 window.location.href = `/admin_edit_turmas/deactivate/${id}`;
             }
         }
 
         // Função para confirmar ativação de turma
-        function confirmActivate(id, turma) {
-            if (confirm(`Tem certeza que deseja ativar a turma "${turma}"?`)) {
+        function confirmActivate(id, nome_turma) {
+            if (confirm(`Tem certeza que deseja ativar a turma "${nome_turma}"?`)) {
                 window.location.href = `/admin_edit_turmas/activate/${id}`;
             }
         }
@@ -705,6 +705,15 @@
                 }
             }
         }
+
+        // Definir data mínima para os campos de data (hoje)
+        document.addEventListener('DOMContentLoaded', function() {
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('dt_inicial').min = today;
+            document.getElementById('dt_final').min = today;
+            document.getElementById('edit_dt_inicial').min = today;
+            document.getElementById('edit_dt_final').min = today;
+        });
     </script>
 </body>
 </html>

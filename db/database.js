@@ -1,76 +1,83 @@
+// db/database.js
 const sqlite3 = require('sqlite3').verbose();
 
-// Conexão com os bancos
-const db = new sqlite3.Database('./db/campanha.db');
-const db2 = new sqlite3.Database('./db/TCC.db');
+// Conexão com o banco de dados TCC.db (usando db2 como nome principal)
+const db = new sqlite3.Database('./db/TCC.db');
 
-// Configuração do db2 (TCC.db)
-db2.serialize(() => {
-  // Tabela de Campanhas - CORRIGIDA a foreign key
-  db2.run(`CREATE TABLE IF NOT EXISTS CAMPANHAS (
+// Configuração das tabelas
+db.serialize(() => {
+  // Tabela de Campanhas
+  db.run(`CREATE TABLE IF NOT EXISTS CAMPANHAS (
     id_campanha INTEGER PRIMARY KEY AUTOINCREMENT,
     nome_campanha TEXT NOT NULL,
-    status_sala INTEGER NOT NULL DEFAULT 1,
+    status INTEGER NOT NULL DEFAULT 1,
     dt_inicial TEXT NOT NULL,
     dt_final TEXT NOT NULL,
-    pt_total_sala INTEGER NOT NULL DEFAULT 0
+    meta_pontos INTEGER DEFAULT 0
   )`);
 
-  // Tabela de Turmas - CORRIGIDA a foreign key
-  db2.run(`CREATE TABLE IF NOT EXISTS TURMAS (
-    id_turmas INTEGER PRIMARY KEY AUTOINCREMENT,
-    turma TEXT NOT NULL,
+  // Tabela de Turmas
+  db.run(`CREATE TABLE IF NOT EXISTS TURMAS (
+    id_turma INTEGER PRIMARY KEY AUTOINCREMENT,
+    nome_turma TEXT NOT NULL,
     docente TEXT NOT NULL,
-    d_total INTEGER NOT NULL DEFAULT 0,
-    d_atual INTEGER NOT NULL DEFAULT 0,
     status INTEGER NOT NULL DEFAULT 1,
     dt_inicial TEXT,
     dt_final TEXT
   )`);
 
-  // Tabela de relação entre Campanhas e Turmas (Muitos para Muitos)
-  db2.run(`CREATE TABLE IF NOT EXISTS CAMPANHA_TURMAS (
+  // Tabela de Itens
+  db.run(`CREATE TABLE IF NOT EXISTS ITENS (
+    id_item INTEGER PRIMARY KEY AUTOINCREMENT,
+    nome_item TEXT NOT NULL,
+    pontos INTEGER NOT NULL,
+    status INTEGER NOT NULL DEFAULT 1
+  )`);
+
+  // Tabela de Relacionamento entre Campanhas e Turmas
+  db.run(`CREATE TABLE IF NOT EXISTS CAMPANHA_TURMAS (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     id_campanha INTEGER NOT NULL,
-    id_turmas INTEGER NOT NULL,
-    FOREIGN KEY(id_campanha) REFERENCES CAMPANHAS(id_campanha),
-    FOREIGN KEY(id_turmas) REFERENCES TURMAS(id_turmas)
+    id_turma INTEGER NOT NULL,
+    pontos_arrecadados INTEGER DEFAULT 0,
+    FOREIGN KEY(id_campanha) REFERENCES CAMPANHAS(id_campanha) ON DELETE CASCADE,
+    FOREIGN KEY(id_turma) REFERENCES TURMAS(id_turma) ON DELETE CASCADE
   )`);
 
-  // Tabela de Tipos de Itens - CORRIGIDA a foreign key
-  db2.run(`CREATE TABLE IF NOT EXISTS ITENS (
-    id_item INTEGER PRIMARY KEY AUTOINCREMENT,
-    itens TEXT NOT NULL,
-    ponto INTEGER NOT NULL,
-    id_campanha INTEGER,
-    FOREIGN KEY(id_campanha) REFERENCES CAMPANHAS(id_campanha)
-  )`);
-});
-
-// Configuração do db (campanha.db) - para compatibilidade com o sistema existente
-db.serialize(() => {
-  db.run(`CREATE TABLE IF NOT EXISTS roupas (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    tipo TEXT NOT NULL,
-    pontuacao INTEGER NOT NULL
-  )`);
-
-  db.run(`CREATE TABLE IF NOT EXISTS turmas (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    turma TEXT NOT NULL,
-    docente TEXT NOT NULL
-  )`);
-
-  db.run(`CREATE TABLE IF NOT EXISTS doacoes (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    turma_id INTEGER NOT NULL,
-    roupa_id INTEGER NOT NULL,
+  // Tabela de Doações
+  db.run(`CREATE TABLE IF NOT EXISTS DOACOES (
+    id_doacao INTEGER PRIMARY KEY AUTOINCREMENT,
+    id_campanha INTEGER NOT NULL,
+    id_turma INTEGER NOT NULL,
+    id_item INTEGER NOT NULL,
     quantidade INTEGER NOT NULL,
-    data TEXT NOT NULL,
-    FOREIGN KEY(turma_id) REFERENCES turmas(id),
-    FOREIGN KEY(roupa_id) REFERENCES roupas(id)
+    data_doacao TEXT NOT NULL,
+    pontos_total INTEGER NOT NULL,
+    FOREIGN KEY(id_campanha) REFERENCES CAMPANHAS(id_campanha),
+    FOREIGN KEY(id_turma) REFERENCES TURMAS(id_turma),
+    FOREIGN KEY(id_item) REFERENCES ITENS(id_item)
   )`);
+
+  // Inserir dados iniciais de itens
+  const itensIniciais = [
+    { nome: 'Agasalho', pontos: 5 },
+    { nome: 'Calça', pontos: 3 },
+    { nome: 'Blusa', pontos: 2 },
+    { nome: 'Meias', pontos: 1 },
+    { nome: 'Tênis', pontos: 4 },
+    { nome: 'Casaco', pontos: 6 },
+    { nome: 'Cobertor', pontos: 7 },
+    { nome: 'Gorro', pontos: 2 },
+    { nome: 'Luvas', pontos: 2 },
+    { nome: 'Cachecol', pontos: 3 }
+  ];
+
+  itensIniciais.forEach(item => {
+    db.run(
+      `INSERT OR IGNORE INTO ITENS (nome_item, pontos) VALUES (?, ?)`,
+      [item.nome, item.pontos]
+    );
+  });
 });
 
-// Exportando ambos os bancos
-module.exports = { db, db2 };
+module.exports = db;
