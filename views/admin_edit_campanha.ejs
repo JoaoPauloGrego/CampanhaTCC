@@ -530,7 +530,7 @@
                                             <div class="form-check">
                                                 <input class="form-check-input" type="checkbox" name="turmas_selecionadas" value="<%= turma.ID_TURMAS %>" id="turma_<%= turma.ID_TURMAS %>">
                                                 <label class="form-check-label" for="turma_<%= turma.ID_TURMAS %>">
-                                                    <%= turma.TURMA %> - <%= turma.DOCENTE %>
+                                                    <%= turma.nome_turma %> - <%= turma.docente %>
                                                 </label>
                                             </div>
                                         <% }); %>
@@ -551,9 +551,9 @@
                                 <% if (typeof itens !== 'undefined' && itens.length > 0) { %>
                                     <% itens.forEach(function(item) { %>
                                         <div class="form-check">
-                                            <input class="form-check-input" type="checkbox" name="itens_selecionados" value="<%= item.ID_ITEM %>" id="item_<%= item.ID_ITEM %>">
+                                            <input class="form-check-input" type="checkbox" name="itens_selecionados" value="<%= item.id_item %>" id="item_<%= item.ID_ITEM %>">
                                             <label class="form-check-label" for="item_<%= item.ID_ITEM %>">
-                                                <%= item.ITENS %> (<%= item.PONTO %> pontos)
+                                                <%= item.nome_item %> (<%= item.pontos %> pontos)
                                             </label>
                                         </div>
                                     <% }); %>
@@ -607,26 +607,26 @@
                             <% if (typeof campanhas !== 'undefined' && campanhas.length > 0) { %>
                                 <% campanhas.forEach(function(campanha) { %>
                                     <tr>
-                                        <td><%= campanha.ID_CAMPANHA %></td>
-                                        <td><%= campanha.NOME_CAMPANHA %></td>
-                                        <td><%= new Date(campanha.DT_INICIAL).toLocaleDateString('pt-BR') %></td>
-                                        <td><%= new Date(campanha.DT_FINAL).toLocaleDateString('pt-BR') %></td>
-                                        <td><%= campanha.TURMAS_PARTICIPANTES || '0' %></td>
+                                        <td><%= campanha.id_campanha %></td>
+                                        <td><%= campanha.nome_campanha %></td>
+                                        <td><%= new Date(campanha.dt_inicial).toLocaleDateString('pt-BR') %></td>
+                                        <td><%= new Date(campanha.dt_final).toLocaleDateString('pt-BR') %></td>
+                                        <td><%= campanha.turma_participantes || '0' %></td>
                                         <td>
-                                            <span class="status-badge <%= campanha.STATUS_SALA == 1 ? 'status-active' : 'status-inactive' %>">
-                                                <%= campanha.STATUS_SALA == 1 ? 'Ativa' : 'Inativa' %>
+                                            <span class="status-badge <%= campanha.status_sala == 1 ? 'status-active' : 'status-inactive' %>">
+                                                <%= campanha.status == 1 ? 'Ativa' : 'Inativa' %>
                                             </span>
                                         </td>
                                         <td>
-                                            <button class="btn btn-primary btn-sm" onclick="editarCampanha(<%= campanha.ID_CAMPANHA %>)">
+                                            <button class="btn btn-primary btn-sm" onclick="editarCampanha(<%= campanha.id_campanha %>)">
                                                 <i class="fas fa-edit"></i> Editar
                                             </button>
-                                            <% if (campanha.STATUS_SALA == 1) { %>
-                                                <button class="btn btn-warning btn-sm" onclick="desativarCampanha(<%= campanha.ID_CAMPANHA %>, '<%= campanha.NOME_CAMPANHA %>')">
+                                            <% if (campanha.status == 1) { %>
+                                                <button class="btn btn-warning btn-sm" onclick="desativarCampanha(<%= campanha.id_campanha %>, '<%= campanha.nome_campanha %>')">
                                                     <i class="fas fa-ban"></i> Desativar
                                                 </button>
                                             <% } else { %>
-                                                <button class="btn btn-success btn-sm" onclick="ativarCampanha(<%= campanha.ID_CAMPANHA %>, '<%= campanha.NOME_CAMPANHA %>')">
+                                                <button class="btn btn-success btn-sm" onclick="ativarCampanha(<%= campanha.id_campanha %>, '<%= campanha.nome_campanha %>')">
                                                     <i class="fas fa-check"></i> Ativar
                                                 </button>
                                             <% } %>
