@@ -1,6 +1,6 @@
 const express = require("express");
 const session = require("express-session");
-const db = require("./db/database"); // Importação corrigida
+const db = require("./db/database");
 const app = express();
 const port = 3000;
 
@@ -35,33 +35,30 @@ app.get("/doar", (req, res) => res.render("doar"));
 
 // Processar login
 app.post("/login", (req, res) => {
-  const { username, password } = req.body;
+  const { nome_usuario, senha } = req.body;
+  const query = "SELECT * FROM USUARIOS WHERE nome_usuario = ? AND senha = ?";
 
-  if (username === "admin" && password === "admin123") {
-    req.session.user = {
-      role: "admin",
-      name: "Administrador",
-    };
-    return res.redirect("/admin");
-  }
+  db.get(query, [nome_usuario, senha], (err, row) => {
+    if (err) {
+      console.error(err);
+      return res.redirect("/unauthorized2");
+    }
+    if (row) {
+      req.session.nome_usuario = nome_usuario;
+      req.session.id_usuario = row.id;
+      req.session.role = row.role;
 
-  if (username === "aluno" && password === "aluno123") {
-    req.session.user = {
-      role: "aluno",
-      name: "Aluno",
+      if (row.role === 'admin') {
+        return res.redirect("/admin");
+      } else if (row.role === 'sAdmin') {
+        return res.redirect("/sAdmin");
+      } else if (row.role === 'aluno') {
+        return res.redirect("/aluno");
+      } else {
+        return res.redirect("/login");
+      };
     };
-    return res.redirect("/aluno");
-  }
-
-  if (username === "sAdmin" && password === "sAdmin123") {
-    req.session.user = {
-      role: "sAdmin",
-      name: "sAdmin",
-    };
-    return res.redirect("/sAdmin");
-  } else {
-    res.redirect("/login?error=1");
-  }
+  });
 });
 
 // Middleware de autenticação
@@ -76,16 +73,16 @@ const requireAuth = (role) => (req, res, next) => {
 app.get("/admin", requireAuth("admin"), (req, res) => {
   db.parallelize(() => {
     db.all(
-      "SELECT id, turma || ' - ' || docente AS turma_info FROM turmas",
+      "SELECT id_turma, nome_turma || ' - ' || docente AS turma_info FROM TURMAS",
       (err, turmas) => {
         if (err) return console.error(err);
 
-        db.all("SELECT * FROM roupas", (err, roupas) => {
+        db.all("SELECT * FROM ITENS", (err, nome_itens) => {
           if (err) return console.error(err);
 
           res.render("admin", {
-            turmas,
-            roupas,
+            id_turma,
+            nome_itens,
             success: req.query.success,
             error: req.query.error,
           });
@@ -166,7 +163,7 @@ app.get("/aluno", requireAuth("aluno"), (req, res) => {
 
 // Registrar nova doação
 app.post("/doacao", requireAuth("admin"), (req, res) => {
-  const { turma_id, roupa_id, quantidade, data } = req.body;
+  const { id_campanha, roupa_id, quantidade, data } = req.body;
   console.log("Tentando registrar doação:", {
     turma_id,
     roupa_id,
@@ -206,15 +203,15 @@ app.get('/admin_edit_turmas', requireAuth('sAdmin'), (req, res) => {
   db.all('SELECT * FROM TURMAS', (err, turmas) => {
     if (err) {
       console.error(err);
-      return res.render('admin_edit_turmas', { 
-        turmas: [], 
+      return res.render('admin_edit_turmas', {
+        turmas: [],
         error: 'Erro ao carregar turmas',
-        user: req.session.user 
+        user: req.session.user
       });
     }
 
-    res.render('admin_edit_turmas', { 
-      turmas: turmas, 
+    res.render('admin_edit_turmas', {
+      turmas: turmas,
       user: req.session.user,
       success: req.query.success,
       error: req.query.error
@@ -225,17 +222,17 @@ app.get('/admin_edit_turmas', requireAuth('sAdmin'), (req, res) => {
 // Criar nova turma
 app.post('/admin_edit_turmas/create', requireAuth('sAdmin'), (req, res) => {
   const { nome_turma, docente, status, dt_inicial, dt_final } = req.body;
-  
+
   db.run(
     `INSERT INTO TURMAS (nome_turma, docente, status, dt_inicial, dt_final) 
      VALUES (?, ?, ?, ?, ?)`,
     [nome_turma, docente, status || 1, dt_inicial, dt_final],
-    function(err) {
+    function (err) {
       if (err) {
         console.error(err);
         return res.redirect('/admin_edit_turmas?error=Erro ao criar turma');
       }
-      
+
       res.redirect('/admin_edit_turmas?success=Turma criada com sucesso');
     }
   );
@@ -244,17 +241,17 @@ app.post('/admin_edit_turmas/create', requireAuth('sAdmin'), (req, res) => {
 // Atualizar turma
 app.post('/admin_edit_turmas/update', requireAuth('sAdmin'), (req, res) => {
   const { id_turma, nome_turma, docente, status, dt_inicial, dt_final } = req.body;
-  
+
   db.run(
     `UPDATE TURMAS SET nome_turma = ?, docente = ?, status = ?, dt_inicial = ?, dt_final = ? 
      WHERE id_turma = ?`,
     [nome_turma, docente, status, dt_inicial, dt_final, id_turma],
-    function(err) {
+    function (err) {
       if (err) {
         console.error(err);
         return res.redirect('/admin_edit_turmas?error=Erro ao atualizar turma');
       }
-      
+
       res.redirect('/admin_edit_turmas?success=Turma atualizada com sucesso');
     }
   );
@@ -263,16 +260,16 @@ app.post('/admin_edit_turmas/update', requireAuth('sAdmin'), (req, res) => {
 // Desativar turma
 app.get('/admin_edit_turmas/deactivate/:id', requireAuth('sAdmin'), (req, res) => {
   const id = req.params.id;
-  
+
   db.run(
     'UPDATE TURMAS SET status = 0 WHERE id_turma = ?',
     [id],
-    function(err) {
+    function (err) {
       if (err) {
         console.error(err);
         return res.redirect('/admin_edit_turmas?error=Erro ao desativar turma');
       }
-      
+
       res.redirect('/admin_edit_turmas?success=Turma desativada com sucesso');
     }
   );
@@ -281,16 +278,16 @@ app.get('/admin_edit_turmas/deactivate/:id', requireAuth('sAdmin'), (req, res) =
 // Ativar turma
 app.get('/admin_edit_turmas/activate/:id', requireAuth('sAdmin'), (req, res) => {
   const id = req.params.id;
-  
+
   db.run(
     'UPDATE TURMAS SET status = 1 WHERE id_turma = ?',
     [id],
-    function(err) {
+    function (err) {
       if (err) {
         console.error(err);
         return res.redirect('/admin_edit_turmas?error=Erro ao ativar turma');
       }
-      
+
       res.redirect('/admin_edit_turmas?success=Turma ativada com sucesso');
     }
   );
@@ -353,23 +350,23 @@ app.get("/admin_edit_campanha", requireAuth("sAdmin"), (req, res) => {
 // Rota para processar a criação de campanhas
 app.post('/admin_edit_campanha/create', requireAuth('sAdmin'), (req, res) => {
   const { nome_campanha, dt_inicial, dt_final, turmas_selecionadas, itens_selecionados } = req.body;
-  
+
   db.run(
     `INSERT INTO CAMPANHAS (nome_campanha, dt_inicial, dt_final) 
      VALUES (?, ?, ?)`,
     [nome_campanha, dt_inicial, dt_final],
-    function(err) {
+    function (err) {
       if (err) {
         console.error(err);
         return res.redirect('/admin_edit_campanha?error=Erro ao criar campanha');
       }
-      
+
       const campanhaId = this.lastID;
-      
+
       // Associar turmas selecionadas à campanha
       if (turmas_selecionadas) {
         const turmasArray = Array.isArray(turmas_selecionadas) ? turmas_selecionadas : [turmas_selecionadas];
-        
+
         turmasArray.forEach(turmaId => {
           db.run(
             `INSERT INTO CAMPANHA_TURMAS (id_campanha, id_turma) VALUES (?, ?)`,
@@ -377,7 +374,7 @@ app.post('/admin_edit_campanha/create', requireAuth('sAdmin'), (req, res) => {
           );
         });
       }
-      
+
       res.redirect('/admin_edit_campanha?success=Campanha criada com sucesso');
     }
   );

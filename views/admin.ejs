@@ -324,11 +324,20 @@
         </div>
 
         <form action="/doacao" method="POST">
+                    <div class="form-group">
+            <label for="turma_id"><i class="fas fa-users"></i> Campanha:</label>
+            <select name="turma_id" id="turma_id" required>
+              <% CAMPANHAS.forEach(c => { %>
+                <option value="<%= c.id %>"><%= c.nome_campanha %></option>
+              <% }); %>
+            </select>
+          </div>
+
           <div class="form-group">
             <label for="turma_id"><i class="fas fa-users"></i> Turma e Docente:</label>
             <select name="turma_id" id="turma_id" required>
-              <% turmas.forEach(t => { %>
-                <option value="<%= t.id %>"><%= t.turma_info %></option>
+              <% TURMAS.forEach(t => { %>
+                <option value="<%= t.id %>"><%= t.nome_turma %></option>
               <% }); %>
             </select>
           </div>
@@ -336,8 +345,8 @@
           <div class="form-group">
             <label for="roupa_id"><i class="fas fa-tshirt"></i> Tipo de Roupa:</label>
             <select name="roupa_id" id="roupa_id" required>
-              <% roupas.forEach(r => { %>
-                <option value="<%= r.id %>"><%= r.tipo %> (<%= r.pontuacao %> pontos)</option>
+              <% ITENS.forEach(r => { %>
+                <option value="<%= r.id_item %>"><%= r.nome_item %> (<%= r.pontos %> pontos)</option>
               <% }); %>
             </select>
           </div>

@@ -6,6 +6,16 @@ const db = new sqlite3.Database('./db/TCC.db');
 
 // Configuração das tabelas
 db.serialize(() => {
+
+  // Tabela de Usuários
+  db.run(`CREATE TABLE IF NOT EXISTS USUARIOS (
+    id_usuario INTEGER PRIMARY KEY AUTOINCREMENT,
+    nome_usuario TEXT NOT NULL,
+    role TEXT NOT NULL,
+    senha TEXT NOT NULL,
+    status INTEGER NOT NULL DEFAULT 1
+  )`)
+
   // Tabela de Campanhas
   db.run(`CREATE TABLE IF NOT EXISTS CAMPANHAS (
     id_campanha INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -29,9 +39,11 @@ db.serialize(() => {
   // Tabela de Itens
   db.run(`CREATE TABLE IF NOT EXISTS ITENS (
     id_item INTEGER PRIMARY KEY AUTOINCREMENT,
+    id_campanha TEXT NOT NULL,
     nome_item TEXT NOT NULL,
     pontos INTEGER NOT NULL,
-    status INTEGER NOT NULL DEFAULT 1
+    status INTEGER NOT NULL DEFAULT 1,
+    FOREIGN KEY(id_campanha) REFERENCES CAMPANHAS(id_campanha)
   )`);
 
   // Tabela de Relacionamento entre Campanhas e Turmas
