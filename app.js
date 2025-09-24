@@ -75,10 +75,9 @@ const requireAuth = (role) => (req, res, next) => {
 app.get("/admin", (req, res) => {
   console.log("GET /admin")
   if (req.session.loggedin || req.session.role == "admin") {
+  const queryTurma = `SELECT id_turma, nome_turma || ' - ' || docente AS turma_info FROM TURMAS`;
   db.parallelize(() => {
-    db.all(
-      "SELECT id_turma, nome_turma || ' - ' || docente AS turma_info FROM TURMAS",
-      (err, row) => {
+    db.all(queryTurma, (err, row) => {
         if (err) return console.error(err);
         console.log(JSON.stringify(row));
         db.all("SELECT * FROM ITENS", (err, nome_itens, id_turma) => {

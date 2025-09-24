@@ -65,9 +65,9 @@
           <div class="form-group">
             <label for="turma_id"><i class="fas fa-users"></i> Turma e Docente:</label>
             <select name="turma_id" id="turma_id" required>
-              <% TURMAS.forEach(t => { %>
-                <option value="<%= t.id %>"><%= t.nome_turma %></option>
-              <% }); %>
+              <% let i = 0; for(i = 0; TURMAS.length; i++){  %>
+                <option value="<%=  TURMAS.id[i] %>"><%= TURMAS.nome_turma[i] %></option>
+              <% }; %>
             </select>
           </div>
           
