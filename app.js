@@ -28,13 +28,14 @@ app.use((req, res, next) => {
 });
 
 // Rotas públicas
-app.get("/", (req, res) => res.render("index"));
-app.get("/login", (req, res) => res.render("login"));
-app.get("/sobre", (req, res) => res.render("sobre"));
-app.get("/doar", (req, res) => res.render("doar"));
+app.get("/", (req, res) => { console.log("POST /"), res.render("index") });
+app.get("/login", (req, res) =>   { console.log("POST /login"), res.render("login")});
+app.get("/sobre", (req, res) => { console.log("POST /sobre"), res.render("sobre")});
+app.get("/doar", (req, res) => { console.log("POST /doar"), res.render("doar")} );
 
 // Processar login
 app.post("/login", (req, res) => {
+  console.log("POST /login")
   const { nome_usuario, senha } = req.body;
   const query = "SELECT * FROM USUARIOS WHERE nome_usuario = ? AND senha = ?";
 
@@ -44,6 +45,7 @@ app.post("/login", (req, res) => {
       return res.redirect("/unauthorized2");
     }
     if (row) {
+      console.log(JSON.stringify(row));
       req.session.nome_usuario = nome_usuario;
       req.session.id_usuario = row.id;
       req.session.role = row.role;
@@ -70,17 +72,22 @@ const requireAuth = (role) => (req, res, next) => {
 };
 
 // Painel Admin (usa db - campanha.db)
-app.get("/admin", requireAuth("admin"), (req, res) => {
+app.get("/admin", (req, res) => {
+  console.log("GET /admin")
+  if (req.session.loggedin || req.session.role == "admin") {
   db.parallelize(() => {
     db.all(
       "SELECT id_turma, nome_turma || ' - ' || docente AS turma_info FROM TURMAS",
-      (err, turmas) => {
+      (err, row) => {
         if (err) return console.error(err);
-
-        db.all("SELECT * FROM ITENS", (err, nome_itens) => {
+        console.log(JSON.stringify(row));
+        db.all("SELECT * FROM ITENS", (err, nome_itens, id_turma) => {
           if (err) return console.error(err);
 
           res.render("admin", {
+            TURMAS: row,
+            CAMPANHAS: [],
+            ITENS: [],
             id_turma,
             nome_itens,
             success: req.query.success,
@@ -90,6 +97,9 @@ app.get("/admin", requireAuth("admin"), (req, res) => {
       }
     );
   });
+        } else {
+          res.redirect("/login")
+        }
 });
 
 // Painel Aluno (usa db - campanha.db)

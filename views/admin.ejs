@@ -5,6 +5,160 @@
   <link rel="icon" href="/logo.png" type="image/x-icon">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Montserrat:wght@700;800&display=swap" rel="stylesheet">
+</head>
+
+<body>
+  <div class="container">
+    <!-- Header -->
+    <header>
+      <div class="logo">
+        <i class="fas fa-tshirt"></i>
+        <h1>Campanha do Agasalho</h1>
+      </div>
+      
+      <div class="user-info">
+        <i class="fas fa-user-shield"></i>
+        <span>Admin: A </span>
+      </div>
+      
+      <nav>
+        <ul>
+          <li><a href="/"><i class="fas fa-home"></i> Início</a></li>
+          <li><a href="/doar"><i class="fas fa-hands-helping"></i> Como Ajudar</a></li>
+          <li><a href="/sobre"><i class="fas fa-info-circle"></i> Sobre</a></li>
+          <li><a href="/logout" class="logout-btn">
+            <i class="fas fa-sign-out-alt"></i> Sair
+          </a></li>
+        </ul>
+      </nav>
+    </header>
+
+    <div class="main-content">
+      <!-- Formulário de Registro -->
+      <div class="form-container">
+        <h2 class="form-title">Registrar Nova Doação</h2>
+        
+        <div class="messages">
+          <% if(typeof success !== 'undefined') { %>
+            <div class="success-message">
+              <i class="fas fa-check-circle"></i> Doação registrada com sucesso!
+            </div>
+          <% } %>
+          
+          <% if(typeof error !== 'undefined') { %>
+            <div class="error-message">
+              <i class="fas fa-exclamation-circle"></i> <%= error %>
+            </div>
+          <% } %>
+        </div>
+
+        <form action="/doacao" method="POST">
+                    <div class="form-group">
+            <label for="turma_id"><i class="fas fa-users"></i> Campanha:</label>
+            <select name="turma_id" id="turma_id" required>
+              <% CAMPANHAS.forEach(c => { %>
+                <option value="<%= c.id %>"><%= c.nome_campanha %></option>
+              <% }); %>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="turma_id"><i class="fas fa-users"></i> Turma e Docente:</label>
+            <select name="turma_id" id="turma_id" required>
+              <% TURMAS.forEach(t => { %>
+                <option value="<%= t.id %>"><%= t.nome_turma %></option>
+              <% }); %>
+            </select>
+          </div>
+          
+          <div class="form-group">
+            <label for="roupa_id"><i class="fas fa-tshirt"></i> Tipo de Roupa:</label>
+            <select name="roupa_id" id="roupa_id" required>
+              <% ITENS.forEach(r => { %>
+                <option value="<%= r.id_item %>"><%= r.nome_item %> (<%= r.pontos %> pontos)</option>
+              <% }); %>
+            </select>
+          </div>
+          
+          <div class="form-group">
+            <label for="quantidade"><i class="fas fa-calculator"></i> Quantidade:</label>
+            <input type="number" name="quantidade" id="quantidade" min="1" required>
+          </div>
+          
+          <div class="form-group">
+            <label for="data"><i class="fas fa-calendar-alt"></i> Data:</label>
+            <input type="date" name="data" id="data" required>
+          </div>
+          
+          <button type="submit" class="btn-submit">
+            <i class="fas fa-save"></i> Registrar Doação
+          </button>
+        </form>
+      </div>
+      
+      <!-- Links Rápidos -->
+      <div class="info-container">
+        <div class="quick-links">
+          <a href="/admin/doacoes" class="link-card">
+            <i class="fas fa-list"></i>
+            <div class="link-text">
+              <h3>Ver Todas as Doações</h3>
+              <p>Acesse o histórico completo de doações registradas</p>
+            </div>
+          </a>
+          
+          <a href="/admin/turmas" class="link-card">
+            <i class="fas fa-chart-bar"></i>
+            <div class="link-text">
+              <h3>Relatório de Turmas</h3>
+              <p>Visualize o ranking e desempenho das turmas</p>
+            </div>
+          </a>
+          
+          <a href="/admin" class="link-card">
+            <i class="fas fa-sync-alt"></i>
+            <div class="link-text">
+              <h3>Recarregar Página</h3>
+              <p>Atualize os dados mais recentes</p>
+            </div>
+          </a>
+        </div>
+        
+        <div class="stats-card" style="background: rgba(255, 255, 255, 0.1); border-radius: 10px; padding: 20px; margin-top: 30px;">
+          <h3 style="color: var(--accent); margin-top: 0;">Dicas Rápidas</h3>
+          <ul style="padding-left: 20px;">
+            <li>Verifique a data antes de registrar</li>
+            <li>Confira se selecionou a turma correta</li>
+            <li>Atualize a página após registrar doações</li>
+            <li>Use o relatório para acompanhar o progresso</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <footer>
+      <p class="copyright">© 2025 Campanha do Agasalho. Todos os direitos reservados.</p>
+    </footer>
+  </div>
+
+  <script>
+    // Definir a data atual como padrão
+    document.addEventListener('DOMContentLoaded', function() {
+      const today = new Date();
+      const formattedDate = today.toISOString().split('T')[0];
+      document.getElementById('data').value = formattedDate;
+      
+      // Debug: verificar envio do formulário
+      const form = document.querySelector('form');
+      form.addEventListener('submit', function() {
+        console.log('Formulário enviado');
+        console.log('Turma ID:', document.getElementById('turma_id').value);
+        console.log('Roupa ID:', document.getElementById('roupa_id').value);
+        console.log('Quantidade:', document.getElementById('quantidade').value);
+        console.log('Data:', document.getElementById('data').value);
+      });
+    });
+  </script>
   <style>
     :root {
       --primary: #3498db;
@@ -276,159 +430,5 @@
       color: var(--accent);
     }
   </style>
-</head>
-
-<body>
-  <div class="container">
-    <!-- Header -->
-    <header>
-      <div class="logo">
-        <i class="fas fa-tshirt"></i>
-        <h1>Campanha do Agasalho</h1>
-      </div>
-      
-      <div class="user-info">
-        <i class="fas fa-user-shield"></i>
-        <span>Admin: <%= user.name %></span>
-      </div>
-      
-      <nav>
-        <ul>
-          <li><a href="/"><i class="fas fa-home"></i> Início</a></li>
-          <li><a href="/doar"><i class="fas fa-hands-helping"></i> Como Ajudar</a></li>
-          <li><a href="/sobre"><i class="fas fa-info-circle"></i> Sobre</a></li>
-          <li><a href="/logout" class="logout-btn">
-            <i class="fas fa-sign-out-alt"></i> Sair
-          </a></li>
-        </ul>
-      </nav>
-    </header>
-
-    <div class="main-content">
-      <!-- Formulário de Registro -->
-      <div class="form-container">
-        <h2 class="form-title">Registrar Nova Doação</h2>
-        
-        <div class="messages">
-          <% if(typeof success !== 'undefined') { %>
-            <div class="success-message">
-              <i class="fas fa-check-circle"></i> Doação registrada com sucesso!
-            </div>
-          <% } %>
-          
-          <% if(typeof error !== 'undefined') { %>
-            <div class="error-message">
-              <i class="fas fa-exclamation-circle"></i> <%= error %>
-            </div>
-          <% } %>
-        </div>
-
-        <form action="/doacao" method="POST">
-                    <div class="form-group">
-            <label for="turma_id"><i class="fas fa-users"></i> Campanha:</label>
-            <select name="turma_id" id="turma_id" required>
-              <% CAMPANHAS.forEach(c => { %>
-                <option value="<%= c.id %>"><%= c.nome_campanha %></option>
-              <% }); %>
-            </select>
-          </div>
-
-          <div class="form-group">
-            <label for="turma_id"><i class="fas fa-users"></i> Turma e Docente:</label>
-            <select name="turma_id" id="turma_id" required>
-              <% TURMAS.forEach(t => { %>
-                <option value="<%= t.id %>"><%= t.nome_turma %></option>
-              <% }); %>
-            </select>
-          </div>
-          
-          <div class="form-group">
-            <label for="roupa_id"><i class="fas fa-tshirt"></i> Tipo de Roupa:</label>
-            <select name="roupa_id" id="roupa_id" required>
-              <% ITENS.forEach(r => { %>
-                <option value="<%= r.id_item %>"><%= r.nome_item %> (<%= r.pontos %> pontos)</option>
-              <% }); %>
-            </select>
-          </div>
-          
-          <div class="form-group">
-            <label for="quantidade"><i class="fas fa-calculator"></i> Quantidade:</label>
-            <input type="number" name="quantidade" id="quantidade" min="1" required>
-          </div>
-          
-          <div class="form-group">
-            <label for="data"><i class="fas fa-calendar-alt"></i> Data:</label>
-            <input type="date" name="data" id="data" required>
-          </div>
-          
-          <button type="submit" class="btn-submit">
-            <i class="fas fa-save"></i> Registrar Doação
-          </button>
-        </form>
-      </div>
-      
-      <!-- Links Rápidos -->
-      <div class="info-container">
-        <div class="quick-links">
-          <a href="/admin/doacoes" class="link-card">
-            <i class="fas fa-list"></i>
-            <div class="link-text">
-              <h3>Ver Todas as Doações</h3>
-              <p>Acesse o histórico completo de doações registradas</p>
-            </div>
-          </a>
-          
-          <a href="/admin/turmas" class="link-card">
-            <i class="fas fa-chart-bar"></i>
-            <div class="link-text">
-              <h3>Relatório de Turmas</h3>
-              <p>Visualize o ranking e desempenho das turmas</p>
-            </div>
-          </a>
-          
-          <a href="/admin" class="link-card">
-            <i class="fas fa-sync-alt"></i>
-            <div class="link-text">
-              <h3>Recarregar Página</h3>
-              <p>Atualize os dados mais recentes</p>
-            </div>
-          </a>
-        </div>
-        
-        <div class="stats-card" style="background: rgba(255, 255, 255, 0.1); border-radius: 10px; padding: 20px; margin-top: 30px;">
-          <h3 style="color: var(--accent); margin-top: 0;">Dicas Rápidas</h3>
-          <ul style="padding-left: 20px;">
-            <li>Verifique a data antes de registrar</li>
-            <li>Confira se selecionou a turma correta</li>
-            <li>Atualize a página após registrar doações</li>
-            <li>Use o relatório para acompanhar o progresso</li>
-          </ul>
-        </div>
-      </div>
-    </div>
-
-    <footer>
-      <p class="copyright">© 2025 Campanha do Agasalho. Todos os direitos reservados.</p>
-    </footer>
-  </div>
-
-  <script>
-    // Definir a data atual como padrão
-    document.addEventListener('DOMContentLoaded', function() {
-      const today = new Date();
-      const formattedDate = today.toISOString().split('T')[0];
-      document.getElementById('data').value = formattedDate;
-      
-      // Debug: verificar envio do formulário
-      const form = document.querySelector('form');
-      form.addEventListener('submit', function() {
-        console.log('Formulário enviado');
-        console.log('Turma ID:', document.getElementById('turma_id').value);
-        console.log('Roupa ID:', document.getElementById('roupa_id').value);
-        console.log('Quantidade:', document.getElementById('quantidade').value);
-        console.log('Data:', document.getElementById('data').value);
-      });
-    });
-  </script>
 </body>
 </html>
