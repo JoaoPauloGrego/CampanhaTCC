@@ -46,8 +46,13 @@ app.post("/login", (req, res) => {
     }
     if (row) {
       console.log(JSON.stringify(row));
-      req.session.nome_usuario = nome_usuario;
-      req.session.id_usuario = row.id;
+
+      req.session.user = {
+      nome_usuario: nome_usuario,
+      id_usuario: row.id,
+      role: row.role
+      }
+      req.session.loggedin = true;
       req.session.role = row.role;
 
       if (row.role === 'admin') {
@@ -65,43 +70,59 @@ app.post("/login", (req, res) => {
 
 // Middleware de autenticação
 const requireAuth = (role) => (req, res, next) => {
-  if (req.session.user && req.session.user.role === role) {
+  if (req.session.loggedin && req.session.user && req.session.user.role === role) {
     return next();
   }
   res.redirect("/login");
 };
 
-// Painel Admin (usa db - campanha.db)
+// Painel Admin Base
 app.get("/admin", (req, res) => {
   console.log("GET /admin")
-  if (req.session.loggedin || req.session.role == "admin") {
-  const queryTurma = `SELECT id_turma, nome_turma || ' - ' || docente AS turma_info FROM TURMAS`;
-  db.parallelize(() => {
-    db.all(queryTurma, (err, row) => {
-        if (err) return console.error(err);
-        console.log(JSON.stringify(row));
-        db.all("SELECT * FROM ITENS", (err, nome_itens, id_turma) => {
-          if (err) return console.error(err);
+  if (req.session.loggedin && req.session.user && req.session.user.role === "admin") {
+    const queryTurma = `SELECT id_turma, nome_turma, docente FROM TURMAS WHERE status = 1`;
+    const queryItens = `SELECT * FROM ITENS WHERE status = 1`;
+    const queryCampanhas = `SELECT * FROM CAMPANHAS WHERE status = 1`;
 
-          res.render("admin", {
-            TURMAS: row,
-            CAMPANHAS: [],
-            ITENS: [],
-            id_turma,
-            nome_itens,
-            success: req.query.success,
-            error: req.query.error,
+    db.serialize(() => {
+      // Buscar turmas
+      db.all(queryTurma, (err, turmas) => {
+        if (err) {
+          console.error(err);
+          return res.redirect("/admin?error=Erro ao carregar turmas");
+        }
+        
+        // Buscar itens
+        db.all(queryItens, (err, itens) => {
+          if (err) {
+            console.error(err);
+            return res.redirect("/admin?error=Erro ao carregar itens");
+          }
+          
+          // Buscar campanhas
+          db.all(queryCampanhas, (err, campanhas) => {
+            if (err) {
+              console.error(err);
+              return res.redirect("/admin?error=Erro ao carregar campanhas");
+            }
+
+            res.render("admin", {
+              TURMAS: turmas,
+              CAMPANHAS: campanhas,
+              ITENS: itens,
+              success: req.query.success,
+              error: req.query.error,
+              user: req.session.user
+            });
           });
         });
-      }
-    );
-  });
-        } else {
-          res.redirect("/login")
-        }
+      });
+    });
+  } else {
+    res.redirect("/login?error=Acesso negado");
+  }
 });
 
-// Painel Aluno (usa db - campanha.db)
 app.get("/aluno", requireAuth("aluno"), (req, res) => {
   // Consulta para todas as turmas (não apenas as top 3)
   const allTurmasQuery =
@@ -171,8 +192,13 @@ app.get("/aluno", requireAuth("aluno"), (req, res) => {
 });
 
 // Registrar nova doação
-app.post("/doacao", requireAuth("admin"), (req, res) => {
-  const { id_campanha, roupa_id, quantidade, data } = req.body;
+app.post("/doacao", (req, res) => {
+  // Verificar autenticação primeiro
+  if (!req.session.loggedin || req.session.user.role !== "admin") {
+    return res.redirect("/login?error=Acesso negado");
+  }
+
+  const { turma_id, roupa_id, quantidade, data } = req.body;
   console.log("Tentando registrar doação:", {
     turma_id,
     roupa_id,

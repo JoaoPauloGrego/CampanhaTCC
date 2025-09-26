@@ -1,10 +1,13 @@
 <!DOCTYPE html>
 <html>
+
 <head>
   <title>Painel Admin</title>
   <link rel="icon" href="/logo.png" type="image/x-icon">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Montserrat:wght@700;800&display=swap" rel="stylesheet">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Montserrat:wght@700;800&display=swap"
+    rel="stylesheet">
 </head>
 
 <body>
@@ -15,20 +18,20 @@
         <i class="fas fa-tshirt"></i>
         <h1>Campanha do Agasalho</h1>
       </div>
-      
+
       <div class="user-info">
         <i class="fas fa-user-shield"></i>
-        <span>Admin: A </span>
+        <span>Admin: <%= user ? user.nome_usuario : 'Não logado' %> </span>
       </div>
-      
+
       <nav>
         <ul>
           <li><a href="/"><i class="fas fa-home"></i> Início</a></li>
           <li><a href="/doar"><i class="fas fa-hands-helping"></i> Como Ajudar</a></li>
           <li><a href="/sobre"><i class="fas fa-info-circle"></i> Sobre</a></li>
           <li><a href="/logout" class="logout-btn">
-            <i class="fas fa-sign-out-alt"></i> Sair
-          </a></li>
+              <i class="fas fa-sign-out-alt"></i> Sair
+            </a></li>
         </ul>
       </nav>
     </header>
@@ -37,27 +40,32 @@
       <!-- Formulário de Registro -->
       <div class="form-container">
         <h2 class="form-title">Registrar Nova Doação</h2>
-        
+
         <div class="messages">
-          <% if(typeof success !== 'undefined') { %>
+          <% if(typeof success !=='undefined' ) { %>
             <div class="success-message">
-              <i class="fas fa-check-circle"></i> Doação registrada com sucesso!
+              <i class="fas fa-check-circle"></i>
+              <%= success %>
             </div>
           <% } %>
-          
-          <% if(typeof error !== 'undefined') { %>
+
+          <% if(typeof error !=='undefined' ) { %>
             <div class="error-message">
-              <i class="fas fa-exclamation-circle"></i> <%= error %>
+              <i class="fas fa-exclamation-circle"></i>
+              <%= error %>
             </div>
           <% } %>
         </div>
 
         <form action="/doacao" method="POST">
-                    <div class="form-group">
-            <label for="turma_id"><i class="fas fa-users"></i> Campanha:</label>
-            <select name="turma_id" id="turma_id" required>
-              <% CAMPANHAS.forEach(c => { %>
-                <option value="<%= c.id %>"><%= c.nome_campanha %></option>
+          
+          <div class="form-group">
+            <label for="id_campanha"><i class="fas fa-campaign"></i> Campanha:</label>
+            <select name="id_campanha" id="id_campanha" required>
+              <% CAMPANHAS.forEach(campanha=> { %>
+                <option value="<%= campanha.id_campanha %>">
+                  <%= campanha.nome_campanha %>
+                </option>
               <% }); %>
             </select>
           </div>
@@ -65,37 +73,41 @@
           <div class="form-group">
             <label for="turma_id"><i class="fas fa-users"></i> Turma e Docente:</label>
             <select name="turma_id" id="turma_id" required>
-              <% let i = 0; for(i = 0; TURMAS.length; i++){  %>
-                <option value="<%=  TURMAS.id[i] %>"><%= TURMAS.nome_turma[i] %></option>
-              <% }; %>
-            </select>
-          </div>
-          
-          <div class="form-group">
-            <label for="roupa_id"><i class="fas fa-tshirt"></i> Tipo de Roupa:</label>
-            <select name="roupa_id" id="roupa_id" required>
-              <% ITENS.forEach(r => { %>
-                <option value="<%= r.id_item %>"><%= r.nome_item %> (<%= r.pontos %> pontos)</option>
+              <% TURMAS.forEach(turma=> { %>
+                <option value="<%= turma.id_turma %>">
+                  <%= turma.nome_turma %> - <%= turma.docente %>
+                </option>
               <% }); %>
             </select>
           </div>
-          
+
+          <div class="form-group">
+            <label for="roupa_id"><i class="fas fa-tshirt"></i> Tipo de Roupa:</label>
+            <select name="roupa_id" id="roupa_id" required>
+              <% ITENS.forEach(item=> { %>
+                <option value="<%= item.id_item %>">
+                  <%= item.nome_item %> (<%= item.pontos %> pontos)
+                </option>
+              <% }); %>
+            </select>
+          </div>
+
           <div class="form-group">
             <label for="quantidade"><i class="fas fa-calculator"></i> Quantidade:</label>
             <input type="number" name="quantidade" id="quantidade" min="1" required>
           </div>
-          
+
           <div class="form-group">
             <label for="data"><i class="fas fa-calendar-alt"></i> Data:</label>
             <input type="date" name="data" id="data" required>
           </div>
-          
+
           <button type="submit" class="btn-submit">
             <i class="fas fa-save"></i> Registrar Doação
           </button>
         </form>
       </div>
-      
+
       <!-- Links Rápidos -->
       <div class="info-container">
         <div class="quick-links">
@@ -106,7 +118,7 @@
               <p>Acesse o histórico completo de doações registradas</p>
             </div>
           </a>
-          
+
           <a href="/admin/turmas" class="link-card">
             <i class="fas fa-chart-bar"></i>
             <div class="link-text">
@@ -114,7 +126,7 @@
               <p>Visualize o ranking e desempenho das turmas</p>
             </div>
           </a>
-          
+
           <a href="/admin" class="link-card">
             <i class="fas fa-sync-alt"></i>
             <div class="link-text">
@@ -123,10 +135,10 @@
             </div>
           </a>
         </div>
-        
-        <div class="stats-card" style="background: rgba(255, 255, 255, 0.1); border-radius: 10px; padding: 20px; margin-top: 30px;">
-          <h3 style="color: var(--accent); margin-top: 0;">Dicas Rápidas</h3>
-          <ul style="padding-left: 20px;">
+
+        <div class="stats-card">
+          <h3>Dicas Rápidas</h3>
+          <ul>
             <li>Verifique a data antes de registrar</li>
             <li>Confira se selecionou a turma correta</li>
             <li>Atualize a página após registrar doações</li>
@@ -143,14 +155,14 @@
 
   <script>
     // Definir a data atual como padrão
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', function () {
       const today = new Date();
       const formattedDate = today.toISOString().split('T')[0];
       document.getElementById('data').value = formattedDate;
-      
+
       // Debug: verificar envio do formulário
       const form = document.querySelector('form');
-      form.addEventListener('submit', function() {
+      form.addEventListener('submit', function () {
         console.log('Formulário enviado');
         console.log('Turma ID:', document.getElementById('turma_id').value);
         console.log('Roupa ID:', document.getElementById('roupa_id').value);
@@ -195,6 +207,9 @@
       max-width: 1200px;
       margin: 0 auto;
       padding: 20px;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
     }
 
     /* Header */
@@ -203,12 +218,15 @@
       justify-content: space-between;
       align-items: center;
       padding: 20px 0;
+      flex-wrap: wrap;
+      gap: 20px;
     }
 
     .logo {
       display: flex;
       align-items: center;
       gap: 10px;
+      flex-shrink: 0;
     }
 
     .logo i {
@@ -221,14 +239,16 @@
       font-weight: 700;
       color: white;
       margin: 0;
+      white-space: nowrap;
     }
 
     nav ul {
       display: flex;
       list-style: none;
-      gap: 30px;
+      gap: 20px;
       margin: 0;
       padding: 0;
+      flex-wrap: wrap;
     }
 
     nav a {
@@ -238,6 +258,7 @@
       transition: all 0.3s ease;
       position: relative;
       padding: 5px 0;
+      white-space: nowrap;
     }
 
     nav a::after {
@@ -262,6 +283,7 @@
       background: rgba(255, 255, 255, 0.1);
       padding: 8px 15px;
       border-radius: 20px;
+      flex-shrink: 0;
     }
 
     .user-info i {
@@ -273,6 +295,7 @@
       display: flex;
       gap: 40px;
       margin-top: 30px;
+      flex: 1;
     }
 
     .form-container {
@@ -282,10 +305,14 @@
       border-radius: 15px;
       padding: 30px;
       box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+      height: fit-content;
     }
 
     .info-container {
       flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 30px;
     }
 
     .form-title {
@@ -306,7 +333,8 @@
       font-size: 1.1rem;
     }
 
-    select, input {
+    select,
+    input {
       width: 100%;
       padding: 14px;
       border-radius: 8px;
@@ -315,9 +343,11 @@
       color: white;
       font-size: 1rem;
       transition: all 0.3s ease;
+      box-sizing: border-box;
     }
 
-    select:focus, input:focus {
+    select:focus,
+    input:focus {
       outline: none;
       border-color: var(--accent);
       box-shadow: 0 0 0 3px rgba(243, 156, 18, 0.3);
@@ -325,6 +355,7 @@
 
     option {
       background: #2c3e50;
+      color: white;
     }
 
     .btn-submit {
@@ -352,7 +383,6 @@
       display: flex;
       flex-direction: column;
       gap: 20px;
-      margin-top: 30px;
     }
 
     .link-card {
@@ -409,6 +439,27 @@
       margin-bottom: 20px;
     }
 
+    .stats-card {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 10px;
+      padding: 20px;
+      margin-top: 0;
+    }
+
+    .stats-card h3 {
+      color: var(--accent);
+      margin-top: 0;
+    }
+
+    .stats-card ul {
+      padding-left: 20px;
+      margin: 0;
+    }
+
+    .stats-card li {
+      margin-bottom: 8px;
+    }
+
     footer {
       text-align: center;
       padding: 30px 0;
@@ -429,6 +480,29 @@
     .logout-btn:hover {
       color: var(--accent);
     }
+
+    /* Responsividade */
+    @media (max-width: 768px) {
+      .main-content {
+        flex-direction: column;
+        gap: 20px;
+      }
+      
+      header {
+        flex-direction: column;
+        text-align: center;
+        gap: 15px;
+      }
+      
+      nav ul {
+        justify-content: center;
+      }
+      
+      .container {
+        padding: 10px;
+      }
+    }
   </style>
 </body>
+
 </html>
