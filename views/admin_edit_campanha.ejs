@@ -251,15 +251,15 @@
         // Função para adicionar novo item
         function adicionarItem() {
             const nomeItem = document.getElementById('novo_item').value;
-            const pontosItem = document.getElementById('pontos_item').value;
+            const pontosItem = document.getElementById('pontos').value;
+            const itemCampanha = document.getElementById('id_campanha').value;
+            const status = document.getElementById('status').value;
             
             if (!nomeItem || !pontosItem) {
                 alert('Por favor, preencha o nome e os pontos do item.');
                 return;
             }
             
-            // Aqui você pode implementar a lógica para adicionar o item via AJAX
-            // ou simplesmente adicionar ao formulário como um campo oculto
             alert(`Item "${nomeItem}" com ${pontosItem} pontos será adicionado à campanha.`);
             
             // Limpar os campos
@@ -285,8 +285,7 @@
         
         // Função para editar campanha
         function editarCampanha(id) {
-            // Aqui você implementaria a busca dos dados da campanha
-            // Por enquanto, vamos apenas abrir o modal
+
             abrirModal('editModal');
         }
         

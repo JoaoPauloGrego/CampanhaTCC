@@ -198,24 +198,25 @@ app.post("/doacao", (req, res) => {
     return res.redirect("/login?error=Acesso negado");
   }
 
-  const { turma_id, roupa_id, quantidade, data } = req.body;
+  const { id_campanha, id_turma, roupa_id, quantidade, data } = req.body;
   console.log("Tentando registrar doação:", {
-    turma_id,
+    id_campanha,
+    id_turma,
     roupa_id,
     quantidade,
     data,
   });
 
   // Verificar se todos os campos estão preenchidos
-  if (!turma_id || !roupa_id || !quantidade || !data) {
+  if (!id_campanha || !id_turma || !roupa_id || !quantidade || !data) {
     console.error("Campos obrigatórios faltando");
     return res.redirect("/admin?error=Campos obrigatórios faltando");
   }
 
   db.run(
-    `INSERT INTO doacoes (turma_id, roupa_id, quantidade, data)
-     VALUES (?, ?, ?, ?)`,
-    [turma_id, roupa_id, quantidade, data],
+    `INSERT INTO DOACOES (id_campanha, id_turma, roupa_id, quantidade, data)
+     VALUES (?, ?, ?, ?, ?)`,
+    [id_campanha, id_turma, roupa_id, quantidade, data],
     function (err) {
       if (err) {
         console.error("Erro ao registrar doação:", err);
@@ -335,9 +336,9 @@ app.get("/admin_edit_campanha", requireAuth("sAdmin"), (req, res) => {
     if (err) {
       console.error("Erro ao buscar campanhas:", err);
       return res.render("admin_edit_campanha", {
-        campanhas: [],
-        turmas: [],
-        itens: [],
+        campanhas: campanhas,
+        turmas: turmas,
+        itens: itens,
         error: "Erro ao carregar campanhas",
         user: req.session.user
       });
@@ -348,9 +349,9 @@ app.get("/admin_edit_campanha", requireAuth("sAdmin"), (req, res) => {
       if (err) {
         console.error("Erro ao buscar turmas:", err);
         return res.render("admin_edit_campanha", {
-          campanhas: [],
-          turmas: [],
-          itens: [],
+          campanhas: campanhas,
+          turmas: turmas,
+          itens: itens,
           error: "Erro ao carregar turmas",
           user: req.session.user
         });
@@ -361,9 +362,9 @@ app.get("/admin_edit_campanha", requireAuth("sAdmin"), (req, res) => {
         if (err) {
           console.error("Erro ao buscar itens:", err);
           return res.render("admin_edit_campanha", {
-            campanhas: [],
-            turmas: [],
-            itens: [],
+            campanhas: campanhas,
+            turmas: itens,
+            itens: itens,
             error: "Erro ao carregar itens",
             user: req.session.user
           });

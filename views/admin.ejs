@@ -64,7 +64,7 @@
             <select name="id_campanha" id="id_campanha" required>
               <% CAMPANHAS.forEach(campanha=> { %>
                 <option value="<%= campanha.id_campanha %>">
-                  <%= campanha.nome_campanha %>
+                  <%= campanha.id_campanha %>
                 </option>
               <% }); %>
             </select>
@@ -75,15 +75,15 @@
             <select name="turma_id" id="turma_id" required>
               <% TURMAS.forEach(turma=> { %>
                 <option value="<%= turma.id_turma %>">
-                  <%= turma.nome_turma %> - <%= turma.docente %>
+                  <%= turma.id_turma  %>
                 </option>
               <% }); %>
             </select>
           </div>
 
           <div class="form-group">
-            <label for="roupa_id"><i class="fas fa-tshirt"></i> Tipo de Roupa:</label>
-            <select name="roupa_id" id="roupa_id" required>
+            <label for="id_item"><i class="fas fa-tshirt"></i> Tipo de Roupa:</label>
+            <select name="roupa_id" id="id_item" required>
               <% ITENS.forEach(item=> { %>
                 <option value="<%= item.id_item %>">
                   <%= item.nome_item %> (<%= item.pontos %> pontos)
@@ -164,10 +164,10 @@
       const form = document.querySelector('form');
       form.addEventListener('submit', function () {
         console.log('Formulário enviado');
-        console.log('Turma ID:', document.getElementById('turma_id').value);
-        console.log('Roupa ID:', document.getElementById('roupa_id').value);
+        console.log('Turma ID:', document.getElementById('id_turma').value);
+        console.log('Roupa ID:', document.getElementById('id_item').value);
         console.log('Quantidade:', document.getElementById('quantidade').value);
-        console.log('Data:', document.getElementById('data').value);
+        console.log('Data:', document.getElementById('data_doacao').value);
       });
     });
   </script>
