@@ -7,7 +7,311 @@
     <link rel="icon" href="/logo.png" type="image/x-icon">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Montserrat:wght@700;800&display=swap" rel="stylesheet">
-    <style>
+
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header>
+            <div class="logo">
+                <i class="fas fa-tshirt"></i>
+                <h1>Campanha do Agasalho</h1>
+            </div>
+            
+            <div class="user-info">
+                <i class="fas fa-user-shield"></i>
+                <span>Super Admin: <%= user.name %></span>
+            </div>
+            
+            <nav>
+                <ul>
+                    <li><a href="/sAdmin"><i class="fas fa-arrow-left"></i> Voltar</a></li>
+                    <li><a href="/admin_edit_turmas"><i class="fas fa-users"></i> Gerenciar Turmas</a></li>
+                    <li><a href="/logout" class="logout-btn">
+                        <i class="fas fa-sign-out-alt"></i> Sair
+                    </a></li>
+                </ul>
+            </nav>
+        </header>
+
+        <div class="main-content">
+            <h2 class="page-title">Gerenciamento de Campanhas</h2>
+            
+            <!-- Mensagens de sucesso/erro -->
+            <div class="messages">
+                <% if(typeof success !== 'undefined') { %>
+                    <div class="success-message">
+                        <i class="fas fa-check-circle"></i> <%= success %>
+                    </div>
+                <% } %>
+                
+                <% if(typeof error !== 'undefined') { %>
+                    <div class="error-message">
+                        <i class="fas fa-exclamation-circle"></i> <%= error %>
+                    </div>
+                <% } %>
+            </div>
+            
+            <!-- Card de Criação de Campanha -->
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Criar Nova Campanha</h3>
+                </div>
+                
+                <form action="/admin_edit_campanha/create" method="POST">
+                    <div class="form-container">
+                        <div class="form-section">
+                            <h4 class="form-section-title">Informações da Campanha</h4>
+                            
+                            <div class="form-group">
+                                <label class="form-label" for="nome_campanha">Nome da Campanha:</label>
+                                <input type="text" id="nome_campanha" name="nome_campanha" class="form-control" placeholder="Ex: Campanha de Inverno 2025" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label" for="dt_inicial">Data Inicial:</label>
+                                <input type="date" id="dt_inicial" name="dt_inicial" class="form-control" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label" for="dt_final">Data Final:</label>
+                                <input type="date" id="dt_final" name="dt_final" class="form-control" required>
+                            </div>
+                        </div>
+                        
+                        <div class="form-section">
+                            <h4 class="form-section-title">Turmas Participantes</h4>
+                            
+                            <div class="form-group">
+                                <label class="form-label">Selecione as turmas participantes:</label>
+                                <div class="checkbox-group">
+                                    <% if (typeof turmas !== 'undefined' && turmas.length > 0) { %>
+                                        <% turmas.forEach(function(turma) { %>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" name="turmas_selecionadas" value="<%= turma.ID_TURMAS %>" id="turma_<%= turma.ID_TURMAS %>">
+                                                <label class="form-check-label" for="turma_<%= turma.ID_TURMAS %>">
+                                                    <%= turma.nome_turma %> - <%= turma.docente %>
+                                                </label>
+                                            </div>
+                                        <% }); %>
+                                    <% } else { %>
+                                        <p>Nenhuma turma cadastrada. <a href="/admin_edit_turmas">Cadastre turmas primeiro</a>.</p>
+                                    <% } %>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-section">
+                        <h4 class="form-section-title">Itens da Campanha</h4>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Selecione os itens aceitos na campanha:</label>
+                            <div class="checkbox-group">
+                                <% if (typeof itens !== 'undefined' && itens.length > 0) { %>
+                                    <% itens.forEach(function(item) { %>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" name="itens_selecionados" value="<%= item.id_item %>" id="item_<%= item.ID_ITEM %>">
+                                            <label class="form-check-label" for="item_<%= item.ID_ITEM %>">
+                                                <%= item.nome_item %> (<%= item.pontos %> pontos)
+                                            </label>
+                                        </div>
+                                    <% }); %>
+                                <% } else { %>
+                                    <p>Nenhum item cadastrado. Adicione itens abaixo.</p>
+                                <% } %>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Adicionar Novo Item:</label>
+                            <div class="item-form">
+                                <input type="text" id="novo_item" name="novo_item" class="form-control" placeholder="Nome do item">
+                                <input type="number" id="pontos_item" name="pontos_item" class="form-control" placeholder="Pontos" min="1">
+                                <button type="button" class="btn btn-primary" onclick="adicionarItem()">
+                                    <i class="fas fa-plus"></i> Adicionar
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-success">
+                        <i class="fas fa-save"></i> Criar Campanha
+                    </button>
+                </form>
+            </div>
+            
+            <!-- Card de Listagem de Campanhas -->
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Campanhas Existentes</h3>
+                    <div>
+                        <span>Total: <strong><%= typeof campanhas !== 'undefined' ? campanhas.length : 0 %> campanhas</strong></span>
+                    </div>
+                </div>
+                
+                <div class="table-responsive">
+                    <table id="campanhasTable">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Nome</th>
+                                <th>Data Inicial</th>
+                                <th>Data Final</th>
+                                <th>Turmas</th>
+                                <th>Status</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% if (typeof campanhas !== 'undefined' && campanhas.length > 0) { %>
+                                <% campanhas.forEach(function(campanha) { %>
+                                    <tr>
+                                        <td><%= campanha.id_campanha %></td>
+                                        <td><%= campanha.nome_campanha %></td>
+                                        <td><%= new Date(campanha.dt_inicial).toLocaleDateString('pt-BR') %></td>
+                                        <td><%= new Date(campanha.dt_final).toLocaleDateString('pt-BR') %></td>
+                                        <td><%= campanha.turma_participantes || '0' %></td>
+                                        <td>
+                                            <span class="status-badge <%= campanha.status_sala == 1 ? 'status-active' : 'status-inactive' %>">
+                                                <%= campanha.status == 1 ? 'Ativa' : 'Inativa' %>
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <button class="btn btn-primary btn-sm" onclick="editarCampanha(<%= campanha.id_campanha %>)">
+                                                <i class="fas fa-edit"></i> Editar
+                                            </button>
+                                            <% if (campanha.status == 1) { %>
+                                                <button class="btn btn-warning btn-sm" onclick="desativarCampanha(<%= campanha.id_campanha %>, '<%= campanha.nome_campanha %>')">
+                                                    <i class="fas fa-ban"></i> Desativar
+                                                </button>
+                                            <% } else { %>
+                                                <button class="btn btn-success btn-sm" onclick="ativarCampanha(<%= campanha.id_campanha %>, '<%= campanha.nome_campanha %>')">
+                                                    <i class="fas fa-check"></i> Ativar
+                                                </button>
+                                            <% } %>
+                                        </td>
+                                    </tr>
+                                <% }); %>
+                            <% } else { %>
+                                <tr>
+                                    <td colspan="7" style="text-align: center;">Nenhuma campanha cadastrada</td>
+                                </tr>
+                            <% } %>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            <p class="copyright">© 2025 Campanha do Agasalho. Todos os direitos reservados.</p>
+        </footer>
+    </div>
+
+    <!-- Modal para Editar Campanha -->
+    <div id="editModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="fecharModal()">&times;</span>
+            <h2>Editar Campanha</h2>
+            <form id="editForm" action="/admin_edit_campanha/update" method="POST">
+                <input type="hidden" id="edit_id" name="ID_CAMPANHA">
+                
+                <div class="form-group">
+                    <label class="form-label" for="edit_nome">Nome da Campanha:</label>
+                    <input type="text" id="edit_nome" name="NOME_CAMPANHA" class="form-control" required>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label" for="edit_dt_inicial">Data Inicial:</label>
+                    <input type="date" id="edit_dt_inicial" name="DT_INICIAL" class="form-control" required>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label" for="edit_dt_final">Data Final:</label>
+                    <input type="date" id="edit_dt_final" name="DT_FINAL" class="form-control" required>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label" for="edit_status">Status:</label>
+                    <select id="edit_status" name="STATUS_SALA" class="form-control" required>
+                        <option value="1">Ativa</option>
+                        <option value="0">Inativa</option>
+                    </select>
+                </div>
+                
+                <button type="submit" class="btn btn-success">
+                    <i class="fas fa-save"></i> Salvar Alterações
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Função para adicionar novo item
+        function adicionarItem() {
+            const nomeItem = document.getElementById('novo_item').value;
+            const pontosItem = document.getElementById('pontos_item').value;
+            
+            if (!nomeItem || !pontosItem) {
+                alert('Por favor, preencha o nome e os pontos do item.');
+                return;
+            }
+            
+            // Aqui você pode implementar a lógica para adicionar o item via AJAX
+            // ou simplesmente adicionar ao formulário como um campo oculto
+            alert(`Item "${nomeItem}" com ${pontosItem} pontos será adicionado à campanha.`);
+            
+            // Limpar os campos
+            document.getElementById('novo_item').value = '';
+            document.getElementById('pontos_item').value = '';
+        }
+        
+        // Funções para modais
+        function abrirModal(modalId) {
+            document.getElementById(modalId).style.display = 'block';
+        }
+        
+        function fecharModal() {
+            document.getElementById('editModal').style.display = 'none';
+        }
+        
+        // Fechar modais ao clicar fora deles
+        window.onclick = function(event) {
+            if (event.target.classList.contains('modal')) {
+                event.target.style.display = 'none';
+            }
+        }
+        
+        // Função para editar campanha
+        function editarCampanha(id) {
+            // Aqui você implementaria a busca dos dados da campanha
+            // Por enquanto, vamos apenas abrir o modal
+            abrirModal('editModal');
+        }
+        
+        // Função para confirmar desativação de campanha
+        function desativarCampanha(id, nome) {
+            if (confirm(`Tem certeza que deseja desativar a campanha "${nome}"?`)) {
+                window.location.href = `/admin_edit_campanha/deactivate/${id}`;
+            }
+        }
+        
+        // Função para confirmar ativação de campanha
+        function ativarCampanha(id, nome) {
+            if (confirm(`Tem certeza que deseja ativar a campanha "${nome}"?`)) {
+                window.location.href = `/admin_edit_campanha/activate/${id}`;
+            }
+        }
+        
+        // Definir data mínima para os campos de data (hoje)
+        document.addEventListener('DOMContentLoaded', function() {
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('dt_inicial');
+            document.getElementById('dt_final').min = today;
+        });
+    </script>
+        <style>
         :root {
             --primary: #3498db;
             --secondary: #e74c3c;
@@ -448,308 +752,5 @@
             }
         }
     </style>
-</head>
-<body>
-    <div class="container">
-        <!-- Header -->
-        <header>
-            <div class="logo">
-                <i class="fas fa-tshirt"></i>
-                <h1>Campanha do Agasalho</h1>
-            </div>
-            
-            <div class="user-info">
-                <i class="fas fa-user-shield"></i>
-                <span>Super Admin: <%= user.name %></span>
-            </div>
-            
-            <nav>
-                <ul>
-                    <li><a href="/sAdmin"><i class="fas fa-arrow-left"></i> Voltar</a></li>
-                    <li><a href="/admin_edit_turmas"><i class="fas fa-users"></i> Gerenciar Turmas</a></li>
-                    <li><a href="/logout" class="logout-btn">
-                        <i class="fas fa-sign-out-alt"></i> Sair
-                    </a></li>
-                </ul>
-            </nav>
-        </header>
-
-        <div class="main-content">
-            <h2 class="page-title">Gerenciamento de Campanhas</h2>
-            
-            <!-- Mensagens de sucesso/erro -->
-            <div class="messages">
-                <% if(typeof success !== 'undefined') { %>
-                    <div class="success-message">
-                        <i class="fas fa-check-circle"></i> <%= success %>
-                    </div>
-                <% } %>
-                
-                <% if(typeof error !== 'undefined') { %>
-                    <div class="error-message">
-                        <i class="fas fa-exclamation-circle"></i> <%= error %>
-                    </div>
-                <% } %>
-            </div>
-            
-            <!-- Card de Criação de Campanha -->
-            <div class="card">
-                <div class="card-header">
-                    <h3 class="card-title">Criar Nova Campanha</h3>
-                </div>
-                
-                <form action="/admin_edit_campanha/create" method="POST">
-                    <div class="form-container">
-                        <div class="form-section">
-                            <h4 class="form-section-title">Informações da Campanha</h4>
-                            
-                            <div class="form-group">
-                                <label class="form-label" for="nome_campanha">Nome da Campanha:</label>
-                                <input type="text" id="nome_campanha" name="nome_campanha" class="form-control" placeholder="Ex: Campanha de Inverno 2025" required>
-                            </div>
-                            
-                            <div class="form-group">
-                                <label class="form-label" for="dt_inicial">Data Inicial:</label>
-                                <input type="date" id="dt_inicial" name="dt_inicial" class="form-control" required>
-                            </div>
-                            
-                            <div class="form-group">
-                                <label class="form-label" for="dt_final">Data Final:</label>
-                                <input type="date" id="dt_final" name="dt_final" class="form-control" required>
-                            </div>
-                        </div>
-                        
-                        <div class="form-section">
-                            <h4 class="form-section-title">Turmas Participantes</h4>
-                            
-                            <div class="form-group">
-                                <label class="form-label">Selecione as turmas participantes:</label>
-                                <div class="checkbox-group">
-                                    <% if (typeof turmas !== 'undefined' && turmas.length > 0) { %>
-                                        <% turmas.forEach(function(turma) { %>
-                                            <div class="form-check">
-                                                <input class="form-check-input" type="checkbox" name="turmas_selecionadas" value="<%= turma.ID_TURMAS %>" id="turma_<%= turma.ID_TURMAS %>">
-                                                <label class="form-check-label" for="turma_<%= turma.ID_TURMAS %>">
-                                                    <%= turma.nome_turma %> - <%= turma.docente %>
-                                                </label>
-                                            </div>
-                                        <% }); %>
-                                    <% } else { %>
-                                        <p>Nenhuma turma cadastrada. <a href="/admin_edit_turmas">Cadastre turmas primeiro</a>.</p>
-                                    <% } %>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="form-section">
-                        <h4 class="form-section-title">Itens da Campanha</h4>
-                        
-                        <div class="form-group">
-                            <label class="form-label">Selecione os itens aceitos na campanha:</label>
-                            <div class="checkbox-group">
-                                <% if (typeof itens !== 'undefined' && itens.length > 0) { %>
-                                    <% itens.forEach(function(item) { %>
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="checkbox" name="itens_selecionados" value="<%= item.id_item %>" id="item_<%= item.ID_ITEM %>">
-                                            <label class="form-check-label" for="item_<%= item.ID_ITEM %>">
-                                                <%= item.nome_item %> (<%= item.pontos %> pontos)
-                                            </label>
-                                        </div>
-                                    <% }); %>
-                                <% } else { %>
-                                    <p>Nenhum item cadastrado. Adicione itens abaixo.</p>
-                                <% } %>
-                            </div>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label class="form-label">Adicionar Novo Item:</label>
-                            <div class="item-form">
-                                <input type="text" id="novo_item" name="novo_item" class="form-control" placeholder="Nome do item">
-                                <input type="number" id="pontos_item" name="pontos_item" class="form-control" placeholder="Pontos" min="1">
-                                <button type="button" class="btn btn-primary" onclick="adicionarItem()">
-                                    <i class="fas fa-plus"></i> Adicionar
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <button type="submit" class="btn btn-success">
-                        <i class="fas fa-save"></i> Criar Campanha
-                    </button>
-                </form>
-            </div>
-            
-            <!-- Card de Listagem de Campanhas -->
-            <div class="card">
-                <div class="card-header">
-                    <h3 class="card-title">Campanhas Existentes</h3>
-                    <div>
-                        <span>Total: <strong><%= typeof campanhas !== 'undefined' ? campanhas.length : 0 %> campanhas</strong></span>
-                    </div>
-                </div>
-                
-                <div class="table-responsive">
-                    <table id="campanhasTable">
-                        <thead>
-                            <tr>
-                                <th>ID</th>
-                                <th>Nome</th>
-                                <th>Data Inicial</th>
-                                <th>Data Final</th>
-                                <th>Turmas</th>
-                                <th>Status</th>
-                                <th>Ações</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <% if (typeof campanhas !== 'undefined' && campanhas.length > 0) { %>
-                                <% campanhas.forEach(function(campanha) { %>
-                                    <tr>
-                                        <td><%= campanha.id_campanha %></td>
-                                        <td><%= campanha.nome_campanha %></td>
-                                        <td><%= new Date(campanha.dt_inicial).toLocaleDateString('pt-BR') %></td>
-                                        <td><%= new Date(campanha.dt_final).toLocaleDateString('pt-BR') %></td>
-                                        <td><%= campanha.turma_participantes || '0' %></td>
-                                        <td>
-                                            <span class="status-badge <%= campanha.status_sala == 1 ? 'status-active' : 'status-inactive' %>">
-                                                <%= campanha.status == 1 ? 'Ativa' : 'Inativa' %>
-                                            </span>
-                                        </td>
-                                        <td>
-                                            <button class="btn btn-primary btn-sm" onclick="editarCampanha(<%= campanha.id_campanha %>)">
-                                                <i class="fas fa-edit"></i> Editar
-                                            </button>
-                                            <% if (campanha.status == 1) { %>
-                                                <button class="btn btn-warning btn-sm" onclick="desativarCampanha(<%= campanha.id_campanha %>, '<%= campanha.nome_campanha %>')">
-                                                    <i class="fas fa-ban"></i> Desativar
-                                                </button>
-                                            <% } else { %>
-                                                <button class="btn btn-success btn-sm" onclick="ativarCampanha(<%= campanha.id_campanha %>, '<%= campanha.nome_campanha %>')">
-                                                    <i class="fas fa-check"></i> Ativar
-                                                </button>
-                                            <% } %>
-                                        </td>
-                                    </tr>
-                                <% }); %>
-                            <% } else { %>
-                                <tr>
-                                    <td colspan="7" style="text-align: center;">Nenhuma campanha cadastrada</td>
-                                </tr>
-                            <% } %>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-
-        <footer>
-            <p class="copyright">© 2025 Campanha do Agasalho. Todos os direitos reservados.</p>
-        </footer>
-    </div>
-
-    <!-- Modal para Editar Campanha -->
-    <div id="editModal" class="modal">
-        <div class="modal-content">
-            <span class="close" onclick="fecharModal()">&times;</span>
-            <h2>Editar Campanha</h2>
-            <form id="editForm" action="/admin_edit_campanha/update" method="POST">
-                <input type="hidden" id="edit_id" name="ID_CAMPANHA">
-                
-                <div class="form-group">
-                    <label class="form-label" for="edit_nome">Nome da Campanha:</label>
-                    <input type="text" id="edit_nome" name="NOME_CAMPANHA" class="form-control" required>
-                </div>
-                
-                <div class="form-group">
-                    <label class="form-label" for="edit_dt_inicial">Data Inicial:</label>
-                    <input type="date" id="edit_dt_inicial" name="DT_INICIAL" class="form-control" required>
-                </div>
-                
-                <div class="form-group">
-                    <label class="form-label" for="edit_dt_final">Data Final:</label>
-                    <input type="date" id="edit_dt_final" name="DT_FINAL" class="form-control" required>
-                </div>
-                
-                <div class="form-group">
-                    <label class="form-label" for="edit_status">Status:</label>
-                    <select id="edit_status" name="STATUS_SALA" class="form-control" required>
-                        <option value="1">Ativa</option>
-                        <option value="0">Inativa</option>
-                    </select>
-                </div>
-                
-                <button type="submit" class="btn btn-success">
-                    <i class="fas fa-save"></i> Salvar Alterações
-                </button>
-            </form>
-        </div>
-    </div>
-
-    <script>
-        // Função para adicionar novo item
-        function adicionarItem() {
-            const nomeItem = document.getElementById('novo_item').value;
-            const pontosItem = document.getElementById('pontos_item').value;
-            
-            if (!nomeItem || !pontosItem) {
-                alert('Por favor, preencha o nome e os pontos do item.');
-                return;
-            }
-            
-            // Aqui você pode implementar a lógica para adicionar o item via AJAX
-            // ou simplesmente adicionar ao formulário como um campo oculto
-            alert(`Item "${nomeItem}" com ${pontosItem} pontos será adicionado à campanha.`);
-            
-            // Limpar os campos
-            document.getElementById('novo_item').value = '';
-            document.getElementById('pontos_item').value = '';
-        }
-        
-        // Funções para modais
-        function abrirModal(modalId) {
-            document.getElementById(modalId).style.display = 'block';
-        }
-        
-        function fecharModal() {
-            document.getElementById('editModal').style.display = 'none';
-        }
-        
-        // Fechar modais ao clicar fora deles
-        window.onclick = function(event) {
-            if (event.target.classList.contains('modal')) {
-                event.target.style.display = 'none';
-            }
-        }
-        
-        // Função para editar campanha
-        function editarCampanha(id) {
-            // Aqui você implementaria a busca dos dados da campanha
-            // Por enquanto, vamos apenas abrir o modal
-            abrirModal('editModal');
-        }
-        
-        // Função para confirmar desativação de campanha
-        function desativarCampanha(id, nome) {
-            if (confirm(`Tem certeza que deseja desativar a campanha "${nome}"?`)) {
-                window.location.href = `/admin_edit_campanha/deactivate/${id}`;
-            }
-        }
-        
-        // Função para confirmar ativação de campanha
-        function ativarCampanha(id, nome) {
-            if (confirm(`Tem certeza que deseja ativar a campanha "${nome}"?`)) {
-                window.location.href = `/admin_edit_campanha/activate/${id}`;
-            }
-        }
-        
-        // Definir data mínima para os campos de data (hoje)
-        document.addEventListener('DOMContentLoaded', function() {
-            const today = new Date().toISOString().split('T')[0];
-            document.getElementById('dt_inicial');
-            document.getElementById('dt_final').min = today;
-        });
-    </script>
 </body>
 </html>

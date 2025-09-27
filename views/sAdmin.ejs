@@ -7,7 +7,55 @@
     <link rel="icon" href="/logo.png" type="image/x-icon">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Montserrat:wght@700;800&display=swap" rel="stylesheet">
-    <style>
+ 
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">
+                <i class="fas fa-tshirt"></i>
+                <h1>Campanha do Agasalho</h1>
+            </div>
+            
+            <div class="user-info">
+                <i class="fas fa-user-shield"></i>
+                <span>Super Admin: <%= user.name %></span>
+            </div>
+            
+            <nav>
+                <ul>
+                    <li><a href="/"><i class="fas fa-home"></i> Início</a></li>
+                    <li><a href="/doar"><i class="fas fa-hands-helping"></i> Como Ajudar</a></li>
+                    <li><a href="/sobre"><i class="fas fa-info-circle"></i> Sobre</a></li>
+                    <li><a href="/logout" class="logout-btn">
+                        <i class="fas fa-sign-out-alt"></i> Sair
+                    </a></li>
+                </ul>
+            </nav>
+        </header>
+
+        <div class="main-content">
+            <div class="button-container">
+                <a href="/admin_edit_turmas" class="big-button">
+                    <i class="fas fa-users"></i>
+                    <h2>Gerenciar Turmas</h2>
+                </a>
+                <a href="/admin_edit_campanha" class="big-button">
+                    <i class="fas fa-tshirt"></i>
+                    <h2>Gerenciar Campanhas</h2>
+                </a>
+                <a href="/admin_edit_usuarios" class="big-button">
+                    <i class="fas fa-users"></i>
+                    <h2>Gerenciar Usuários</h2>
+                </a>
+            </div>
+        </div>
+
+        <footer>
+            <p class="copyright">© 2025 Campanha do Agasalho. Todos os direitos reservados.</p>
+        </footer>
+    </div>
+       <style>
         :root {
             --primary: #3498db;
             --secondary: #e74c3c;
@@ -182,48 +230,5 @@
             color: var(--accent);
         }
     </style>
-</head>
-<body>
-    <div class="container">
-        <header>
-            <div class="logo">
-                <i class="fas fa-tshirt"></i>
-                <h1>Campanha do Agasalho</h1>
-            </div>
-            
-            <div class="user-info">
-                <i class="fas fa-user-shield"></i>
-                <span>Super Admin: <%= user.name %></span>
-            </div>
-            
-            <nav>
-                <ul>
-                    <li><a href="/"><i class="fas fa-home"></i> Início</a></li>
-                    <li><a href="/doar"><i class="fas fa-hands-helping"></i> Como Ajudar</a></li>
-                    <li><a href="/sobre"><i class="fas fa-info-circle"></i> Sobre</a></li>
-                    <li><a href="/logout" class="logout-btn">
-                        <i class="fas fa-sign-out-alt"></i> Sair
-                    </a></li>
-                </ul>
-            </nav>
-        </header>
-
-        <div class="main-content">
-            <div class="button-container">
-                <a href="/admin_edit_turmas" class="big-button">
-                    <i class="fas fa-users"></i>
-                    <h2>Gerenciar Turmas</h2>
-                </a>
-                <a href="/admin_edit_campanha" class="big-button">
-                    <i class="fas fa-tshirt"></i>
-                    <h2>Gerenciar Campanhas</h2>
-                </a>
-            </div>
-        </div>
-
-        <footer>
-            <p class="copyright">© 2025 Campanha do Agasalho. Todos os direitos reservados.</p>
-        </footer>
-    </div>
 </body>
 </html>

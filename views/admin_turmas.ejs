@@ -140,7 +140,36 @@
         </div>
       </div>
     </div>
-    <style>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        const turmaSelect = document.getElementById("turma-select");
+
+        // Função para mostrar a turma selecionada
+        function showSelectedTurma() {
+          // Esconder todos os detalhes
+          document.querySelectorAll(".turma-details").forEach((el) => {
+            el.style.display = "none";
+          });
+
+          // Mostrar apenas a turma selecionada
+          const selectedTurma = turmaSelect.value;
+          const turmaElement = document.getElementById(
+            `turma-${selectedTurma}`
+          );
+          if (turmaElement) {
+            turmaElement.style.display = "block";
+          }
+        }
+
+        // Configurar o evento de change
+        turmaSelect.addEventListener("change", showSelectedTurma);
+
+        // Mostrar a turma inicial
+        showSelectedTurma();
+      });
+    </script>
+        <style>
       * {
         margin: 0;
         padding: 0;
@@ -537,33 +566,5 @@
         background: radial-gradient(circle, #cd7f32 0%, transparent 70%);
       }
     </style>
-    <script>
-      document.addEventListener("DOMContentLoaded", function () {
-        const turmaSelect = document.getElementById("turma-select");
-
-        // Função para mostrar a turma selecionada
-        function showSelectedTurma() {
-          // Esconder todos os detalhes
-          document.querySelectorAll(".turma-details").forEach((el) => {
-            el.style.display = "none";
-          });
-
-          // Mostrar apenas a turma selecionada
-          const selectedTurma = turmaSelect.value;
-          const turmaElement = document.getElementById(
-            `turma-${selectedTurma}`
-          );
-          if (turmaElement) {
-            turmaElement.style.display = "block";
-          }
-        }
-
-        // Configurar o evento de change
-        turmaSelect.addEventListener("change", showSelectedTurma);
-
-        // Mostrar a turma inicial
-        showSelectedTurma();
-      });
-    </script>
   </body>
 </html>

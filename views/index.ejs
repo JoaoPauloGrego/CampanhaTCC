@@ -8,6 +8,67 @@
   <link rel="icon" href="/logo.png" type="image/x-icon">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Montserrat:wght@700;800&display=swap" rel="stylesheet">
+  
+
+
+</head>
+
+<body>
+  <div class="container">
+    <!-- Header -->
+    <header>
+      <div class="logo">
+        <i class="fas fa-tshirt"></i>
+        <h1>Campanha do Agasalho</h1>
+      </div>
+      <nav>
+        <ul>
+          <li><a href="/"><i class="fas fa-home"></i> Início</a></li>
+          <li><a href="/doar"><i class="fas fa-hands-helping"></i> Como Ajudar</a></li>
+          <li><a href="/sobre"><i class="fas fa-info-circle"></i> Sobre</a></li>
+        </ul>
+      </nav>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+      <div class="hero-content">
+        <h2>Seu agasalho pode aquecer um coração</h2>
+        <p>Participe da nossa campanha e ajude pessoas em situação de vulnerabilidade neste inverno. Cada doação faz a diferença!</p>
+        <a href="/login" class="btn">
+          <i class="fas fa-sign-in-alt"></i> Acessar o Sistema
+        </a>
+
+        <div class="stats">
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+      <p class="copyright">© 2025 Campanha do Agasalho. Todos os direitos reservados.</p>
+    </footer>
+  </div>
+
+  <script>
+    // Adicionando animação de digitação no título
+    document.addEventListener('DOMContentLoaded', function() {
+      const title = document.querySelector('.hero h2');
+      const text = title.textContent;
+      title.textContent = '';
+
+      let i = 0;
+      const typeWriter = () => {
+        if (i < text.length) {
+          title.textContent += text.charAt(i);
+          i++;
+          setTimeout(typeWriter, 50);
+        }
+      };
+
+      setTimeout(typeWriter, 500);
+    });
+  </script>
   <style >
     * {
       margin: 0;
@@ -360,66 +421,6 @@
       }
     }
   </style>
-
-
-</head>
-
-<body>
-  <div class="container">
-    <!-- Header -->
-    <header>
-      <div class="logo">
-        <i class="fas fa-tshirt"></i>
-        <h1>Campanha do Agasalho</h1>
-      </div>
-      <nav>
-        <ul>
-          <li><a href="/"><i class="fas fa-home"></i> Início</a></li>
-          <li><a href="/doar"><i class="fas fa-hands-helping"></i> Como Ajudar</a></li>
-          <li><a href="/sobre"><i class="fas fa-info-circle"></i> Sobre</a></li>
-        </ul>
-      </nav>
-    </header>
-
-    <!-- Hero Section -->
-    <section class="hero">
-      <div class="hero-content">
-        <h2>Seu agasalho pode aquecer um coração</h2>
-        <p>Participe da nossa campanha e ajude pessoas em situação de vulnerabilidade neste inverno. Cada doação faz a diferença!</p>
-        <a href="/login" class="btn">
-          <i class="fas fa-sign-in-alt"></i> Acessar o Sistema
-        </a>
-
-        <div class="stats">
-        </div>
-      </div>
-    </section>
-
-    <!-- Footer -->
-    <footer>
-      <p class="copyright">© 2025 Campanha do Agasalho. Todos os direitos reservados.</p>
-    </footer>
-  </div>
-
-  <script>
-    // Adicionando animação de digitação no título
-    document.addEventListener('DOMContentLoaded', function() {
-      const title = document.querySelector('.hero h2');
-      const text = title.textContent;
-      title.textContent = '';
-
-      let i = 0;
-      const typeWriter = () => {
-        if (i < text.length) {
-          title.textContent += text.charAt(i);
-          i++;
-          setTimeout(typeWriter, 50);
-        }
-      };
-
-      setTimeout(typeWriter, 500);
-    });
-  </script>
 </body>
 
 </html>

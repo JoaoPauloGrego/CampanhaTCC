@@ -6,7 +6,156 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Relatório de Turmas - Aluno</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <style>
+ 
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <!-- Header -->
+    <div class="header">
+      <div class="header-content">
+        <div class="logo">
+          <i class="fas fa-hands-helping"></i>
+          <h1>Campanha do Agasalho - Painel do Aluno</h1>
+        </div>
+        <a href="/logout" class="back-btn">
+          <i class="fas fa-sign-out-alt"></i> Sair
+        </a>
+      </div>
+    </div>
+
+    <!-- Page Title -->
+    <div class="page-title">
+      <h2>Pontuação por Turma</h2>
+    </div>
+
+    <!-- Ranking Section - Apenas 3 primeiros -->
+    <div class="ranking-container">
+      <% turmas.forEach((turma, index)=> { %>
+        <div class="ranking-card">
+          <div class="ranking-position medal-effect">
+            <%= index + 1 %>
+          </div>
+          <div class="turma-info">
+            <div class="turma-name">
+              <%= turma.turma_docente.split(' - ')[0] %></div>
+            <div class="turma-docente"><%= turma.turma_docente.split(' - ')[1] %></div>
+          </div>
+          <div class="turma-stats">
+            <div class="stat-box">
+              <div class="stat-value"><%= turma.total_pontos %></div>
+              <div class="stat-label">Pontos</div>
+            </div>
+            <div class="stat-box">
+              <div class="stat-value"><%= itensPorTurma[turma.id] ? itensPorTurma[turma.id].length : 0 %></div>
+              <div class="stat-label">Tipos de Itens</div>
+            </div>
+          </div>
+        </div>
+      <% }); %>
+      
+      <!-- Mensagem para outras turmas -->
+      <div class="other-teams">
+        <h3>As demais turmas estão competindo pelo top 3!</h3>
+        <p>Continue doando para sua turma subir no ranking.</p>
+      </div>
+    </div>
+
+    <!-- Details Section -->
+    <div class="details-container">
+      <div class="table-header">
+        <div class="table-title">Detalhamento de Itens por Turma</div>
+        <div class="turma-selector">
+        <label for="turma-select"><i class="fas fa-filter"></i> Selecione a Turma:</label>
+        <select id="turma-select" class="turma-select">
+         <% allTurmas.forEach(turma=> { %>
+         <option value="<%= turma.id %>">
+          <%= turma.turma_docente %>
+         </option>
+         <% }); %>
+       </select>
+  </div>
+        </div>
+      </div>
+      
+<!-- Seção de detalhes -->
+<% allTurmas.forEach(turma => { %>
+  <div class="turma-details" id="turma-<%= turma.id %>" style="<%= allTurmas[0].id !== turma.id ? 'display: none;' : '' %>">
+    <table>
+      <thead>
+        <tr>
+          <th>Tipo de Roupa</th>
+          <th>Pontuação Unitária</th>
+          <th>Quantidade</th>
+          <th>Pontos Totais</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% const itensDaTurma = itensPorTurma[turma.id] || []; %>
+        <% if (itensDaTurma.length > 0) { %>
+          <% itensDaTurma.forEach(item => { %>
+            <tr>
+              <td><%= item.tipo %></td>
+              <td><%= item.pontuacao %></td>
+              <td><%= item.quantidade_total %></td>
+              <td class="highlight"><%= item.pontos_total %></td>
+            </tr>
+          <% }); %>
+          <tr style="background-color: #f8f9fa;">
+            <td colspan="3" style="text-align: right; font-weight: 600;">Total da Turma:</td>
+            <td class="highlight" style="font-size: 1.1rem;">
+              <%= itensDaTurma.reduce((acc, item) => acc + item.pontos_total, 0) %>
+            </td>
+          </tr>
+        <% } else { %>
+          <tr>
+            <td colspan="4" style="text-align: center; padding: 30px; color: var(--text-light);">
+              Nenhum item registrado para esta turma
+            </td>
+          </tr>
+        <% } %>
+      </tbody>
+    </table>
+  </div>
+<% }); %>
+          </div>
+
+          <!-- Footer -->
+          <div class="footer">
+            <div class="copyright">
+              © 2025 Campanha do Agasalho. Todos os direitos reservados.
+            </div>
+          </div>
+        </div>
+
+        <script>
+          document.addEventListener('DOMContentLoaded', function () {
+            const turmaSelect = document.getElementById('turma-select');
+
+            // Função para mostrar a turma selecionada
+            function showSelectedTurma() {
+              // Esconder todos os detalhes
+              document.querySelectorAll('.turma-details').forEach(el => {
+                el.style.display = 'none';
+              });
+
+              // Mostrar apenas a turma selecionada
+              const selectedTurma = turmaSelect.value;
+              const turmaElement = document.getElementById(`turma-${selectedTurma}`);
+              if (turmaElement) {
+                turmaElement.style.display = 'block';
+              }
+            }
+
+            // Configurar o evento de change
+            turmaSelect.addEventListener('change', showSelectedTurma);
+
+            // Mostrar a turma inicial
+            showSelectedTurma();
+          });
+        </script>
+         <style>
 
     /* Adicione estes novos estilos */
     .ranking-container:has(.ranking-card:nth-child(4)) {
@@ -406,154 +555,6 @@
       }
     }
   </style>
-  </style>
-</head>
-
-<body>
-  <div class="container">
-    <!-- Header -->
-    <div class="header">
-      <div class="header-content">
-        <div class="logo">
-          <i class="fas fa-hands-helping"></i>
-          <h1>Campanha do Agasalho - Painel do Aluno</h1>
-        </div>
-        <a href="/logout" class="back-btn">
-          <i class="fas fa-sign-out-alt"></i> Sair
-        </a>
-      </div>
-    </div>
-
-    <!-- Page Title -->
-    <div class="page-title">
-      <h2>Pontuação por Turma</h2>
-    </div>
-
-    <!-- Ranking Section - Apenas 3 primeiros -->
-    <div class="ranking-container">
-      <% turmas.forEach((turma, index)=> { %>
-        <div class="ranking-card">
-          <div class="ranking-position medal-effect">
-            <%= index + 1 %>
-          </div>
-          <div class="turma-info">
-            <div class="turma-name">
-              <%= turma.turma_docente.split(' - ')[0] %></div>
-            <div class="turma-docente"><%= turma.turma_docente.split(' - ')[1] %></div>
-          </div>
-          <div class="turma-stats">
-            <div class="stat-box">
-              <div class="stat-value"><%= turma.total_pontos %></div>
-              <div class="stat-label">Pontos</div>
-            </div>
-            <div class="stat-box">
-              <div class="stat-value"><%= itensPorTurma[turma.id] ? itensPorTurma[turma.id].length : 0 %></div>
-              <div class="stat-label">Tipos de Itens</div>
-            </div>
-          </div>
-        </div>
-      <% }); %>
-      
-      <!-- Mensagem para outras turmas -->
-      <div class="other-teams">
-        <h3>As demais turmas estão competindo pelo top 3!</h3>
-        <p>Continue doando para sua turma subir no ranking.</p>
-      </div>
-    </div>
-
-    <!-- Details Section -->
-    <div class="details-container">
-      <div class="table-header">
-        <div class="table-title">Detalhamento de Itens por Turma</div>
-        <div class="turma-selector">
-        <label for="turma-select"><i class="fas fa-filter"></i> Selecione a Turma:</label>
-        <select id="turma-select" class="turma-select">
-         <% allTurmas.forEach(turma=> { %>
-         <option value="<%= turma.id %>">
-          <%= turma.turma_docente %>
-         </option>
-         <% }); %>
-       </select>
-  </div>
-        </div>
-      </div>
-      
-<!-- Seção de detalhes -->
-<% allTurmas.forEach(turma => { %>
-  <div class="turma-details" id="turma-<%= turma.id %>" style="<%= allTurmas[0].id !== turma.id ? 'display: none;' : '' %>">
-    <table>
-      <thead>
-        <tr>
-          <th>Tipo de Roupa</th>
-          <th>Pontuação Unitária</th>
-          <th>Quantidade</th>
-          <th>Pontos Totais</th>
-        </tr>
-      </thead>
-      <tbody>
-        <% const itensDaTurma = itensPorTurma[turma.id] || []; %>
-        <% if (itensDaTurma.length > 0) { %>
-          <% itensDaTurma.forEach(item => { %>
-            <tr>
-              <td><%= item.tipo %></td>
-              <td><%= item.pontuacao %></td>
-              <td><%= item.quantidade_total %></td>
-              <td class="highlight"><%= item.pontos_total %></td>
-            </tr>
-          <% }); %>
-          <tr style="background-color: #f8f9fa;">
-            <td colspan="3" style="text-align: right; font-weight: 600;">Total da Turma:</td>
-            <td class="highlight" style="font-size: 1.1rem;">
-              <%= itensDaTurma.reduce((acc, item) => acc + item.pontos_total, 0) %>
-            </td>
-          </tr>
-        <% } else { %>
-          <tr>
-            <td colspan="4" style="text-align: center; padding: 30px; color: var(--text-light);">
-              Nenhum item registrado para esta turma
-            </td>
-          </tr>
-        <% } %>
-      </tbody>
-    </table>
-  </div>
-<% }); %>
-          </div>
-
-          <!-- Footer -->
-          <div class="footer">
-            <div class="copyright">
-              © 2025 Campanha do Agasalho. Todos os direitos reservados.
-            </div>
-          </div>
-        </div>
-
-        <script>
-          document.addEventListener('DOMContentLoaded', function () {
-            const turmaSelect = document.getElementById('turma-select');
-
-            // Função para mostrar a turma selecionada
-            function showSelectedTurma() {
-              // Esconder todos os detalhes
-              document.querySelectorAll('.turma-details').forEach(el => {
-                el.style.display = 'none';
-              });
-
-              // Mostrar apenas a turma selecionada
-              const selectedTurma = turmaSelect.value;
-              const turmaElement = document.getElementById(`turma-${selectedTurma}`);
-              if (turmaElement) {
-                turmaElement.style.display = 'block';
-              }
-            }
-
-            // Configurar o evento de change
-            turmaSelect.addEventListener('change', showSelectedTurma);
-
-            // Mostrar a turma inicial
-            showSelectedTurma();
-          });
-        </script>
 </body>
 
 </html>

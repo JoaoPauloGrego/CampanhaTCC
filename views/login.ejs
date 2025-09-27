@@ -13,6 +13,39 @@
   <p style="color:red">Credenciais inválidas!</p>
   <% } %>
 
+  
+
+  <div class="container">
+    <!-- Header -->
+    <header>
+      <div class="logo">
+        <i class="fas fa-tshirt"></i>
+        <h1>Campanha do Agasalho</h1>
+      </div>
+      <nav>
+        <ul>
+          <li><a href="/"><i class="fas fa-home"></i> Início</a></li>
+          <li><a href="/doar"><i class="fas fa-hands-helping"></i> Como Ajudar</a></li>
+          <li><a href="/sobre"><i class="fas fa-info-circle"></i> Sobre</a></li>
+        </ul>
+      </nav>
+    </header>
+
+    <div class="login-container">
+      <h2 id="login">Para continuar navegando, faça seu <b>Login</b></h2>
+      <form action="/login" method="POST">
+        <input type="text" name="nome_usuario" placeholder="Usuário" required><br>
+        <input type="password" name="senha" placeholder="Senha" required><br>
+        <button type="submit" id="entrar">Entrar</button>
+      </form><br>
+      <i id="sair" class="fas fa-sign-in-alt"></i>
+      <a href="/logout">Sair</a>
+    </div>
+
+  <footer>
+    <p class="copyright">© 2025 Campanhas. Todos os direitos reservados.</p>
+  </footer>
+  </div>
   <style>
     :root {
       --primary: #3498db;
@@ -154,38 +187,6 @@
       text-decoration: none;
     }
   </style>
-
-  <div class="container">
-    <!-- Header -->
-    <header>
-      <div class="logo">
-        <i class="fas fa-tshirt"></i>
-        <h1>Campanha do Agasalho</h1>
-      </div>
-      <nav>
-        <ul>
-          <li><a href="/"><i class="fas fa-home"></i> Início</a></li>
-          <li><a href="/doar"><i class="fas fa-hands-helping"></i> Como Ajudar</a></li>
-          <li><a href="/sobre"><i class="fas fa-info-circle"></i> Sobre</a></li>
-        </ul>
-      </nav>
-    </header>
-
-    <div class="login-container">
-      <h2 id="login">Para continuar navegando, faça seu <b>Login</b></h2>
-      <form action="/login" method="POST">
-        <input type="text" name="nome_usuario" placeholder="Usuário" required><br>
-        <input type="password" name="senha" placeholder="Senha" required><br>
-        <button type="submit" id="entrar">Entrar</button>
-      </form><br>
-      <i id="sair" class="fas fa-sign-in-alt"></i>
-      <a href="/logout">Sair</a>
-    </div>
-
-  <footer>
-    <p class="copyright">© 2025 Campanhas. Todos os direitos reservados.</p>
-  </footer>
-  </div>
 </body>
 
 </html>
