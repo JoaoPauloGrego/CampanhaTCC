@@ -28,14 +28,22 @@ app.use((req, res, next) => {
 });
 
 // Rotas públicas
-app.get("/", (req, res) => { console.log("POST /"), res.render("index") });
-app.get("/login", (req, res) =>   { console.log("POST /login"), res.render("login")});
-app.get("/sobre", (req, res) => { console.log("POST /sobre"), res.render("sobre")});
-app.get("/doar", (req, res) => { console.log("POST /doar"), res.render("doar")} );
+app.get("/", (req, res) => {
+  console.log("POST /"), res.render("index");
+});
+app.get("/login", (req, res) => {
+  console.log("POST /login"), res.render("login");
+});
+app.get("/sobre", (req, res) => {
+  console.log("POST /sobre"), res.render("sobre");
+});
+app.get("/doar", (req, res) => {
+  console.log("POST /doar"), res.render("doar");
+});
 
 // Processar login
 app.post("/login", (req, res) => {
-  console.log("POST /login")
+  console.log("POST /login");
   const { nome_usuario, senha } = req.body;
   const query = "SELECT * FROM USUARIOS WHERE nome_usuario = ? AND senha = ?";
 
@@ -48,29 +56,33 @@ app.post("/login", (req, res) => {
       console.log(JSON.stringify(row));
 
       req.session.user = {
-      nome_usuario: nome_usuario,
-      id_usuario: row.id,
-      role: row.role
-      }
+        nome_usuario: nome_usuario,
+        id_usuario: row.id,
+        role: row.role,
+      };
       req.session.loggedin = true;
       req.session.role = row.role;
 
-      if (row.role === 'admin') {
+      if (row.role === "admin") {
         return res.redirect("/admin");
-      } else if (row.role === 'sAdmin') {
+      } else if (row.role === "sAdmin") {
         return res.redirect("/sAdmin");
-      } else if (row.role === 'aluno') {
+      } else if (row.role === "aluno") {
         return res.redirect("/aluno");
       } else {
         return res.redirect("/login");
-      };
-    };
+      }
+    }
   });
 });
 
 // Middleware de autenticação
 const requireAuth = (role) => (req, res, next) => {
-  if (req.session.loggedin && req.session.user && req.session.user.role === role) {
+  if (
+    req.session.loggedin &&
+    req.session.user &&
+    req.session.user.role === role
+  ) {
     return next();
   }
   res.redirect("/login");
@@ -78,8 +90,12 @@ const requireAuth = (role) => (req, res, next) => {
 
 // Painel Admin Base
 app.get("/admin", (req, res) => {
-  console.log("GET /admin")
-  if (req.session.loggedin && req.session.user && req.session.user.role === "admin") {
+  console.log("GET /admin");
+  if (
+    req.session.loggedin &&
+    req.session.user &&
+    req.session.user.role === "admin"
+  ) {
     const queryTurma = `SELECT id_turma, nome_turma, docente FROM TURMAS WHERE status = 1`;
     const queryItens = `SELECT * FROM ITENS WHERE status = 1`;
     const queryCampanhas = `SELECT * FROM CAMPANHAS WHERE status = 1`;
@@ -91,14 +107,14 @@ app.get("/admin", (req, res) => {
           console.error(err);
           return res.redirect("/admin?error=Erro ao carregar turmas");
         }
-        
+
         // Buscar itens
         db.all(queryItens, (err, itens) => {
           if (err) {
             console.error(err);
             return res.redirect("/admin?error=Erro ao carregar itens");
           }
-          
+
           // Buscar campanhas
           db.all(queryCampanhas, (err, campanhas) => {
             if (err) {
@@ -112,7 +128,7 @@ app.get("/admin", (req, res) => {
               ITENS: itens,
               success: req.query.success,
               error: req.query.error,
-              user: req.session.user
+              user: req.session.user,
             });
           });
         });
@@ -158,19 +174,19 @@ app.get("/aluno", requireAuth("aluno"), (req, res) => {
   `;
 
   db.serialize(() => {
-    // Buscar todas as turmas
+    // Busca todas as turmas
     db.all(allTurmasQuery, (err, allTurmas) => {
       if (err) return console.error(err);
 
-      // Buscar top 3 turmas
+      // Busca top 3 turmas
       db.all(turmasQuery, (err, turmas) => {
         if (err) return console.error(err);
 
-        // Buscar itens por turma
+        // Busca itens por turma
         db.all(itensQuery, (err, itens) => {
           if (err) return console.error(err);
 
-          // Organizar itens por turma
+          // Organiza itens por turma
           const itensPorTurma = {};
           itens.forEach((item) => {
             if (!itensPorTurma[item.turma_id]) {
@@ -182,7 +198,7 @@ app.get("/aluno", requireAuth("aluno"), (req, res) => {
           res.render("aluno", {
             turmas,
             itensPorTurma,
-            allTurmas, // Enviar todas as turmas para o front-end
+            allTurmas, // Envia todas as turmas para o front-end
             user: req.session.user,
           });
         });
@@ -191,40 +207,65 @@ app.get("/aluno", requireAuth("aluno"), (req, res) => {
   });
 });
 
-// Registrar nova doação
+// Registra nova doação
 app.post("/doacao", (req, res) => {
+  console.log("POST /doacao recebido");
+  console.log("Dados recebidos:", req.body);
+
   // Verificar autenticação primeiro
   if (!req.session.loggedin || req.session.user.role !== "admin") {
+    console.log("Acesso negado - usuário não autenticado");
     return res.redirect("/login?error=Acesso negado");
   }
 
-  const { id_campanha, id_turma, roupa_id, quantidade, data } = req.body;
-  console.log("Tentando registrar doação:", {
-    id_campanha,
-    id_turma,
-    roupa_id,
-    quantidade,
-    data,
-  });
+  const { id_campanha, id_turma, id_item, quantidade, data_doacao } = req.body;
 
   // Verificar se todos os campos estão preenchidos
-  if (!id_campanha || !id_turma || !roupa_id || !quantidade || !data) {
-    console.error("Campos obrigatórios faltando");
+  if (!id_campanha || !id_turma || !id_item || !quantidade || !data_doacao) {
+    console.error("Campos obrigatórios faltando:", {
+      id_campanha, id_turma, id_item, quantidade, data_doacao
+    });
     return res.redirect("/admin?error=Campos obrigatórios faltando");
   }
 
-  db.run(
-    `INSERT INTO DOACOES (id_campanha, id_turma, roupa_id, quantidade, data)
-     VALUES (?, ?, ?, ?, ?)`,
-    [id_campanha, id_turma, roupa_id, quantidade, data],
-    function (err) {
+  // Primeiro, buscar a pontuação do item selecionado
+  db.get(
+    "SELECT pontos FROM ITENS WHERE id_item = ?",
+    [id_item],
+    (err, item) => {
       if (err) {
-        console.error("Erro ao registrar doação:", err);
-        return res.redirect("/admin?error=Erro ao registrar doação");
+        console.error("Erro ao buscar pontuação do item:", err);
+        return res.redirect("/admin?error=Erro ao buscar item");
+      }
+      
+      if (!item) {
+        console.error("Item não encontrado para ID:", id_item);
+        return res.redirect("/admin?error=Item não encontrado");
       }
 
-      console.log(`Doação registrada com ID: ${this.lastID}`);
-      res.redirect("/admin?success=Doação registrada com sucesso");
+      console.log("Item encontrado:", item);
+      console.log("Pontuação do item:", item.pontos);
+      console.log("Quantidade:", quantidade);
+
+      // Calcular pontos totais
+      const pontosTotais = parseInt(quantidade) * parseInt(item.pontos);
+      console.log("Pontos totais calculados:", pontosTotais);
+
+      // Inserir a doação com os pontos totais
+      db.run(
+        `INSERT INTO DOACOES (id_campanha, id_turma, id_item, quantidade, data_doacao, pontos_total)
+         VALUES (?, ?, ?, ?, ?, ?)`,
+        [id_campanha, id_turma, id_item, quantidade, data_doacao, pontosTotais],
+        function (err) {
+          if (err) {
+            console.error("Erro ao registrar doação:", err);
+            return res.redirect("/admin?error=Erro ao registrar doação: " + err.message);
+          }
+
+          console.log(`Doação registrada com ID: ${this.lastID}`);
+          res.redirect("/admin?success=Doação registrada com sucesso");
+        }
+      );
     }
   );
 });
@@ -235,28 +276,28 @@ app.get("/sAdmin", requireAuth("sAdmin"), (req, res) => {
 });
 
 // Rota principal - Listar turmas (usa db2 - TCC.db)
-app.get('/admin_edit_turmas', requireAuth('sAdmin'), (req, res) => {
-  db.all('SELECT * FROM TURMAS', (err, turmas) => {
+app.get("/admin_edit_turmas", requireAuth("sAdmin"), (req, res) => {
+  db.all("SELECT * FROM TURMAS", (err, turmas) => {
     if (err) {
       console.error(err);
-      return res.render('admin_edit_turmas', {
+      return res.render("admin_edit_turmas", {
         turmas: [],
-        error: 'Erro ao carregar turmas',
-        user: req.session.user
+        error: "Erro ao carregar turmas",
+        user: req.session.user,
       });
     }
 
-    res.render('admin_edit_turmas', {
+    res.render("admin_edit_turmas", {
       turmas: turmas,
       user: req.session.user,
       success: req.query.success,
-      error: req.query.error
+      error: req.query.error,
     });
   });
 });
 
 // Criar nova turma
-app.post('/admin_edit_turmas/create', requireAuth('sAdmin'), (req, res) => {
+app.post("/admin_edit_turmas/create", requireAuth("sAdmin"), (req, res) => {
   const { nome_turma, docente, status, dt_inicial, dt_final } = req.body;
 
   db.run(
@@ -266,17 +307,18 @@ app.post('/admin_edit_turmas/create', requireAuth('sAdmin'), (req, res) => {
     function (err) {
       if (err) {
         console.error(err);
-        return res.redirect('/admin_edit_turmas?error=Erro ao criar turma');
+        return res.redirect("/admin_edit_turmas?error=Erro ao criar turma");
       }
 
-      res.redirect('/admin_edit_turmas?success=Turma criada com sucesso');
+      res.redirect("/admin_edit_turmas?success=Turma criada com sucesso");
     }
   );
 });
 
 // Atualizar turma
-app.post('/admin_edit_turmas/update', requireAuth('sAdmin'), (req, res) => {
-  const { id_turma, nome_turma, docente, status, dt_inicial, dt_final } = req.body;
+app.post("/admin_edit_turmas/update", requireAuth("sAdmin"), (req, res) => {
+  const { id_turma, nome_turma, docente, status, dt_inicial, dt_final } =
+    req.body;
 
   db.run(
     `UPDATE TURMAS SET nome_turma = ?, docente = ?, status = ?, dt_inicial = ?, dt_final = ? 
@@ -285,49 +327,59 @@ app.post('/admin_edit_turmas/update', requireAuth('sAdmin'), (req, res) => {
     function (err) {
       if (err) {
         console.error(err);
-        return res.redirect('/admin_edit_turmas?error=Erro ao atualizar turma');
+        return res.redirect("/admin_edit_turmas?error=Erro ao atualizar turma");
       }
 
-      res.redirect('/admin_edit_turmas?success=Turma atualizada com sucesso');
+      res.redirect("/admin_edit_turmas?success=Turma atualizada com sucesso");
     }
   );
 });
 
 // Desativar turma
-app.get('/admin_edit_turmas/deactivate/:id', requireAuth('sAdmin'), (req, res) => {
-  const id = req.params.id;
+app.get(
+  "/admin_edit_turmas/deactivate/:id",
+  requireAuth("sAdmin"),
+  (req, res) => {
+    const id = req.params.id;
 
-  db.run(
-    'UPDATE TURMAS SET status = 0 WHERE id_turma = ?',
-    [id],
-    function (err) {
-      if (err) {
-        console.error(err);
-        return res.redirect('/admin_edit_turmas?error=Erro ao desativar turma');
+    db.run(
+      "UPDATE TURMAS SET status = 0 WHERE id_turma = ?",
+      [id],
+      function (err) {
+        if (err) {
+          console.error(err);
+          return res.redirect(
+            "/admin_edit_turmas?error=Erro ao desativar turma"
+          );
+        }
+
+        res.redirect("/admin_edit_turmas?success=Turma desativada com sucesso");
       }
-
-      res.redirect('/admin_edit_turmas?success=Turma desativada com sucesso');
-    }
-  );
-});
+    );
+  }
+);
 
 // Ativar turma
-app.get('/admin_edit_turmas/activate/:id', requireAuth('sAdmin'), (req, res) => {
-  const id = req.params.id;
+app.get(
+  "/admin_edit_turmas/activate/:id",
+  requireAuth("sAdmin"),
+  (req, res) => {
+    const id = req.params.id;
 
-  db.run(
-    'UPDATE TURMAS SET status = 1 WHERE id_turma = ?',
-    [id],
-    function (err) {
-      if (err) {
-        console.error(err);
-        return res.redirect('/admin_edit_turmas?error=Erro ao ativar turma');
+    db.run(
+      "UPDATE TURMAS SET status = 1 WHERE id_turma = ?",
+      [id],
+      function (err) {
+        if (err) {
+          console.error(err);
+          return res.redirect("/admin_edit_turmas?error=Erro ao ativar turma");
+        }
+
+        res.redirect("/admin_edit_turmas?success=Turma ativada com sucesso");
       }
-
-      res.redirect('/admin_edit_turmas?success=Turma ativada com sucesso');
-    }
-  );
-});
+    );
+  }
+);
 
 // Rota para gerenciar campanhas
 app.get("/admin_edit_campanha", requireAuth("sAdmin"), (req, res) => {
@@ -340,7 +392,7 @@ app.get("/admin_edit_campanha", requireAuth("sAdmin"), (req, res) => {
         turmas: turmas,
         itens: itens,
         error: "Erro ao carregar campanhas",
-        user: req.session.user
+        user: req.session.user,
       });
     }
 
@@ -353,7 +405,7 @@ app.get("/admin_edit_campanha", requireAuth("sAdmin"), (req, res) => {
           turmas: turmas,
           itens: itens,
           error: "Erro ao carregar turmas",
-          user: req.session.user
+          user: req.session.user,
         });
       }
 
@@ -366,7 +418,7 @@ app.get("/admin_edit_campanha", requireAuth("sAdmin"), (req, res) => {
             turmas: itens,
             itens: itens,
             error: "Erro ao carregar itens",
-            user: req.session.user
+            user: req.session.user,
           });
         }
 
@@ -376,7 +428,7 @@ app.get("/admin_edit_campanha", requireAuth("sAdmin"), (req, res) => {
           itens: itens,
           success: req.query.success,
           error: req.query.error,
-          user: req.session.user
+          user: req.session.user,
         });
       });
     });
@@ -384,8 +436,14 @@ app.get("/admin_edit_campanha", requireAuth("sAdmin"), (req, res) => {
 });
 
 // Rota para processar a criação de campanhas
-app.post('/admin_edit_campanha/create', requireAuth('sAdmin'), (req, res) => {
-  const { nome_campanha, dt_inicial, dt_final, turmas_selecionadas, itens_selecionados } = req.body;
+app.post("/admin_edit_campanha/create", requireAuth("sAdmin"), (req, res) => {
+  const {
+    nome_campanha,
+    dt_inicial,
+    dt_final,
+    turmas_selecionadas,
+    itens_selecionados,
+  } = req.body;
 
   db.run(
     `INSERT INTO CAMPANHAS (nome_campanha, dt_inicial, dt_final) 
@@ -394,16 +452,20 @@ app.post('/admin_edit_campanha/create', requireAuth('sAdmin'), (req, res) => {
     function (err) {
       if (err) {
         console.error(err);
-        return res.redirect('/admin_edit_campanha?error=Erro ao criar campanha');
+        return res.redirect(
+          "/admin_edit_campanha?error=Erro ao criar campanha"
+        );
       }
 
       const campanhaId = this.lastID;
 
       // Associar turmas selecionadas à campanha
       if (turmas_selecionadas) {
-        const turmasArray = Array.isArray(turmas_selecionadas) ? turmas_selecionadas : [turmas_selecionadas];
+        const turmasArray = Array.isArray(turmas_selecionadas)
+          ? turmas_selecionadas
+          : [turmas_selecionadas];
 
-        turmasArray.forEach(turmaId => {
+        turmasArray.forEach((turmaId) => {
           db.run(
             `INSERT INTO CAMPANHA_TURMAS (id_campanha, id_turma) VALUES (?, ?)`,
             [campanhaId, turmaId]
@@ -411,11 +473,10 @@ app.post('/admin_edit_campanha/create', requireAuth('sAdmin'), (req, res) => {
         });
       }
 
-      res.redirect('/admin_edit_campanha?success=Campanha criada com sucesso');
+      res.redirect("/admin_edit_campanha?success=Campanha criada com sucesso");
     }
   );
 });
-
 
 // Visualização de doações (usa db - campanha.db)
 app.get("/admin/doacoes", requireAuth("admin"), (req, res) => {

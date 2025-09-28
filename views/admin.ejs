@@ -1,15 +1,10 @@
-<!DOCTYPE html>
 <html>
-
 <head>
   <title>Painel Admin</title>
   <link rel="icon" href="/logo.png" type="image/x-icon">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link
-    href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Montserrat:wght@700;800&display=swap"
-    rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Montserrat:wght@700;800&display=swap" rel="stylesheet">
 </head>
-
 <body>
   <div class="container">
     <!-- Header -->
@@ -62,20 +57,22 @@
           <div class="form-group">
             <label for="id_campanha"><i class="fas fa-campaign"></i> Campanha:</label>
             <select name="id_campanha" id="id_campanha" required>
+              <option value="">Selecione uma campanha</option>
               <% CAMPANHAS.forEach(campanha=> { %>
                 <option value="<%= campanha.id_campanha %>">
-                  <%= campanha.id_campanha %>
+                  <%= campanha.nome_campanha %> (ID: <%= campanha.id_campanha %>)
                 </option>
               <% }); %>
             </select>
           </div>
 
           <div class="form-group">
-            <label for="turma_id"><i class="fas fa-users"></i> Turma e Docente:</label>
-            <select name="turma_id" id="turma_id" required>
+            <label for="id_turma"><i class="fas fa-users"></i> Turma e Docente:</label>
+            <select name="id_turma" id="id_turma" required>
+              <option value="">Selecione uma turma</option>
               <% TURMAS.forEach(turma=> { %>
                 <option value="<%= turma.id_turma %>">
-                  <%= turma.id_turma  %>
+                  <%= turma.nome_turma %> - <%= turma.docente %> (ID: <%= turma.id_turma %>)
                 </option>
               <% }); %>
             </select>
@@ -83,9 +80,10 @@
 
           <div class="form-group">
             <label for="id_item"><i class="fas fa-tshirt"></i> Tipo de Roupa:</label>
-            <select name="roupa_id" id="id_item" required>
+            <select name="id_item" id="id_item" required>
+              <option value="">Selecione um item</option>
               <% ITENS.forEach(item=> { %>
-                <option value="<%= item.id_item %>">
+                <option value="<%= item.id_item %>" data-pontos="<%= item.pontos %>">
                   <%= item.nome_item %> (<%= item.pontos %> pontos)
                 </option>
               <% }); %>
@@ -98,8 +96,8 @@
           </div>
 
           <div class="form-group">
-            <label for="data"><i class="fas fa-calendar-alt"></i> Data:</label>
-            <input type="date" name="data" id="data" required>
+            <label for="data_doacao"><i class="fas fa-calendar-alt"></i> Data:</label>
+            <input type="date" name="data_doacao" id="data_doacao" required>
           </div>
 
           <button type="submit" class="btn-submit">
@@ -158,16 +156,25 @@
     document.addEventListener('DOMContentLoaded', function () {
       const today = new Date();
       const formattedDate = today.toISOString().split('T')[0];
-      document.getElementById('data').value = formattedDate;
+      document.getElementById('data_doacao').value = formattedDate;
 
       // Debug: verificar envio do formulário
       const form = document.querySelector('form');
-      form.addEventListener('submit', function () {
+      form.addEventListener('submit', function (e) {
         console.log('Formulário enviado');
+        console.log('Campanha ID:', document.getElementById('id_campanha').value);
         console.log('Turma ID:', document.getElementById('id_turma').value);
-        console.log('Roupa ID:', document.getElementById('id_item').value);
+        console.log('Item ID:', document.getElementById('id_item').value);
         console.log('Quantidade:', document.getElementById('quantidade').value);
         console.log('Data:', document.getElementById('data_doacao').value);
+        
+        // Validação adicional
+        const quantidade = document.getElementById('quantidade').value;
+        if (quantidade <= 0) {
+          e.preventDefault();
+          alert('A quantidade deve ser maior que zero');
+          return false;
+        }
       });
     });
   </script>
