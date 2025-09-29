@@ -50,7 +50,6 @@ app.post("/login", (req, res) => {
   db.get(query, [nome_usuario, senha], (err, row) => {
     if (err) {
       console.error(err);
-      return res.redirect("/unauthorized2");
     }
     if (row) {
       console.log(JSON.stringify(row));
@@ -72,6 +71,8 @@ app.post("/login", (req, res) => {
       } else {
         return res.redirect("/login");
       }
+    } else {
+      res.redirect("/login?error=Login ou senha incorreto")
     }
   });
 });
@@ -271,8 +272,16 @@ app.post("/doacao", (req, res) => {
 });
 
 // Rota para a página do Super Admin
-app.get("/sAdmin", requireAuth("sAdmin"), (req, res) => {
+app.get("/sAdmin", (req, res) => {
+  if (
+    req.session.loggedin &&
+    req.session.user &&
+    req.session.user.role === "sAdmin"
+  ) {
   res.render("sAdmin");
+  } else{
+    res.redirect("/login?error=Acesso negado")
+  }
 });
 
 // Rota principal - Listar turmas (usa db2 - TCC.db)
