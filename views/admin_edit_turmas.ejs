@@ -1,130 +1,132 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gerenciamento de Turmas - Super Admin</title>
-    <link rel="icon" href="/logo.png" type="image/x-icon">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Montserrat:wght@700;800&display=swap" rel="stylesheet">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gerenciamento de Turmas - Super Admin</title>
+  <link rel="icon" href="/logo.png" type="image/x-icon">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Montserrat:wght@700;800&display=swap" rel="stylesheet">
 
 </head>
-<body>
-    <div class="container">
-        <!-- Header -->
-        <header>
-            <div class="logo">
-                <i class="fas fa-tshirt"></i>
-                <h1>Campanha do Agasalho</h1>
-            </div>
-            
-            <div class="user-info">
-                <i class="fas fa-user-shield"></i>
-                <span>Super Admin: <%= user.name %></span>
-            </div>
-            
-            <nav>
-                <ul>
-                    <li><a href="/sAdmin"><i class="fas fa-arrow-left"></i> Voltar</a></li>
-                    <li><a href="/admin_edit_campanha"><i class="fas fa-tshirt"></i> Gerenciar Campanhas</a></li>
-                    <li><a href="/logout" class="logout-btn">
-                        <i class="fas fa-sign-out-alt"></i> Sair
-                    </a></li>
-                </ul>
-            </nav>
-        </header>
 
-        <div class="main-content">
-            <h2 class="page-title">Gerenciamento de Turmas</h2>
-            
-            <!-- Mensagens de sucesso/erro -->
-            <div class="messages">
-                <% if(typeof success !== 'undefined') { %>
-                    <div class="success-message">
-                        <i class="fas fa-check-circle"></i> <%= success %>
-                    </div>
-                <% } %>
-                
-                <% if(typeof error !== 'undefined') { %>
-                    <div class="error-message">
-                        <i class="fas fa-exclamation-circle"></i> <%= error %>
-                    </div>
-                <% } %>
-            </div>
-            
-            <!-- Card de Ações -->
-            <div class="card">
-                <div class="card-header">
-                    <h3 class="card-title">Ações</h3>
-                    <button class="btn btn-primary" onclick="openModal('createModal')">
-                        <i class="fas fa-plus"></i> Nova Turma
-                    </button>
-                </div>
-                <p>Aqui você pode gerenciar todas as turmas do sistema. Crie novas turmas, edite as existentes ou desative turmas que não estão mais em uso.</p>
-            </div>
-            
-            <!-- Filtros -->
-            <div class="card">
-                <h3 class="card-title">Filtros</h3>
-                <div class="filters">
-                    <div class="filter-group">
-                        <span class="filter-label">Status:</span>
-                        <select class="filter-select" id="statusFilter" onchange="filterTable()">
-                            <option value="all">Todas</option>
-                            <option value="1">Ativas</option>
-                            <option value="0">Inativas</option>
-                        </select>
-                    </div>
-                    <div class="filter-group">
-                        <span class="filter-label">Ordenar por:</span>
-                        <select class="filter-select" id="sortFilter" onchange="filterTable()">
-                            <option value="nome_turma">Turma (A-Z)</option>
-                            <option value="docente">Docente (A-Z)</option>
-                            <option value="dt_inicial">Data Inicial (Mais Recente)</option>
-                            <option value="dt_final">Data Final (Mais Recente)</option>
-                        </select>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Card de Listagem de Turmas -->
-            <div class="card">
-                <div class="card-header">
-                    <h3 class="card-title">Turmas Cadastradas</h3>
-                    <div>
-                        <span>Total: <strong><%= typeof turmas !== 'undefined' ? turmas.length : 0 %> turmas</strong></span>
-                    </div>
-                </div>
-                
-                <div class="table-responsive">
-                    <table id="turmasTable">
-                        <thead>
-                            <tr>
-                                <th>ID</th>
-                                <th>Turma</th>
-                                <th>Docente</th>
-                                <th>Data Inicial</th>
-                                <th>Data Final</th>
-                                <th>Status</th>
-                                <th>Ações</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <% if (typeof turmas !== 'undefined' && turmas.length > 0) { %>
-                                <% turmas.forEach(function(turma) { %>
-                                    <tr data-status="<%= turma.status %>">
-                                        <td><%= turma.id_turma %></td>
-                                        <td><%= turma.nome_turma %></td>
-                                        <td><%= turma.docente %></td>
-                                        <td><%= turma.dt_inicial ? new Date(turma.dt_inicial).toLocaleDateString('pt-BR') : 'Não definida' %></td>
-                                        <td><%= turma.dt_final ? new Date(turma.dt_final).toLocaleDateString('pt-BR') : 'Não definida' %></td>
-                                        <td>
-                                            <span class="status-badge <%= turma.status == 1 ? 'status-active' : 'status-inactive' %>">
-                                                <%= turma.status == 1 ? 'Ativa' : 'Inativa' %>
-                                            </span>
-                                        </td>
-                                        <td>
-                                            <button class="btn btn-primary btn-sm" onclick="openEditModal(
+<body>
+  <div class="container">
+    <!-- Header -->
+    <header>
+      <div class="logo">
+        <i class="fas fa-tshirt"></i>
+        <h1>Gerenciador de Campanhas</h1>
+      </div>
+
+      <div class="user-info">
+        <i class="fas fa-user-shield"></i>
+        <span>Super Admin: <%= user.name %></span>
+      </div>
+
+      <nav>
+        <ul>
+          <li><a href="/sAdmin"><i class="fas fa-arrow-left"></i> Voltar</a></li>
+          <li><a href="/admin_edit_campanha"><i class="fas fa-tshirt"></i> Gerenciar Campanhas</a></li>
+          <li><a href="/logout" class="logout-btn">
+              <i class="fas fa-sign-out-alt"></i> Sair
+            </a></li>
+        </ul>
+      </nav>
+    </header>
+
+    <div class="main-content">
+      <!-- <h2 class="page-title">Gerenciamento de Turmas</h2> -->
+
+      <!-- Mensagens de sucesso/erro -->
+      <div class="messages">
+        <% if(typeof success !== 'undefined') { %>
+        <div class="success-message">
+          <i class="fas fa-check-circle"></i> <%= success %>
+        </div>
+        <% } %>
+
+        <% if(typeof error !== 'undefined') { %>
+        <div class="error-message">
+          <i class="fas fa-exclamation-circle"></i> <%= error %>
+        </div>
+        <% } %>
+      </div>
+
+      <!-- Card de Ações -->
+      <div class="card">
+        <div class="card-header">
+          <h3 class="card-title">Ações</h3>
+          <button class="btn btn-primary" onclick="openModal('createModal')">
+            <i class="fas fa-plus"></i> Nova Turma
+          </button>
+        </div>
+        <p>Aqui você pode gerenciar todas as turmas do sistema. Crie novas turmas, edite as existentes ou desative turmas que não estão mais em uso.</p>
+      </div>
+
+      <!-- Filtros -->
+      <div class="card">
+        <h3 class="card-title">Filtros</h3>
+        <div class="filters">
+          <div class="filter-group">
+            <span class="filter-label">Status:</span>
+            <select class="filter-select" id="statusFilter" onchange="filterTable()">
+              <option value="all">Todas</option>
+              <option value="1">Ativas</option>
+              <option value="0">Inativas</option>
+            </select>
+          </div>
+          <div class="filter-group">
+            <span class="filter-label">Ordenar por:</span>
+            <select class="filter-select" id="sortFilter" onchange="filterTable()">
+              <option value="nome_turma">Turma (A-Z)</option>
+              <option value="docente">Docente (A-Z)</option>
+              <option value="dt_inicial">Data Inicial (Mais Recente)</option>
+              <option value="dt_final">Data Final (Mais Recente)</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card de Listagem de Turmas -->
+      <div class="card">
+        <div class="card-header">
+          <h3 class="card-title">Turmas Cadastradas</h3>
+          <div>
+            <span>Total: <strong><%= typeof turmas !== 'undefined' ? turmas.length : 0 %> turmas</strong></span>
+          </div>
+        </div>
+
+        <div class="table-responsive">
+          <table id="turmasTable">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Turma</th>
+                <th>Docente</th>
+                <th>Data Inicial</th>
+                <th>Data Final</th>
+                <th>Status</th>
+                <th>Ações</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% if (typeof turmas !== 'undefined' && turmas.length > 0) { %>
+              <% turmas.forEach(function(turma) { %>
+              <tr data-status="<%= turma.status %>">
+                <td><%= turma.id_turma %></td>
+                <td><%= turma.nome_turma %></td>
+                <td><%= turma.docente %></td>
+                <td><%= turma.dt_inicial ? new Date(turma.dt_inicial).toLocaleDateString('pt-BR') : 'Não definida' %></td>
+                <td><%= turma.dt_final ? new Date(turma.dt_final).toLocaleDateString('pt-BR') : 'Não definida' %></td>
+                <td>
+                  <span class="status-badge <%= turma.status == 1 ? 'status-active' : 'status-inactive' %>">
+                    <%= turma.status == 1 ? 'Ativa' : 'Inativa' %>
+                  </span>
+                </td>
+                <td>
+                  <button class="btn btn-primary btn-sm" onclick="openEditModal(
                                                 '<%= turma.id_turma %>', 
                                                 '<%= turma.nome_turma %>', 
                                                 '<%= turma.docente %>',
@@ -132,589 +134,613 @@
                                                 '<%= turma.dt_final %>',
                                                 '<%= turma.status %>'
                                             )">
-                                                <i class="fas fa-edit"></i> Editar
-                                            </button>
-                                            <% if (turma.status == 1) { %>
-                                                <button class="btn btn-warning btn-sm" onclick="confirmDeactivate('<%= turma.id_turma %>', '<%= turma.nome_turma %>')">
-                                                    <i class="fas fa-ban"></i> Desativar
-                                                </button>
-                                            <% } else { %>
-                                                <button class="btn btn-success btn-sm" onclick="confirmActivate('<%= turma.id_turma %>', '<%= turma.nome_turma %>')">
-                                                    <i class="fas fa-check"></i> Ativar
-                                                </button>
-                                            <% } %>
-                                        </td>
-                                    </tr>
-                                <% }); %>
-                            <% } else { %>
-                                <tr>
-                                    <td colspan="7" style="text-align: center;">Nenhuma turma cadastrada</td>
-                                </tr>
-                            <% } %>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
+                    <i class="fas fa-edit"></i> Editar
+                  </button>
+                  <% if (turma.status == 1) { %>
+                  <button class="btn btn-warning btn-sm" onclick="confirmDeactivate('<%= turma.id_turma %>', '<%= turma.nome_turma %>')">
+                    <i class="fas fa-ban"></i> Desativar
+                  </button>
+                  <% } else { %>
+                  <button class="btn btn-success btn-sm" onclick="confirmActivate('<%= turma.id_turma %>', '<%= turma.nome_turma %>')">
+                    <i class="fas fa-check"></i> Ativar
+                  </button>
+                  <% } %>
+                </td>
+              </tr>
+              <% }); %>
+              <% } else { %>
+              <tr>
+                <td colspan="7" style="text-align: center;">Nenhuma turma cadastrada</td>
+              </tr>
+              <% } %>
+            </tbody>
+          </table>
         </div>
-
-        <footer>
-            <p class="copyright">© 2025 Campanha do Agasalho. Todos os direitos reservados.</p>
-        </footer>
+      </div>
     </div>
 
-    <!-- Modal para Criar Turma -->
-    <div id="createModal" class="modal">
-        <div class="modal-content">
-            <span class="close" onclick="closeModal('createModal')">&times;</span>
-            <h2>Nova Turma</h2>
-            <form id="createForm" action="/admin_edit_turmas/create" method="POST">
-                <div class="form-group">
-                    <label class="form-label" for="nome_turma">Nome da Turma:</label>
-                    <input type="text" id="nome_turma" name="nome_turma" class="form-control" placeholder="Ex: 5º Ano A" required>
-                </div>
-                <div class="form-group">
-                    <label class="form-label" for="docente">Nome do Docente:</label>
-                    <input type="text" id="docente" name="docente" class="form-control" placeholder="Ex: Maria Silva" required>
-                </div>
-                <div class="form-group">
-                    <label class="form-label" for="dt_inicial">Data Inicial:</label>
-                    <input type="date" id="dt_inicial" name="dt_inicial" class="form-control">
-                </div>
-                <div class="form-group">
-                    <label class="form-label" for="dt_final">Data Final:</label>
-                    <input type="date" id="dt_final" name="dt_final" class="form-control">
-                </div>
-                <div class="form-group">
-                    <label class="form-label" for="status">Status:</label>
-                    <select id="status" name="status" class="form-control" required>
-                        <option value="1">Ativa</option>
-                        <option value="0">Inativa</option>
-                    </select>
-                </div>
-                <button type="submit" class="btn btn-success">
-                    <i class="fas fa-save"></i> Salvar Turma
-                </button>
-            </form>
+    <footer>
+      <p class="copyright">© 2025 Gerenciador de Campanhas. Todos os direitos reservados.</p>
+    </footer>
+  </div>
+
+  <!-- Modal para Criar Turma -->
+  <div id="createModal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="closeModal('createModal')">&times;</span>
+      <h2>Nova Turma</h2>
+      <form id="createForm" action="/admin_edit_turmas/create" method="POST">
+        <div class="form-group">
+          <label class="form-label" for="nome_turma">Nome da Turma:</label>
+          <input type="text" id="nome_turma" name="nome_turma" class="form-control" placeholder="Ex: 5º Ano A" required>
         </div>
-    </div>
-
-    <!-- Modal para Editar Turma -->
-    <div id="editModal" class="modal">
-        <div class="modal-content">
-            <span class="close" onclick="closeModal('editModal')">&times;</span>
-            <h2>Editar Turma</h2>
-            <form id="editForm" action="/admin_edit_turmas/update" method="POST">
-                <input type="hidden" id="edit_id" name="id_turma">
-                <div class="form-group">
-                    <label class="form-label" for="edit_nome_turma">Nome da Turma:</label>
-                    <input type="text" id="edit_nome_turma" name="nome_turma" class="form-control" required>
-                </div>
-                <div class="form-group">
-                    <label class="form-label" for="edit_docente">Nome do Docente:</label>
-                    <input type="text" id="edit_docente" name="docente" class="form-control" required>
-                </div>
-                <div class="form-group">
-                    <label class="form-label" for="edit_dt_inicial">Data Inicial:</label>
-                    <input type="date" id="edit_dt_inicial" name="dt_inicial" class="form-control">
-                </div>
-                <div class="form-group">
-                    <label class="form-label" for="edit_dt_final">Data Final:</label>
-                    <input type="date" id="edit_dt_final" name="dt_final" class="form-control">
-                </div>
-                <div class="form-group">
-                    <label class="form-label" for="edit_status">Status:</label>
-                    <select id="edit_status" name="status" class="form-control" required>
-                        <option value="1">Ativa</option>
-                        <option value="0">Inativa</option>
-                    </select>
-                </div>
-                <button type="submit" class="btn btn-success">
-                    <i class="fas fa-save"></i> Salvar Alterações
-                </button>
-            </form>
+        <div class="form-group">
+          <label class="form-label" for="docente">Nome do Docente:</label>
+          <input type="text" id="docente" name="docente" class="form-control" placeholder="Ex: Maria Silva" required>
         </div>
+        <div class="form-group">
+          <label class="form-label" for="dt_inicial">Data Inicial:</label>
+          <input type="date" id="dt_inicial" name="dt_inicial" class="form-control">
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="dt_final">Data Final:</label>
+          <input type="date" id="dt_final" name="dt_final" class="form-control">
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="status">Status:</label>
+          <select id="status" name="status" class="form-control-d" required>
+            <option value="1">Ativa</option>
+            <option value="0">Inativa</option>
+          </select>
+        </div>
+        <button type="submit" class="btn btn-success">
+          <i class="fas fa-save"></i> Salvar Turma
+        </button>
+      </form>
     </div>
+  </div>
 
-    <script>
-        // Funções para abrir e fechar modais
-        function openModal(modalId) {
-            document.getElementById(modalId).style.display = 'block';
-        }
+  <!-- Modal para Editar Turma -->
+  <div id="editModal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="closeModal('editModal')">&times;</span>
+      <h2>Editar Turma</h2>
+      <form id="editForm" action="/admin_edit_turmas/update" method="POST">
+        <input type="hidden" id="edit_id" name="id_turma">
+        <div class="form-group">
+          <label class="form-label" for="edit_nome_turma">Nome da Turma:</label>
+          <input type="text" id="edit_nome_turma" name="nome_turma" class="form-control" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="edit_docente">Nome do Docente:</label>
+          <input type="text" id="edit_docente" name="docente" class="form-control" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="edit_dt_inicial">Data Inicial:</label>
+          <input type="date" id="edit_dt_inicial" name="dt_inicial" class="form-control">
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="edit_dt_final">Data Final:</label>
+          <input type="date" id="edit_dt_final" name="dt_final" class="form-control">
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="edit_status">Status:</label>
+          <select id="edit_status" name="status" class="form-control" required>
+            <option value="1">Ativa</option>
+            <option value="0">Inativa</option>
+          </select>
+        </div>
+        <button type="submit" class="btn btn-success">
+          <i class="fas fa-save"></i> Salvar Alterações
+        </button>
+      </form>
+    </div>
+  </div>
 
-        function closeModal(modalId) {
-            document.getElementById(modalId).style.display = 'none';
-        }
+  <script>
+    // Funções para abrir e fechar modais
+    function openModal(modalId) {
+      document.getElementById(modalId).style.display = 'block';
+    }
 
-        // Fechar modais ao clicar fora deles
-        window.onclick = function(event) {
-            if (event.target.classList.contains('modal')) {
-                event.target.style.display = 'none';
-            }
-        }
+    function closeModal(modalId) {
+      document.getElementById(modalId).style.display = 'none';
+    }
 
-        // Função para abrir modal de edição com dados da turma
-        function openEditModal(id, nome_turma, docente, dt_inicial, dt_final, status) {
-            document.getElementById('edit_id').value = id;
-            document.getElementById('edit_nome_turma').value = nome_turma;
-            document.getElementById('edit_docente').value = docente;
-            document.getElementById('edit_dt_inicial').value = dt_inicial;
-            document.getElementById('edit_dt_final').value = dt_final;
-            document.getElementById('edit_status').value = status;
-            openModal('editModal');
-        }
+    // Fechar modais ao clicar fora deles
+    window.onclick = function(event) {
+      if (event.target.classList.contains('modal')) {
+        event.target.style.display = 'none';
+      }
+    }
 
-        // Função para confirmar desativação de turma
-        function confirmDeactivate(id, nome_turma) {
-            if (confirm(`Tem certeza que deseja desativar a turma "${nome_turma}"? A turma permanecerá no sistema mas não estará disponível para novas campanhas.`)) {
-                window.location.href = `/admin_edit_turmas/deactivate/${id}`;
-            }
-        }
+    // Função para abrir modal de edição com dados da turma
+    function openEditModal(id, nome_turma, docente, dt_inicial, dt_final, status) {
+      document.getElementById('edit_id').value = id;
+      document.getElementById('edit_nome_turma').value = nome_turma;
+      document.getElementById('edit_docente').value = docente;
+      document.getElementById('edit_dt_inicial').value = dt_inicial;
+      document.getElementById('edit_dt_final').value = dt_final;
+      document.getElementById('edit_status').value = status;
+      openModal('editModal');
+    }
 
-        // Função para confirmar ativação de turma
-        function confirmActivate(id, nome_turma) {
-            if (confirm(`Tem certeza que deseja ativar a turma "${nome_turma}"?`)) {
-                window.location.href = `/admin_edit_turmas/activate/${id}`;
-            }
-        }
+    // Função para confirmar desativação de turma
+    function confirmDeactivate(id, nome_turma) {
+      if (confirm(`Tem certeza que deseja desativar a turma "${nome_turma}"? A turma permanecerá no sistema mas não estará disponível para novas campanhas.`)) {
+        window.location.href = `/admin_edit_turmas/deactivate/${id}`;
+      }
+    }
 
-        // Função para filtrar a tabela
-        function filterTable() {
-            const statusFilter = document.getElementById('statusFilter').value;
-            const sortFilter = document.getElementById('sortFilter').value;
-            const table = document.getElementById('turmasTable');
-            const rows = table.getElementsByTagName('tbody')[0].getElementsByTagName('tr');
-            
-            // Filtrar por status
-            for (let i = 0; i < rows.length; i++) {
-                const status = rows[i].getAttribute('data-status');
-                
-                if (statusFilter === 'all' || status === statusFilter) {
-                    rows[i].style.display = '';
-                } else {
-                    rows[i].style.display = 'none';
-                }
-            }
-        }
+    // Função para confirmar ativação de turma
+    function confirmActivate(id, nome_turma) {
+      if (confirm(`Tem certeza que deseja ativar a turma "${nome_turma}"?`)) {
+        window.location.href = `/admin_edit_turmas/activate/${id}`;
+      }
+    }
 
-        // Definir data mínima para os campos de data (hoje)
-        document.addEventListener('DOMContentLoaded', function() {
-            const today = new Date().toISOString().split('T')[0];
-            document.getElementById('dt_inicial');
-            document.getElementById('dt_final').min = today;
-            document.getElementById('edit_dt_inicial');
-            document.getElementById('edit_dt_final').min = today;
-        });
-    </script>
-    <style>
-        :root {
-            --primary: #3498db;
-            --secondary: #e74c3c;
-            --accent: #f39c12;
-            --dark: #2c3e50;
-            --light: #ecf0f1;
-            --success: #27ae60;
-            --warning: #f39c12;
-            --danger: #e74c3c;
-        }
+    // Função para filtrar a tabela
+    function filterTable() {
+      const statusFilter = document.getElementById('statusFilter').value;
+      const sortFilter = document.getElementById('sortFilter').value;
+      const table = document.getElementById('turmasTable');
+      const rows = table.getElementsByTagName('tbody')[0].getElementsByTagName('tr');
 
-        body {
-            font-family: 'Poppins', sans-serif;
-            background: linear-gradient(135deg, #1a2980, #26d0ce);
-            color: var(--light);
-            min-height: 100vh;
-            overflow-x: hidden;
-            position: relative;
-            margin: 0;
-            padding: 0;
-        }
+      // Filtrar por status
+      for (let i = 0; i < rows.length; i++) {
+        const status = rows[i].getAttribute('data-status');
 
-        body::before {
-            content: "";
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.3);
-            z-index: -1;
+        if (statusFilter === 'all' || status === statusFilter) {
+          rows[i].style.display = '';
+        } else {
+          rows[i].style.display = 'none';
         }
+      }
+    }
 
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-        }
+    // Definir data mínima para os campos de data (hoje)
+    document.addEventListener('DOMContentLoaded', function() {
+      const today = new Date().toISOString().split('T')[0];
+      document.getElementById('dt_inicial');
+      document.getElementById('dt_final').min = today;
+      document.getElementById('edit_dt_inicial');
+      document.getElementById('edit_dt_final').min = today;
+    });
+  </script>
+  <style>
+    :root {
+      --primary: #3498db;
+      --secondary: #e74c3c;
+      --accent: #f39c12;
+      --dark: #2c3e50;
+      --light: #ecf0f1;
+      --success: #27ae60;
+      --warning: #f39c12;
+      --danger: #e74c3c;
+    }
 
-        /* Header */
-        header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 20px 0;
-        }
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, #1a2980, #26d0ce);
+      color: var(--light);
+      min-height: 100vh;
+      overflow-x: hidden;
+      position: relative;
+      margin: 0;
+      padding: 0;
+    }
 
-        .logo {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
+    body::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.3);
+      z-index: -1;
+    }
 
-        .logo i {
-            font-size: 2.5rem;
-            color: var(--accent);
-        }
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+    }
 
-        .logo h1 {
-            font-size: 1.8rem;
-            font-weight: 700;
-            color: white;
-            margin: 0;
-        }
+    /* Header */
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px 0;
+    }
 
-        nav ul {
-            display: flex;
-            list-style: none;
-            gap: 30px;
-            margin: 0;
-            padding: 0;
-        }
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
 
-        nav a {
-            color: white;
-            text-decoration: none;
-            font-weight: 500;
-            transition: all 0.3s ease;
-            position: relative;
-            padding: 5px 0;
-        }
+    .logo i {
+      font-size: 2.5rem;
+      color: var(--accent);
+    }
 
-        nav a::after {
-            content: "";
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 0;
-            height: 2px;
-            background: var(--accent);
-            transition: width 0.3s ease;
-        }
+    .logo h1 {
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: white;
+      margin: 0;
+    }
 
-        nav a:hover::after {
-            width: 100%;
-        }
+    nav ul {
+      display: flex;
+      list-style: none;
+      gap: 3rem;
+      margin: 0;
+      padding: 0;
+    }
 
-        .user-info {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            background: rgba(255, 255, 255, 0.1);
-            padding: 8px 15px;
-            border-radius: 20px;
-        }
+    nav a {
+      color: white;
+      text-decoration: none;
+      font-weight: 500;
+      transition: all 0.3s ease;
+      position: relative;
+      padding: 5px 0;
+    }
 
-        .user-info i {
-            font-size: 1.2rem;
-        }
+    nav a::after {
+      content: "";
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 0;
+      height: 2px;
+      background: var(--accent);
+      transition: width 0.3s ease;
+    }
 
-        /* Main Content */
-        .main-content {
-            display: flex;
-            flex-direction: column;
-            gap: 30px;
-            margin-top: 30px;
-        }
+    nav a:hover::after {
+      width: 100%;
+    }
 
-        .page-title {
-            font-size: 2rem;
-            color: white;
-            margin-bottom: 20px;
-            text-align: center;
-        }
+    .user-info {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: rgba(255, 255, 255, 0.1);
+      padding: 8px 15px;
+      border-radius: 20px;
+    }
 
-        .card {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            border-radius: 15px;
-            padding: 25px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
-        }
+    .user-info i {
+      font-size: 1.2rem;
+    }
 
-        .card-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-        }
+    /* Main Content */
+    .main-content {
+      display: flex;
+      flex-direction: column;
+      gap: 30px;
+      margin-top: -10px;
+    }
 
-        .card-title {
-            font-size: 1.5rem;
-            color: var(--accent);
-            margin: 0;
-        }
+    .page-title {
+      font-size: 2rem;
+      color: white;
+      margin-bottom: 20px;
+      text-align: center;
+    }
 
-        .btn {
-            padding: 10px 20px;
-            border-radius: 8px;
-            border: none;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-        }
+    .card {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      border-radius: 15px;
+      padding: 25px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+    }
 
-        .btn-primary {
-            background: var(--primary);
-            color: white;
-        }
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
 
-        .btn-primary:hover {
-            background: #2980b9;
-            transform: translateY(-2px);
-        }
+    .card-title {
+      font-size: 1.5rem;
+      color: var(--accent);
+      margin: 0;
+    }
 
-        .btn-success {
-            background: var(--success);
-            color: white;
-        }
+    .btn {
+      padding: 10px 20px;
+      border-radius: 8px;
+      border: none;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
 
-        .btn-success:hover {
-            background: #219653;
-            transform: translateY(-2px);
-        }
+    .btn-primary {
+      background: var(--primary);
+      color: white;
+    }
 
-        .btn-danger {
-            background: var(--danger);
-            color: white;
-        }
+    .btn-primary:hover {
+      background: #2980b9;
+      transform: translateY(-2px);
+    }
 
-        .btn-danger:hover {
-            background: #c0392b;
-            transform: translateY(-2px);
-        }
+    .btn-success {
+      background: #3498db;
+      color: white;
+    }
 
-        .btn-warning {
-            background: var(--warning);
-            color: white;
-        }
+    .btn-success:hover {
+      background: #362196;
+      transform: translateY(-2px);
+    }
 
-        .btn-warning:hover {
-            background: #e67e22;
-            transform: translateY(-2px);
-        }
+    .btn-danger {
+      background: var(--danger);
+      color: white;
+    }
 
-        .btn-sm {
-            padding: 6px 12px;
-            font-size: 0.9rem;
-        }
+    .btn-danger:hover {
+      background: #c0392b;
+      transform: translateY(-2px);
+    }
 
-        /* Table Styles */
-        .table-responsive {
-            overflow-x: auto;
-        }
+    .btn-warning {
+      background: var(--warning);
+      color: white;
+    }
 
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 15px;
-        }
+    .btn-warning:hover {
+      background: #e67e22;
+      transform: translateY(-2px);
+    }
 
-        th, td {
-            padding: 12px 15px;
-            text-align: left;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        }
+    .btn-sm {
+      padding: 6px 12px;
+      font-size: 0.9rem;
+    }
 
-        th {
-            background-color: rgba(0, 0, 0, 0.2);
-            font-weight: 600;
-        }
+    /* Table Styles */
+    .table-responsive {
+      overflow-x: auto;
+    }
 
-        tr:hover {
-            background-color: rgba(255, 255, 255, 0.05);
-        }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 15px;
+    }
 
-        .status-badge {
-            display: inline-block;
-            padding: 5px 10px;
-            border-radius: 20px;
-            font-size: 0.85rem;
-            font-weight: 500;
-        }
+    th,
+    td {
+      padding: 12px 15px;
+      text-align: left;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
 
-        .status-active {
-            background-color: rgba(46, 204, 113, 0.2);
-            color: #27ae60;
-        }
+    th {
+      background-color: rgba(0, 0, 0, 0.2);
+      font-weight: 600;
+    }
 
-        .status-inactive {
-            background-color: rgba(231, 76, 60, 0.2);
-            color: #e74c3c;
-        }
+    tr:hover {
+      background-color: rgba(255, 255, 255, 0.05);
+    }
 
-        /* Modal Styles */
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 1000;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.5);
-            overflow: auto;
-        }
+    .status-badge {
+      display: inline-block;
+      padding: 5px 10px;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: 500;
+    }
 
-        .modal-content {
-            background: linear-gradient(135deg, #1a2980, #26d0ce);
-            margin: 5% auto;
-            padding: 25px;
-            border-radius: 15px;
-            width: 80%;
-            max-width: 600px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-            position: relative;
-        }
+    .status-active {
+      background-color: rgba(0, 55, 255, 0.2);
+      color: #bec9ff;
+    }
 
-        .close {
-            color: #aaa;
-            position: absolute;
-            top: 15px;
-            right: 20px;
-            font-size: 28px;
-            font-weight: bold;
-            cursor: pointer;
-        }
+    .status-inactive {
+      background-color: rgba(231, 76, 60, 0.2);
+      color: #e74c3c;
+    }
 
-        .close:hover {
-            color: white;
-        }
+    /* Modal Styles */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      overflow: auto;
+    }
 
-        .form-group {
-            margin-bottom: 20px;
-        }
+    .modal-content {
+      background: linear-gradient(135deg, #1a2980, #26d0ce);
+      margin: 5% auto;
+      padding: 25px;
+      border-radius: 15px;
+      width: 80%;
+      max-width: 600px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+      position: relative;
+    }
 
-        .form-label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 600;
-        }
+    .close {
+      color: #aaa;
+      position: absolute;
+      top: 15px;
+      right: 20px;
+      font-size: 28px;
+      font-weight: bold;
+      cursor: pointer;
+    }
 
-        .form-control {
-            width: 100%;
-            padding: 12px;
-            border-radius: 8px;
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            background: rgba(0, 0, 0, 0.2);
-            color: white;
-            font-size: 1rem;
-        }
+    .close:hover {
+      color: white;
+    }
 
-        .form-control:focus {
-            outline: none;
-            border-color: var(--accent);
-            box-shadow: 0 0 0 3px rgba(243, 156, 18, 0.3);
-        }
+    .form-group {
+      margin-bottom: 20px;
+    }
 
-        /* Footer */
-        footer {
-            text-align: center;
-            padding: 30px 0;
-            margin-top: 50px;
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
-        }
+    .form-label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 600;
+    }
 
-        .logout-btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            color: white;
-            text-decoration: none;
-            font-weight: 600;
-            transition: all 0.3s ease;
-        }
+    .form-control {
+      width: 90%;
+      padding: 12px;
+      border-radius: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      background: rgba(0, 0, 0, 0.2);
+      color: white;
+      font-size: 1rem;
+    }
 
-        .logout-btn:hover {
-            color: var(--accent);
-        }
+    .form-control-d{
+      width: 94%;
+      padding: 12px;
+      border-radius: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      background: rgba(0, 0, 0, 0.2);
+      color: white;
+      font-size: 1rem;
+    }
 
-        /* Filtros */
-        .filters {
-            display: flex;
-            gap: 15px;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
-        }
+    .form-control:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(243, 156, 18, 0.3);
+    }
 
-        .filter-group {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
+    /* Footer */
+    footer {
+      text-align: center;
+      padding: 30px 0;
+      margin-top: 50px;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+    }
 
-        .filter-label {
-            font-weight: 600;
-        }
+    .logout-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: white;
+      text-decoration: none;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      margin-top: -4px;
+    }
 
-        .filter-select {
-            padding: 8px 12px;
-            border-radius: 8px;
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            background: rgba(0, 0, 0, 0.2);
-            color: white;
-        }
+    .logout-btn:hover {
+      color: var(--accent);
+    }
 
-        /* Responsividade */
-        @media (max-width: 768px) {
-            .card-header {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 15px;
-            }
-            
-            nav ul {
-                flex-direction: column;
-                gap: 15px;
-            }
-            
-            header {
-                flex-direction: column;
-                gap: 20px;
-            }
-            
-            .modal-content {
-                width: 95%;
-                margin: 10% auto;
-            }
-            
-            .filters {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-        }
+    /* Filtros */
+    .filters {
+      display: flex;
+      gap: 15px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
 
-        .messages {
-            margin: 20px 0;
-        }
+    .filter-group {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
 
-        .success-message {
-            background: rgba(46, 204, 113, 0.2);
-            color: #fff;
-            padding: 15px;
-            border-radius: 8px;
-            border-left: 4px solid #27ae60;
-            margin-bottom: 20px;
-        }
+    .filter-label {
+      font-weight: 600;
+    }
 
-        .error-message {
-            background: rgba(231, 76, 60, 0.2);
-            color: #fff;
-            padding: 15px;
-            border-radius: 8px;
-            border-left: 4px solid #c0392b;
-            margin-bottom: 20px;
-        }
-    </style>
+    .filter-select {
+      padding: 8px 12px;
+      border-radius: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      background: rgba(0, 0, 0, 0.2);
+      color: white;
+    }
+
+    .filter-select {
+      background-color: #1e3a5f;
+      /* cor de fundo do select */
+      color: white;
+      /* cor do texto */
+    }
+
+    input[type="date"]::-webkit-calendar-picker-indicator {
+      opacity: 0;
+    }
+
+    /* Responsividade */
+    @media (max-width: 768px) {
+      .card-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+      }
+
+      nav ul {
+        flex-direction: column;
+        gap: 15px;
+      }
+
+      header {
+        flex-direction: column;
+        gap: 20px;
+      }
+
+      .modal-content {
+        width: 95%;
+        margin: 10% auto;
+      }
+
+      .filters {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+    }
+
+    .messages {
+      margin: 20px 0;
+    }
+
+    .success-message {
+      background: rgba(46, 204, 113, 0.2);
+      color: #fff;
+      padding: 15px;
+      border-radius: 8px;
+      border-left: 4px solid #27ae60;
+      margin-bottom: 20px;
+    }
+
+    .error-message {
+      background: rgba(231, 76, 60, 0.2);
+      color: #fff;
+      padding: 15px;
+      border-radius: 8px;
+      border-left: 4px solid #c0392b;
+      margin-bottom: 20px;
+    }
+  </style>
 </body>
+
 </html>
