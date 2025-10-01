@@ -140,21 +140,21 @@ app.get("/admin", (req, res) => {
   }
 });
 
-app.get("/aluno", requireAuth("aluno"), (req, res) => {
+app.get("/aluno"), (req, res) => {
   // Consulta para todas as turmas (não apenas as top 3)
   const allTurmasQuery =
-    "SELECT id, turma || ' - ' || docente AS turma_docente FROM turmas";
+    "SELECT id_turma, nome_turma || ' - ' || docente FROM turmas";
 
   // Consulta para pontuação total por turma (top 3)
   const turmasQuery = `
     SELECT 
-      t.id,
-      t.turma || ' - ' || t.docente AS turma_docente,
-      COALESCE(SUM(r.pontuacao * d.quantidade), 0) AS total_pontos
-    FROM turmas t
-    LEFT JOIN doacoes d ON t.id = d.turma_id
-    LEFT JOIN roupas r ON d.roupa_id = r.id
-    GROUP BY t.id
+        TURMAS.id_turma,
+      TURMAS.nome_turma || ' - ' || docente,
+      COALESCE(SUM(ITENS.pontos * DOACOES.quantidade), 0) AS total_pontos
+    FROM TURMAS 
+    LEFT JOIN DOACOES ON TURMAS.id_turma = DOACOES.id_turma
+    LEFT JOIN ITENS ON DOACOES.id_item = ITENS.id_item
+    GROUP BY TURMAS.id_turma
     ORDER BY total_pontos DESC
     LIMIT 3;
   `;
@@ -162,16 +162,16 @@ app.get("/aluno", requireAuth("aluno"), (req, res) => {
   // Consulta para itens doados por turma
   const itensQuery = `
     SELECT 
-      t.id AS turma_id,
-      r.tipo,
-      r.pontuacao,
-      COALESCE(SUM(d.quantidade), 0) AS quantidade_total,
-      COALESCE(SUM(r.pontuacao * d.quantidade), 0) AS pontos_total
-    FROM turmas t
-    LEFT JOIN doacoes d ON t.id = d.turma_id
-    LEFT JOIN roupas r ON d.roupa_id = r.id
-    GROUP BY t.id, r.id
-    ORDER BY t.id, r.tipo;
+      TURMAS.id_turma,
+      ITENS.nome_time,
+      ITENS.pontos,
+      COALESCE(SUM(DOACOES.quantidade), 0) AS quantidade_total,
+      COALESCE(SUM(ITENS.pontos * DOACOES.quantidade), 0) AS pontos_total
+    FROM TURMAS 
+    LEFT JOIN DOACOES ON TURMAS.id_turma = DOACOES.id_turma
+    LEFT JOIN ITENS ON DOACOES.id_item = ITENS.id_turma
+    GROUP BY TURMAS.id_turma, ITENS.id_item
+    ORDER BY TURMAS.id_turma, ITENS.nome_item;
   `;
 
   db.serialize(() => {
@@ -197,8 +197,8 @@ app.get("/aluno", requireAuth("aluno"), (req, res) => {
           });
 
           res.render("aluno", {
-            turmas,
-            itensPorTurma,
+            turmas: turmas,
+            itensPorTurma: itensPorTurma,
             allTurmas, // Envia todas as turmas para o front-end
             user: req.session.user,
           });
@@ -206,7 +206,7 @@ app.get("/aluno", requireAuth("aluno"), (req, res) => {
       });
     });
   });
-});
+};
 
 // Registra nova doação
 app.post("/doacao", (req, res) => {
