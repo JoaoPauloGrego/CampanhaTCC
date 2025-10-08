@@ -48,7 +48,7 @@
               <div class="stat-label">Pontos</div>
             </div>
             <div class="stat-box">
-              <div class="stat-value"><%= itensPorTurma[turma.id] ? itensPorTurma[turma.id].length : 0 %></div>
+              <div class="stat-value"><%= itensPorTurma[turma.id_turma] ? itensPorTurma[turma.id_turma].length : 0 %></div>
               <div class="stat-label">Tipos de Itens</div>
             </div>
           </div>
@@ -70,7 +70,7 @@
         <label for="turma-select"><i class="fas fa-filter"></i> Selecione a Turma:</label>
         <select id="turma-select" class="turma-select">
          <% allTurmas.forEach(turma=> { %>
-         <option value="<%= turma.id %>">
+         <option value="<%= turma.id_turma %>">
           <%= turma.turma_docente %>
          </option>
          <% }); %>
@@ -81,7 +81,7 @@
       
 <!-- Seção de detalhes -->
 <% allTurmas.forEach(turma => { %>
-  <div class="turma-details" id="turma-<%= turma.id %>" style="<%= allTurmas[0].id !== turma.id ? 'display: none;' : '' %>">
+  <div class="turma-details" id="turma-<%= turma.id_turma %>" style="<%= allTurmas[0].id_turma !== turma.id_turma ? 'display: none;' : '' %>">
     <table>
       <thead>
         <tr>
@@ -92,12 +92,12 @@
         </tr>
       </thead>
       <tbody>
-        <% const itensDaTurma = itensPorTurma[turma.id] || []; %>
+        <% const itensDaTurma = itensPorTurma[turma.id_turma] || []; %>
         <% if (itensDaTurma.length > 0) { %>
           <% itensDaTurma.forEach(item => { %>
             <tr>
-              <td><%= item.tipo %></td>
-              <td><%= item.pontuacao %></td>
+              <td><%= item.nome_item %></td>
+              <td><%= item.pontos %></td>
               <td><%= item.quantidade_total %></td>
               <td class="highlight"><%= item.pontos_total %></td>
             </tr>

@@ -143,36 +143,38 @@ app.get("/admin", (req, res) => {
 app.get("/aluno", requireAuth("aluno"), (req, res) => {
   // Consulta para todas as turmas (não apenas as top 3)
   const allTurmasQuery =
-    "SELECT id, turma || ' - ' || docente AS turma_docente FROM turmas";
+    "SELECT id_turma, nome_turma || ' - ' || docente AS turma_docente FROM turmas";
 
   // Consulta para pontuação total por turma (top 3)
   const turmasQuery = `
     SELECT 
-      t.id,
-      t.turma || ' - ' || t.docente AS turma_docente,
-      COALESCE(SUM(r.pontuacao * d.quantidade), 0) AS total_pontos
-    FROM turmas t
-    LEFT JOIN doacoes d ON t.id = d.turma_id
-    LEFT JOIN roupas r ON d.roupa_id = r.id
-    GROUP BY t.id
+      t.id_turma,
+      t.nome_turma || ' - ' || t.docente AS turma_docente,
+      COALESCE(SUM(i.pontos * d.quantidade), 0) AS total_pontos
+    FROM TURMAS t
+    LEFT JOIN DOACOES d ON t.id_turma = d.id_turma
+    LEFT JOIN ITENS i ON d.id_item = i.id_item
+    GROUP BY t.id_turma
     ORDER BY total_pontos DESC
     LIMIT 3;
   `;
+  console.log("Resultado da requisição:", turmasQuery)
 
   // Consulta para itens doados por turma
   const itensQuery = `
     SELECT 
-      t.id AS turma_id,
-      r.tipo,
-      r.pontuacao,
+      t.id_turma,
+      i.nome_item,
+      i.pontos,
       COALESCE(SUM(d.quantidade), 0) AS quantidade_total,
-      COALESCE(SUM(r.pontuacao * d.quantidade), 0) AS pontos_total
-    FROM turmas t
-    LEFT JOIN doacoes d ON t.id = d.turma_id
-    LEFT JOIN roupas r ON d.roupa_id = r.id
-    GROUP BY t.id, r.id
-    ORDER BY t.id, r.tipo;
+      COALESCE(SUM(i.pontos * d.quantidade), 0) AS pontos_total
+    FROM TURMAS t
+    LEFT JOIN DOACOES d ON t.id_turma = d.id_turma
+    LEFT JOIN ITENS i ON d.id_item = i.id_item
+    GROUP BY t.id_turma, i.id_item
+    ORDER BY t.id_turma, i.nome_item;
   `;
+  console.log("Resultado da requisição:", itensQuery)
 
   db.serialize(() => {
     // Busca todas as turmas
@@ -190,10 +192,10 @@ app.get("/aluno", requireAuth("aluno"), (req, res) => {
           // Organiza itens por turma
           const itensPorTurma = {};
           itens.forEach((item) => {
-            if (!itensPorTurma[item.turma_id]) {
-              itensPorTurma[item.turma_id] = [];
+            if (!itensPorTurma[item.id_turma]) {
+              itensPorTurma[item.id_turma] = [];
             }
-            itensPorTurma[item.turma_id].push(item);
+            itensPorTurma[item.id_turma].push(item);
           });
 
           res.render("aluno", {
@@ -571,10 +573,10 @@ app.get("/admin/turmas", requireAuth("admin"), (req, res) => {
           // Organizar itens por turma
           const itensPorTurma = {};
           itens.forEach((item) => {
-            if (!itensPorTurma[item.turma_id]) {
-              itensPorTurma[item.turma_id] = [];
+            if (!itensPorTurma[item.id_turma]) {
+              itensPorTurma[item.id_turma] = [];
             }
-            itensPorTurma[item.turma_id].push(item);
+            itensPorTurma[item.id_turma].push(item);
           });
 
           res.render("admin_turmas", {
