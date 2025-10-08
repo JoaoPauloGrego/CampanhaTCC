@@ -140,7 +140,12 @@ app.get("/admin", (req, res) => {
   }
 });
 
-app.get("/aluno", requireAuth("aluno"), (req, res) => {
+app.get("/aluno", (req, res) => {
+  console.log("GET /aluno");
+  if (!req.session.loggedin || req.session.user.role !== "aluno") {
+    console.log("Acesso negado - usuário não autenticado");
+    return res.redirect("/login?error=Acesso negado");
+  }
   // Consulta para todas as turmas (não apenas as top 3)
   const allTurmasQuery =
     "SELECT id_turma, nome_turma || ' - ' || docente AS turma_docente FROM turmas";
