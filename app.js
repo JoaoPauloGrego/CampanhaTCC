@@ -146,8 +146,9 @@ app.get("aluno/selectCampanha", (req, res) => {
     console.log("Acesso negado - usuário não autenticado");
     return res.redirect("/login?error=Acesso negado");
   }
-  // 
-  const 
+  // Consulta para todas as campanhas ativas MOURIS 
+  const allCampanhasQuery =
+    "SELECT id_campanha || ' - ' || nome_campanha AS campanhas FROM CAMPANHAS WHERE STATUS = 1"
 })
 
 app.get("/aluno", (req, res) => {
