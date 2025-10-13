@@ -140,6 +140,16 @@ app.get("/admin", (req, res) => {
   }
 });
 
+app.get("aluno/selectCampanha", (req, res) => {
+  console.log("GET /aluno/selectCampanha");
+  if (!req.session.loggedin || req.session.user.role !== "aluno") {
+    console.log("Acesso negado - usuário não autenticado");
+    return res.redirect("/login?error=Acesso negado");
+  }
+  // 
+  const 
+})
+
 app.get("/aluno", (req, res) => {
   console.log("GET /aluno");
   if (!req.session.loggedin || req.session.user.role !== "aluno") {
@@ -203,7 +213,7 @@ app.get("/aluno", (req, res) => {
             itensPorTurma[item.id_turma].push(item);
           });
 
-          res.render("aluno", {
+          res.render("aluno_campanha_tabela", {
             turmas,
             itensPorTurma,
             allTurmas, // Envia todas as turmas para o front-end
