@@ -104,6 +104,8 @@
               <td class="highlight"><%= item.pontos_total %></td>
             </tr>
           <% }}); %>
+          <% itensDaTurma.forEach(item => { %>
+          <% if(item.pontos_total > 0){ %>
           <tr style="background-color: #f8f9fa;">
             <td colspan="3" style="text-align: right; font-weight: 600;">Total da Turma:</td>
             <td class="highlight" style="font-size: 1.1rem;">
@@ -116,11 +118,11 @@
               Nenhum item registrado para esta turma
             </td>
           </tr>
-        <% } %>
+        <% }}); %>
       </tbody>
     </table>
   </div>
-<% }); %>
+<% }}); %>
           </div>
 
           <!-- Footer -->
