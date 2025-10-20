@@ -46,6 +46,13 @@ db.serialize(() => {
     FOREIGN KEY(id_campanha) REFERENCES CAMPANHAS(id_campanha)
   )`);
 
+  // Tabela de itens independente
+  db.run(`CREATE TABLE IF NOT EXISTS ITENS_EVANESCENCE(
+  id_item INTEGER PRIMARY KEY AUTOINCREMENT,
+  nome_item TEXT NOT NULL,
+  pontos INTEGER NOT NULL
+  )`);
+
   // Tabela de Relacionamento entre Campanhas e Turmas
   db.run(`CREATE TABLE IF NOT EXISTS CAMPANHA_TURMAS (
     id INTEGER PRIMARY KEY AUTOINCREMENT,

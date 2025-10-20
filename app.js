@@ -303,7 +303,7 @@ app.get("/sAdmin", (req, res) => {
 });
 
 // Rota principal - Listar turmas (usa db2 - TCC.db)
-app.get("/admin_edit_turmas", requireAuth("sAdmin"), (req, res) => {
+app.get("/admin_edit_turmas", (req, res) => {
   db.all("SELECT * FROM TURMAS", (err, turmas) => {
     if (err) {
       console.error(err);
