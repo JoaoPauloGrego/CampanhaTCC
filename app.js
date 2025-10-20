@@ -463,48 +463,76 @@ app.get("/admin_edit_campanha", requireAuth("sAdmin"), (req, res) => {
 });
 
 // Rota para processar a criação de campanhas
+// ROTA CORRIGIDA
 app.post("/admin_edit_campanha/create", requireAuth("sAdmin"), (req, res) => {
+  console.log("POST /admin_edit_campanha/create - Dados:", req.body);
+  
   const {
     nome_campanha,
     dt_inicial,
     dt_final,
-    turmas_selecionadas,
-    itens_selecionados,
+    nome_item,      // Nome correto do campo
+    pontos,         // Nome correto do campo
+    turmas_selecionadas
   } = req.body;
 
-  db.run(
-    `INSERT INTO CAMPANHAS (nome_campanha, dt_inicial, dt_final) 
-     VALUES (?, ?, ?)`,
-    [nome_campanha, dt_inicial, dt_final],
-    function (err) {
-      if (err) {
-        console.error(err);
-        return res.redirect(
-          "/admin_edit_campanha?error=Erro ao criar campanha"
+  // Validar campos obrigatórios
+  if (!nome_campanha || !dt_inicial || !dt_final || !nome_item || !pontos) {
+    console.error("Campos obrigatórios faltando:", req.body);
+    return res.redirect("/admin_edit_campanha?error=Todos os campos são obrigatórios");
+  }
+
+  db.serialize(() => {
+    // 1. Criar a campanha
+    db.run(
+      `INSERT INTO CAMPANHAS (nome_campanha, dt_inicial, dt_final) 
+       VALUES (?, ?, ?)`,
+      [nome_campanha, dt_inicial, dt_final],
+      function (err) {
+        if (err) {
+          console.error("Erro ao criar campanha:", err);
+          return res.redirect("/admin_edit_campanha?error=Erro ao criar campanha");
+        }
+
+        const id_campanha = this.lastID;
+        console.log("Campanha criada com ID:", id_campanha);
+
+        // 2. Criar o item associado à campanha
+        db.run(
+          `INSERT INTO ITENS (nome_item, id_campanha, pontos) 
+           VALUES (?, ?, ?)`,
+          [nome_item, id_campanha, pontos],
+          function (err) {
+            if (err) {
+              console.error("Erro ao criar item:", err);
+              return res.redirect("/admin_edit_campanha?error=Erro ao criar item");
+            }
+            console.log("Item criado com ID:", this.lastID);
+
+            // 3. Associar turmas à campanha (se houver)
+            if (turmas_selecionadas) {
+              const turmasArray = Array.isArray(turmas_selecionadas)
+                ? turmas_selecionadas
+                : [turmas_selecionadas];
+
+              turmasArray.forEach((turmaId) => {
+                db.run(
+                  `INSERT INTO CAMPANHA_TURMAS (id_campanha, id_turma) VALUES (?, ?)`,
+                  [id_campanha, turmaId],
+                  function(err) {
+                    if (err) console.error("Erro ao associar turma:", err);
+                  }
+                );
+              });
+            }
+
+            res.redirect("/admin_edit_campanha?success=Campanha criada com sucesso");
+          }
         );
       }
-
-      const campanhaId = this.lastID;
-
-      // Associar turmas selecionadas à campanha
-      if (turmas_selecionadas) {
-        const turmasArray = Array.isArray(turmas_selecionadas)
-          ? turmas_selecionadas
-          : [turmas_selecionadas];
-
-        turmasArray.forEach((turmaId) => {
-          db.run(
-            `INSERT INTO CAMPANHA_TURMAS (id_campanha, id_turma) VALUES (?, ?)`,
-            [campanhaId, turmaId]
-          );
-        });
-      }
-
-      res.redirect("/admin_edit_campanha?success=Campanha criada com sucesso");
-    }
-  );
+    );
+  });
 });
-
 // Visualização de doações (usa db - campanha.db)
 app.get("/admin/doacoes", requireAuth("admin"), (req, res) => {
   const query = `

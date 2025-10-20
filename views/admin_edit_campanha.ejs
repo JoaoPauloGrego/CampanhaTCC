@@ -104,39 +104,21 @@
             </div>
           </div>
 
-          <div class="form-section">
-            <h4 class="form-section-title">Itens da Campanha</h4>
+<div class="form-section">
+  <h4 class="form-section-title">Itens da Campanha</h4>
 
-            <div class="form-group">
-              <label class="form-label">Selecione os itens aceitos na campanha:</label>
-              <div class="checkbox-group">
-                <% if (typeof itens !== 'undefined' && itens.length > 0) { %>
-                <% itens.forEach(function(item) { %>
-                <div class="form-check">
-                  <input class="form-check-input" type="checkbox" name="itens_selecionados" value="<%= item.id_item %>" id="item_<%= item.ID_ITEM %>">
-                  <label class="form-check-label" for="item_<%= item.ID_ITEM %>">
-                    <%= item.nome_item %> (<%= item.pontos %> pontos)
-                  </label>
-                </div>
-                <% }); %>
-                <% } else { %>
-                <p>Nenhum item cadastrado. Adicione itens abaixo.</p>
-                <% } %>
-              </div>
-            </div>
+  <div class="form-group">
+    <label class="form-label">Adicionar Novo Item:</label>
+    <div class="item-form">
+      <input type="text" name="nome_item" class="form-control" placeholder="Nome do item" required>
+      <input type="number" name="pontos" class="form-control" placeholder="Pontos" min="1" required>
+    </div>
+  </div>
 
-            <div class="form-group">
-              <label class="form-label">Adicionar Novo Item:</label>
-              <div class="item-form">
-                <input type="text" id="novo_item" name="novo_item" class="form-control" placeholder="Nome do item">
-                <input type="number" id="pontos_item" name="pontos_item" class="form-control" placeholder="Pontos" min="1">
-                <button type="button" class="btn btn-primary" onclick="adicionarItem()">
-                  <i class="fas fa-plus"></i> Adicionar
-                </button>
-                <button type="submit" class="btn btn-success">
-                    <i class="fas fa-save"></i> Criar Campanha
-                  </button>
-              </div>
+  <button type="submit" class="btn btn-success">
+    <i class="fas fa-save"></i> Criar Campanha
+  </button>
+</div>
             </div>
           </div>          
         </form>
@@ -250,10 +232,9 @@
 
   <script>
     // Função para adicionar novo item
-    function adicionarItem() {
+ 
       const nomeItem = document.getElementById('novo_item').value;
       const pontosItem = document.getElementById('pontos').value;
-      const itemCampanha = document.getElementById('id_campanha').value;
       const status = document.getElementById('status').value;
 
       if (!nomeItem || !pontosItem) {
