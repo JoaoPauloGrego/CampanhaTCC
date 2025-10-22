@@ -67,7 +67,7 @@ app.post("/login", (req, res) => {
       } else if (row.role === "sAdmin") {
         return res.redirect("/sAdmin");
       } else if (row.role === "aluno") {
-        return res.redirect("/aluno");
+        return res.redirect("/aluno/select_campanha");
       } else {
         return res.redirect("/login");
       }
@@ -140,33 +140,53 @@ app.get("/admin", (req, res) => {
   }
 });
 
-app.get("aluno/selectCampanha", (req, res) => {
-  console.log("GET /aluno/selectCampanha");
+app.get("/aluno/select_campanha", (req, res) => {
+  console.log("GET /aluno/select_campanha");
   if (!req.session.loggedin || req.session.user.role !== "aluno") {
     console.log("Acesso negado - usuário não autenticado");
     return res.redirect("/login?error=Acesso negado");
   }
+
   // Consulta para todas as campanhas ativas MOURIS 
   const allCampanhasQuery =
-    "SELECT id_campanha || ' - ' || nome_campanha AS campanhas FROM CAMPANHAS WHERE STATUS = 1"
+    "SELECT id_campanha, nome_campanha FROM CAMPANHAS WHERE STATUS = 1"
 
-    db.all(allCampanhasQuery, (err, allCampanhas) => {
-      if (err) return console.error(err);
+  db.all(allCampanhasQuery, (err, campanhas) => {
+    if (err) return console.error(err);
+    console.log(campanhas);
+    res.render("aluno_campanhas", {
+      campanhas : campanhas,
+      user: req.session.user
+    })
   })
-  res.render("aluno_campanhas", {
-    allCampanhas,
-    user: req.session.user })
 })
 
-app.get("/aluno/:id", (req, res) => {
+app.get("/aluno/campanha/:id", (req, res) => {
+    const idCampanha = req.params.id;
   console.log("GET /aluno");
   if (!req.session.loggedin || req.session.user.role !== "aluno") {
     console.log("Acesso negado - usuário não autenticado");
     return res.redirect("/login?error=Acesso negado");
-    }
+  }
 
-    const idCampanha = req.params.id
-  // Consulta para todas as turmas (não apenas as top 3)
+    // Consulta para todas as turmas (não apenas as top 3)
+    `
+SELECT
+     d.id_campanha,
+     d.id_turma,
+     d.id_item,
+     d.quantidade,
+     d.pontos_total
+   FROM DOACOES d
+   LEFT JOIN CAMPANHAS c ON d.id_campanha = c.id_campanha
+   LEFT JOIN TURMAS t ON d.id_turma = t.id_turma
+   LEFT JOIN ITENS i ON d.id_item = i.id_item
+   GROUP BY d.id_turma
+   ORDER BY d.pontos_total DESC
+   WHERE d.id_campanha = ?;
+`;
+  console.log("Requisição:", idCampanha)
+
   const allTurmasQuery =
     "SELECT id_turma, nome_turma || ' - ' || docente AS turma_docente FROM turmas";
 
@@ -179,11 +199,11 @@ app.get("/aluno/:id", (req, res) => {
     FROM TURMAS t
     LEFT JOIN DOACOES d ON t.id_turma = d.id_turma
     LEFT JOIN ITENS i ON d.id_item = i.id_item
+    WHERE CAMPANHAS.id_campanha = ?
     GROUP BY t.id_turma
     ORDER BY total_pontos DESC
     LIMIT 3;
   `;
-  console.log("Resultado da requisição:", turmasQuery)
 
   // Consulta para itens doados por turma
   const itensQuery = `
@@ -199,20 +219,27 @@ app.get("/aluno/:id", (req, res) => {
     GROUP BY t.id_turma, i.id_item
     ORDER BY t.id_turma, i.nome_item;
   `;
-  console.log("Resultado da requisição:", itensQuery)
+  console.log("Requisição:", itensQuery)
 
   db.serialize(() => {
     // Busca todas as turmas
     db.all(allTurmasQuery, (err, allTurmas) => {
       if (err) return console.error(err);
+        console.log("Requisição:", allTurmasQuery)
+        console.log("Requisição:", allTurmas)
+
 
       // Busca top 3 turmas
       db.all(turmasQuery, (err, turmas) => {
         if (err) return console.error(err);
+        console.log("Requisição:", turmasQuery)
+        console.log("Resultado:", turmas)
 
         // Busca itens por turma
         db.all(itensQuery, (err, itens) => {
           if (err) return console.error(err);
+          console.log("Requisição:", itensQuery)
+          console.log("Requisição:", itens)
 
           // Organiza itens por turma
           const itensPorTurma = {};
@@ -240,7 +267,7 @@ app.get("/admin/turmas", (req, res) => {
   if (!req.session.loggedin || req.session.user.role !== "admin") {
     console.log("Acesso negado - usuário não autenticado");
     return res.redirect("/login?error=Acesso negado");
-    }
+  }
   // Consulta para todas as turmas (não apenas as top 3)
   const allTurmasQuery =
     "SELECT id_turma, nome_turma || ' - ' || docente AS turma_docente FROM turmas";
@@ -340,7 +367,7 @@ app.post("/doacao", (req, res) => {
         console.error("Erro ao buscar pontuação do item:", err);
         return res.redirect("/admin?error=Erro ao buscar item");
       }
-      
+
       if (!item) {
         console.error("Item não encontrado para ID:", id_item);
         return res.redirect("/admin?error=Item não encontrado");
@@ -380,8 +407,8 @@ app.get("/sAdmin", (req, res) => {
     req.session.user &&
     req.session.user.role === "sAdmin"
   ) {
-  res.render("sAdmin");
-  } else{
+    res.render("sAdmin");
+  } else {
     res.redirect("/login?error=Acesso negado")
   }
 });
@@ -550,7 +577,7 @@ app.get("/admin_edit_campanha", requireAuth("sAdmin"), (req, res) => {
 // ROTA CORRIGIDA
 app.post("/admin_edit_campanha/create", requireAuth("sAdmin"), (req, res) => {
   console.log("POST /admin_edit_campanha/create - Dados:", req.body);
-  
+
   const {
     nome_campanha,
     dt_inicial,
@@ -603,7 +630,7 @@ app.post("/admin_edit_campanha/create", requireAuth("sAdmin"), (req, res) => {
                 db.run(
                   `INSERT INTO CAMPANHA_TURMAS (id_campanha, id_turma) VALUES (?, ?)`,
                   [id_campanha, turmaId],
-                  function(err) {
+                  function (err) {
                     if (err) console.error("Erro ao associar turma:", err);
                   }
                 );

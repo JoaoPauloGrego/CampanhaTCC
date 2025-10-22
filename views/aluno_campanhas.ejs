@@ -36,11 +36,10 @@
 
         <div class="main-content">
             <div class="button-container">
-                <% allCampanhas.forEach(campanha =>{ %>
-
-                <a href="/admin/<%campanha.id_campanha%>" class="big-button">
+                <% campanhas.forEach(campanha=> { %>
+                <a href="/aluno/campanha/<%=campanha.id_campanha%>" class="big-button">
                     <i class="fas fa-users"></i>
-                    <h2>Gerenciar Turmas</h2>
+                    <h2><%= campanha.nome_campanha %></h2>
                 </a>
                 <% }) %>
             </div>

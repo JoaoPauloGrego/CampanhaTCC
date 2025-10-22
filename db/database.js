@@ -39,7 +39,7 @@ db.serialize(() => {
   // Tabela de Itens
   db.run(`CREATE TABLE IF NOT EXISTS ITENS (
     id_item INTEGER PRIMARY KEY AUTOINCREMENT,
-    id_campanha TEXT NOT NULL,
+    id_campanha INTEGER NULL,
     nome_item TEXT NOT NULL,
     pontos INTEGER NOT NULL,
     status INTEGER NOT NULL DEFAULT 1,
