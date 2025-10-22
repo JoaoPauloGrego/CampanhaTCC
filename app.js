@@ -149,14 +149,23 @@ app.get("aluno/selectCampanha", (req, res) => {
   // Consulta para todas as campanhas ativas MOURIS 
   const allCampanhasQuery =
     "SELECT id_campanha || ' - ' || nome_campanha AS campanhas FROM CAMPANHAS WHERE STATUS = 1"
+
+    db.all(allCampanhasQuery, (err, allCampanhas) => {
+      if (err) return console.error(err);
+  })
+  res.render("aluno_campanhas", {
+    allCampanhas,
+    user: req.session.user })
 })
 
-app.get("/aluno", (req, res) => {
+app.get("/aluno/:id", (req, res) => {
   console.log("GET /aluno");
   if (!req.session.loggedin || req.session.user.role !== "aluno") {
     console.log("Acesso negado - usuário não autenticado");
     return res.redirect("/login?error=Acesso negado");
     }
+
+    const idCampanha = req.params.id
   // Consulta para todas as turmas (não apenas as top 3)
   const allTurmasQuery =
     "SELECT id_turma, nome_turma || ' - ' || docente AS turma_docente FROM turmas";
