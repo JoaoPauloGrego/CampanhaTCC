@@ -542,7 +542,111 @@ app.get(
     );
   }
 );
+// Rota de edição de usuários //
+app.get("/admin_edit_usuarios", (req, res) => {
+  db.all("SELECT * FROM USUARIOS", (err, usuarios) => {
+    if (err) {
+      console.error(err);
+      return res.render("admin_edit_usuarios", {
+        usuarios: [],
+        error: "Erro ao carregar usuarios",
+        user: req.session.user,
+      });
+    }
 
+    res.render("admin_edit_usuarios", {
+      usuarios: usuarios,
+      user: req.session.user,
+      success: req.query.success,
+      error: req.query.error,
+    });
+  });
+});
+
+// Criar nova usuário
+app.post("/admin_edit_usuarios/create", requireAuth("sAdmin"), (req, res) => {
+  const { nome_usuario, role, status, senha } = req.body;
+
+  db.run(
+    `INSERT INTO USUARIOS (nome_usuario, role, status, senha) 
+     VALUES (?, ?, ?, ?)`,
+    [nome_usuario, role, status || 1, senha],
+    function (err) {
+      if (err) {
+        console.error(err);
+        return res.redirect("/admin_edit_usuarios?error=Erro ao criar usuário");
+      }
+
+      res.redirect("/admin_edit_usuarios?success=Usuário criad0 com sucesso");
+    }
+  );
+});
+
+// Atualizar usuário
+app.post("/admin_edit_usuarios/update", requireAuth("sAdmin"), (req, res) => {
+  const { id_usuario, nome_usuario, role, senha, status,  } =
+    req.body;
+
+  db.run(
+    `UPDATE USUARIOS SET nome_usuario = ?, role = ?, senha = ?, status = ?  
+     WHERE id_usuario = ?`,
+    [nome_usuario, senha, status, role, id_usuario],
+    function (err) {
+      if (err) {
+        console.error(err);
+        return res.redirect("/admin_edit_usuarios?error=Erro ao atualizar usuário");
+      }
+
+      res.redirect("/admin_edit_usuarios?success=Usuario atualizada com sucesso");
+    }
+  );
+});
+
+// Desativar usuário
+app.post(
+  "/admin_edit_usuarios/deactivate/:id",
+  requireAuth("sAdmin"),
+  (req, res) => {
+    const id = req.params.id_usuario;
+
+    db.run(
+      "UPDATE USUARIOS SET status = 0 WHERE id_usuario = ?",
+      [id],
+      function (err) {
+        if (err) {
+          console.error(err);
+          return res.redirect(
+            "/admin_edit_usuarios?error=Erro ao desativar usuário"
+          );
+        }
+
+        res.redirect("/admin_edit_usuarios?success=Usuário desativada com sucesso");
+      }
+    );
+  }
+);
+
+// Ativar usuário
+app.post(
+  "/admin_edit_usuarios/activate/:id",
+  requireAuth("sAdmin"),
+  (req, res) => {
+    const id = req.params.id_usuario;
+
+    db.run(
+      "UPDATE USUARIOS SET status = 1 WHERE id_usuario = ?",
+      [id],
+      function (err) {
+        if (err) {
+          console.error(err);
+          return res.redirect("/admin_edit_usuarios?error=Erro ao ativar usuário");
+        }
+
+        res.redirect("/admin_edit_usuarios?success=Usuário ativado com sucesso");
+      }
+    );
+  }
+);
 // Rota para gerenciar campanhas
 app.get("/admin_edit_campanha", requireAuth("sAdmin"), (req, res) => {
   // Buscar campanhas
