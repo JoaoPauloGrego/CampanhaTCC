@@ -564,13 +564,13 @@ app.get("/admin_edit_usuarios", (req, res) => {
 });
 
 // Criar nova usuário
-app.post("/admin_edit_usuarios/create", requireAuth("sAdmin"), (req, res) => {
+app.get("/admin_edit_usuarios/create", requireAuth("sAdmin"), (req, res) => {
   const { nome_usuario, role, status, senha } = req.body;
 
   db.run(
-    `INSERT INTO USUARIOS (nome_usuario, role, status, senha) 
+    `INSERT INTO USUARIOS (nome_usuario, role, senha, status) 
      VALUES (?, ?, ?, ?)`,
-    [nome_usuario, role, status || 1, senha],
+    [nome_usuario, role, senha, status || 1],
     function (err) {
       if (err) {
         console.error(err);
@@ -583,14 +583,14 @@ app.post("/admin_edit_usuarios/create", requireAuth("sAdmin"), (req, res) => {
 });
 
 // Atualizar usuário
-app.post("/admin_edit_usuarios/update", requireAuth("sAdmin"), (req, res) => {
+app.get("/admin_edit_usuarios/update", requireAuth("sAdmin"), (req, res) => {
   const { id_usuario, nome_usuario, role, senha, status,  } =
     req.body;
 
   db.run(
     `UPDATE USUARIOS SET nome_usuario = ?, role = ?, senha = ?, status = ?  
      WHERE id_usuario = ?`,
-    [nome_usuario, senha, status, role, id_usuario],
+    [id_usuario, nome_usuario, senha, role, status,  ],
     function (err) {
       if (err) {
         console.error(err);
@@ -603,11 +603,11 @@ app.post("/admin_edit_usuarios/update", requireAuth("sAdmin"), (req, res) => {
 });
 
 // Desativar usuário
-app.post(
+app.get(
   "/admin_edit_usuarios/deactivate/:id",
   requireAuth("sAdmin"),
   (req, res) => {
-    const id = req.params.id_usuario;
+    const id = req.params.id;
 
     db.run(
       "UPDATE USUARIOS SET status = 0 WHERE id_usuario = ?",
@@ -627,11 +627,11 @@ app.post(
 );
 
 // Ativar usuário
-app.post(
+app.get(
   "/admin_edit_usuarios/activate/:id",
   requireAuth("sAdmin"),
   (req, res) => {
-    const id = req.params.id_usuario;
+    const id = req.params.id;
 
     db.run(
       "UPDATE USUARIOS SET status = 1 WHERE id_usuario = ?",
