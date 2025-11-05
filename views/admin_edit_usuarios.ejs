@@ -123,20 +123,20 @@
                 </td>
                 <td>
                   <button class="btn btn-primary btn-sm" onclick="openEditModal(
-                                                '<%= usuarios.id_usuario %>', 
-                                                '<%= usuarios.nome_usuario %>', 
-                                                '<%= usuarios.role %>',
-                                                '<%= usuarios.senha %>',
-                                                '<%= usuarios.status %>'
+                                                '<%= usuario.id_usuario %>', 
+                                                '<%= usuario.nome_usuario %>', 
+                                                '<%= usuario.role %>',
+                                                '<%= usuario.senha %>',
+                                                '<%= usuario.status %>'
                                             )">
                     <i class="fas fa-edit"></i> Editar
                   </button>
                   <% if (usuario.status == 1) { %>
-                  <button class="btn btn-warning btn-sm" onclick="confirmDeactivate('<%= usuarios.id_usuario %>', '<%= usuario.nome_usuario %>')">
+                  <button class="btn btn-warning btn-sm" onclick="confirmDeactivate('<%= usuario.id_usuario %>', '<%= usuario.nome_usuario %>')">
                     <i class="fas fa-ban"></i> Desativar
                   </button>
                   <% } else { %>
-                  <button class="btn btn-success btn-sm" onclick="confirmActivate('<%= usuarios.id_usuario %>', '<%= usuario.nome_usuario %>')">
+                  <button class="btn btn-success btn-sm" onclick="confirmActivate('<%= usuario.id_usuario %>', '<%= usuario.nome_usuario %>')">
                     <i class="fas fa-check"></i> Ativar
                   </button>
                   <% } %>

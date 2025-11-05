@@ -45,7 +45,7 @@ app.get("/doar", (req, res) => {
 app.post("/login", (req, res) => {
   console.log("POST /login");
   const { nome_usuario, senha } = req.body;
-  const query = "SELECT * FROM USUARIOS WHERE nome_usuario = ? AND senha = ?";
+  const query = "SELECT * FROM USUARIOS WHERE nome_usuario = ? AND senha = ? AND status = 1";
 
   db.get(query, [nome_usuario, senha], (err, row) => {
     if (err) {
@@ -510,9 +510,7 @@ app.get(
       function (err) {
         if (err) {
           console.error(err);
-          return res.redirect(
-            "/admin_edit_turmas?error=Erro ao desativar turma"
-          );
+          return res.redirect("/admin_edit_turmas?error=Erro ao desativar turma");
         }
 
         res.redirect("/admin_edit_turmas?success=Turma desativada com sucesso");
@@ -577,7 +575,7 @@ app.get("/admin_edit_usuarios/create", requireAuth("sAdmin"), (req, res) => {
         return res.redirect("/admin_edit_usuarios?error=Erro ao criar usuário");
       }
 
-      res.redirect("/admin_edit_usuarios?success=Usuário criad0 com sucesso");
+      res.redirect("/admin_edit_usuarios?success=Usuário criado com sucesso");
     }
   );
 });
@@ -615,9 +613,7 @@ app.get(
       function (err) {
         if (err) {
           console.error(err);
-          return res.redirect(
-            "/admin_edit_usuarios?error=Erro ao desativar usuário"
-          );
+          return res.redirect("/admin_edit_usuarios?error=Erro ao desativar usuário");
         }
 
         res.redirect("/admin_edit_usuarios?success=Usuário desativada com sucesso");
