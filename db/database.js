@@ -6,7 +6,7 @@ const db = new sqlite3.Database('./db/TCC.db');
 
 // Configuração das tabelas
 db.serialize(() => {
-
+  
   // Tabela de Usuários
   db.run(`CREATE TABLE IF NOT EXISTS USUARIOS (
     id_usuario INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -78,25 +78,7 @@ db.serialize(() => {
   )`);
 
   // Inserir dados iniciais de itens
-  const itensIniciais = [
-    { nome: 'Agasalho', pontos: 5 },
-    { nome: 'Calça', pontos: 3 },
-    { nome: 'Blusa', pontos: 2 },
-    { nome: 'Meias', pontos: 1 },
-    { nome: 'Tênis', pontos: 4 },
-    { nome: 'Casaco', pontos: 6 },
-    { nome: 'Cobertor', pontos: 7 },
-    { nome: 'Gorro', pontos: 2 },
-    { nome: 'Luvas', pontos: 2 },
-    { nome: 'Cachecol', pontos: 3 }
-  ];
 
-  itensIniciais.forEach(item => {
-    db.run(
-      `INSERT OR IGNORE INTO ITENS (nome_item, pontos) VALUES (?, ?)`,
-      [item.nome, item.pontos]
-    );
   });
-});
 
 module.exports = db;

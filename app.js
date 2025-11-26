@@ -643,6 +643,108 @@ app.get(
     );
   }
 );
+app.get("/admin_edit_itens", (req, res) => {
+  db.all("SELECT * FROM ITENS", (err, itens) => {
+    if (err) {
+      console.error(err);
+      return res.render("admin_edit_itens", {
+        itens: [],
+        error: "Erro ao carregar itens",
+        user: req.session.user,
+      });
+    }
+
+    res.render("admin_edit_itens", {
+      itens: itens,
+      user: req.session.user,
+      success: req.query.success,
+      error: req.query.error,
+    });
+  });
+});
+
+// Criar nova turma
+app.post("/admin_edit_itens/create", requireAuth("sAdmin"), (req, res) => {
+  const { id_campanha, nome_item, pontos, status } = req.body;
+
+  db.run(
+    `INSERT INTO ITENS (id_campanha, nome_item, pontos, status) 
+     VALUES (?, ?, ?, ?)`,
+    [id_campanha, nome_item, pontos, status || 1],
+    function (err) {
+      if (err) {
+        console.error(err);
+        return res.redirect("/admin_edit_itens?error=Erro ao criar item");
+      }
+
+      res.redirect("/admin_edit_itens?success=Item criado com sucesso");
+    }
+  );
+});
+
+// Atualizar turma
+app.post("/admin_edit_itens/update", requireAuth("sAdmin"), (req, res) => {
+  const { id_item, id_campanha, nome_item, pontos, status } =
+    req.body;
+
+  db.run(
+    `UPDATE ITENS SET id_campanha = ?, nome_item = ?, pontos = ?, status = ? 
+     WHERE id_item = ?`,
+    [id_item, id_campanha, nome_item, pontos, status ],
+    function (err) {
+      if (err) {
+        console.error(err);
+        return res.redirect("/admin_edit_itens?error=Erro ao atualizar item");
+      }
+
+      res.redirect("/admin_edit_itens?success=Item atualizado com sucesso");
+    }
+  );
+});
+
+// Desativar turma
+app.get(
+  "/admin_edit_itens/deactivate/:id",
+  requireAuth("sAdmin"),
+  (req, res) => {
+    const id = req.params.id;
+
+    db.run(
+      "UPDATE ITENS SET status = 0 WHERE id_item = ?",
+      [id],
+      function (err) {
+        if (err) {
+          console.error(err);
+          return res.redirect("/admin_edit_itens?error=Erro ao desativar item");
+        }
+
+        res.redirect("/admin_edit_itens?success=Item desativado com sucesso");
+      }
+    );
+  }
+);
+
+// Ativar turma
+app.get(
+  "/admin_edit_itens/activate/:id",
+  requireAuth("sAdmin"),
+  (req, res) => {
+    const id = req.params.id;
+
+    db.run(
+      "UPDATE ITENS SET status = 1 WHERE id_item = ?",
+      [id],
+      function (err) {
+        if (err) {
+          console.error(err);
+          return res.redirect("/admin_edit_itens?error=Erro ao ativar item");
+        }
+
+        res.redirect("/admin_edit_itens?success=Item ativado com sucesso");
+      }
+    );
+  }
+);
 // Rota para gerenciar campanhas
 app.get("/admin_edit_campanha", requireAuth("sAdmin"), (req, res) => {
   // Buscar campanhas
