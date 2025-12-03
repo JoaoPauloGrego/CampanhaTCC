@@ -644,6 +644,11 @@ app.get(
   }
 );
 app.get("/admin_edit_itens", (req, res) => {
+  console.log("GET /admin_edit_itens");
+  if (!req.session.loggedin || req.session.user.role !== "sAdmin") {
+    console.log("Acesso negado - usuário não autenticado");
+    return res.redirect("/login?error=Acesso negado");
+  }
   db.all("SELECT * FROM ITENS", (err, itens) => {
     if (err) {
       console.error(err);
@@ -703,10 +708,7 @@ app.post("/admin_edit_itens/update", requireAuth("sAdmin"), (req, res) => {
 });
 
 // Desativar turma
-app.get(
-  "/admin_edit_itens/deactivate/:id",
-  requireAuth("sAdmin"),
-  (req, res) => {
+app.get("/admin_edit_itens/deactivate/:id", requireAuth("sAdmin"), (req, res) => {
     const id = req.params.id;
 
     db.run(
@@ -725,10 +727,7 @@ app.get(
 );
 
 // Ativar turma
-app.get(
-  "/admin_edit_itens/activate/:id",
-  requireAuth("sAdmin"),
-  (req, res) => {
+app.get("/admin_edit_itens/activate/:id", requireAuth("sAdmin"), (req, res) => {
     const id = req.params.id;
 
     db.run(
@@ -857,10 +856,10 @@ app.post("/admin_edit_campanha/create", requireAuth("sAdmin"), (req, res) => {
                 ? turmas_selecionadas
                 : [turmas_selecionadas];
 
-              turmasArray.forEach((turmaId) => {
+              turmasArray.forEach((id_turma) => {
                 db.run(
                   `INSERT INTO CAMPANHA_TURMAS (id_campanha, id_turma) VALUES (?, ?)`,
-                  [id_campanha, turmaId],
+                  [id_campanha, id_turma],
                   function (err) {
                     if (err) console.error("Erro ao associar turma:", err);
                   }
@@ -913,12 +912,12 @@ app.get("/admin/doacoes", requireAuth("admin"), (req, res) => {
 app.get("/admin/turmas", requireAuth("admin"), (req, res) => {
   // Consulta para todas as turmas
   const allTurmasQuery =
-    "SELECT id, turma || ' - ' || docente AS turma_docente FROM turmas";
+    "SELECT id_turma, turma || ' - ' || docente AS turma_docente FROM turmas";
 
   // Consulta para pontuação total por turma (top 3)
   const turmasQuery = `
-    SELECT 
-      t.id,
+    SELECT
+      t.id_turma,
       t.turma || ' - ' || t.docente AS turma_docente,
       COALESCE(SUM(r.pontuacao * d.quantidade), 0) AS total_pontos
     FROM turmas t

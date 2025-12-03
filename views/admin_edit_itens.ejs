@@ -122,7 +122,6 @@
                 </td>
                 <td>
                   <button class="btn btn-primary btn-sm" onclick="openEditModal(
-                                                '<%= item.id_item %>', 
                                                 '<%= item.nome_item %>', 
                                                 '<%= item.id_campanha %>',
                                                 '<%= item.pontos %>',
@@ -158,7 +157,7 @@
     </footer>
   </div>
 
-  <!-- Modal para Criar Turma -->
+  <!-- Modal para Criar Item -->
   <div id="createModal" class="modal">
     <div class="modal-content">
       <span class="close" onclick="closeModal('createModal')">&times;</span>
@@ -170,11 +169,11 @@
         </div>
         <div class="form-group">
           <label class="form-label" for="id_campanha">ID da Campanha:</label>
-          <input type="text" id="id_campanha" name="id_campanha" class="form-control" placeholder="Ex: Maria Silva" required>
+          <input type="number" id="id_campanha" name="id_campanha" class="form-control" placeholder="Ex: Maria Silva" required>
         </div>
           <div class="form-group">
           <label class="form-label" for="pontos">Pontos:</label>
-          <input type="text" id="pontos" name="pontos" class="form-control" placeholder="Ex: Maria Silva" required>
+          <input type="number" id="pontos" name="pontos" class="form-control" placeholder="Ex: Maria Silva" required>
         </div>
         <div class="form-group">
           <label class="form-label" for="status">Status:</label>
@@ -194,7 +193,7 @@
   <div id="editModal" class="modal">
     <div class="modal-content">
       <span class="close" onclick="closeModal('editModal')">&times;</span>
-      <h2>Editar Turma</h2>
+      <h2>Editar Item</h2>
       <form id="editForm" action="/admin_edit_itens/update" method="POST">
         <input type="hidden" id="edit_id" name="id_item">
         <div class="form-group">
@@ -203,11 +202,11 @@
         </div>
         <div class="form-group">
           <label class="form-label" for="admin_edit_campanha">ID da Campanha:</label>
-          <input type="text" id="edit_campanha" name="id_campanha" class="form-control" required>
+          <input type="number" id="edit_campanha" name="id_campanha" class="form-control" required>
         </div>
         <div class="form-group">
           <label class="form-label" for="edit_pontos">Pontos:</label>
-          <input type="text" id="edit_pontos" name="pontos" class="form-control" required>
+          <input type="number" id="edit_pontos" name="pontos" class="form-control" required>
         </div>
         <div class="form-group">
           <label class="form-label" for="edit_status">Status:</label>
@@ -242,9 +241,8 @@
 
     // Função para abrir modal de edição com dados do item
     function openEditModal(id, id_campanha, nome_item, pontos, status) {
-      document.getElementById('edit_id').value = id;
-      document.getElementById('edit_campanha').value = id_campanha;
       document.getElementById('edit_nome_item').value = nome_item;
+      document.getElementById('edit_campanha').value = id_campanha;
       document.getElementById('edit_pontos').value = pontos;
       document.getElementById('edit_status').value = status;
       openModal('editModal');

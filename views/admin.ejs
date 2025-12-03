@@ -60,7 +60,7 @@
             <label for="id_campanha"><i class="fas fa-campaign"></i> Campanha:</label>
             <select name="id_campanha" id="id_campanha" required>
               <option value="">Selecione uma campanha</option>
-              <% CAMPANHAS.forEach(campanha=> { %>
+              <% CAMPANHAS.forEach(campanha => { %>
               <option value="<%= campanha.id_campanha %>">
                 <%= campanha.nome_campanha %> (ID: <%= campanha.id_campanha %>)
               </option>

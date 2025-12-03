@@ -90,8 +90,8 @@
                   <% if (typeof turmas !== 'undefined' && turmas.length > 0) { %>
                   <% turmas.forEach(function(turma) { %>
                   <div class="form-check">
-                    <input class="form-check-input" type="checkbox" name="turmas_selecionadas" value="<%= turma.ID_TURMAS %>" id="turma_<%= turma.ID_TURMAS %>">
-                    <label class="form-check-label" for="turma_<%= turma.ID_TURMAS %>">
+                    <input class="form-check-input" type="checkbox" name="turmas_selecionadas" value="<%= turma.id_turma %>" id="turma_<%= turma.id_turma %>">
+                    <label class="form-check-label" for="turma_<%= turma.id_turma %>">
                       <%= turma.nome_turma %> - <%= turma.docente %>
                     </label>
                   </div>
