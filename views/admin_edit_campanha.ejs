@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,9 +7,7 @@
   <link rel="icon" href="/logo.png" type="image/x-icon">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Montserrat:wght@700;800&display=swap" rel="stylesheet">
-
 </head>
-
 <body>
   <div class="container">
     <!-- Header -->
@@ -22,13 +19,14 @@
 
       <div class="user-info">
         <i class="fas fa-user-shield"></i>
-        <span>Super Admin: <%= user.name %></span>
+        <span>Super Admin: <%= user.nome_usuario %></span>
       </div>
 
       <nav>
         <ul>
           <li><a href="/sAdmin"><i class="fas fa-arrow-left"></i> Voltar</a></li>
           <li><a href="/admin_edit_turmas"><i class="fas fa-users"></i> Gerenciar Turmas</a></li>
+          <li><a href="/admin_edit_itens"><i class="fas fa-box"></i> Gerenciar Itens</a></li>
           <li><a href="/logout" class="logout-btn">
               <i class="fas fa-sign-out-alt"></i> Sair
             </a></li>
@@ -37,8 +35,6 @@
     </header>
 
     <div class="main-content">
-      <!-- <h2 class="page-title">Gerenciamento de Campanhas</h2> -->
-
       <!-- Mensagens de sucesso/erro -->
       <div class="messages">
         <% if(typeof success !== 'undefined') { %>
@@ -104,23 +100,36 @@
             </div>
           </div>
 
-<div class="form-section">
-  <h4 class="form-section-title">Itens da Campanha</h4>
-
-  <div class="form-group">
-    <label class="form-label">Adicionar Novo Item:</label>
-    <div class="item-form">
-      <input type="text" name="nome_item" class="form-control" placeholder="Nome do item" required>
-      <input type="number" name="pontos" class="form-control" placeholder="Pontos" min="1" required>
-    </div>
-  </div>
-
-  <button type="submit" class="btn btn-success">
-    <i class="fas fa-save"></i> Criar Campanha
-  </button>
-</div>
+          <div class="form-section">
+            <h4 class="form-section-title">Itens da Campanha</h4>
+            
+            <!-- Botão para adicionar itens -->
+            <button type="button" class="btn btn-primary" onclick="openModal('createItemModal')">
+              <i class="fas fa-plus"></i> Adicionar Item à Campanha
+            </button>
+            
+            <div class="form-group" style="margin-top: 15px;">
+              <label class="form-label">Itens disponíveis para esta campanha:</label>
+              <div class="checkbox-group">
+                <% if (typeof itens !== 'undefined' && itens.length > 0) { %>
+                <% itens.forEach(function(item) { %>
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" name="itens_selecionados" value="<%= item.id_item %>" id="item_<%= item.id_item %>">
+                  <label class="form-check-label" for="item_<%= item.id_item %>">
+                    <%= item.nome_item %> (<%= item.pontos %> pontos)
+                  </label>
+                </div>
+                <% }); %>
+                <% } else { %>
+                <p>Nenhum item cadastrado. Adicione itens usando o botão acima.</p>
+                <% } %>
+              </div>
             </div>
-          </div>          
+          </div>
+
+          <button type="submit" class="btn btn-success" style="margin-top: 20px;">
+            <i class="fas fa-save"></i> Criar Campanha
+          </button>
         </form>
       </div>
 
@@ -142,6 +151,7 @@
                 <th>Data Inicial</th>
                 <th>Data Final</th>
                 <th>Turmas</th>
+                <th>Itens</th>
                 <th>Status</th>
                 <th>Ações</th>
               </tr>
@@ -154,9 +164,21 @@
                 <td><%= campanha.nome_campanha %></td>
                 <td><%= new Date(campanha.dt_inicial).toLocaleDateString('pt-BR') %></td>
                 <td><%= new Date(campanha.dt_final).toLocaleDateString('pt-BR') %></td>
-                <td><%= campanha.turma_participantes || '0' %></td>
                 <td>
-                  <span class="status-badge <%= campanha.status_sala == 1 ? 'status-active' : 'status-inactive' %>">
+                  <% 
+                    const turmasCampanha = turmas.filter(t => campanha.turmas_selecionadas && 
+                      campanha.turmas_selecionadas.includes(t.id_turma.toString()));
+                  %>
+                  <%= turmasCampanha.length || 0 %>
+                </td>
+                <td>
+                  <% 
+                    const itensCampanha = itens.filter(i => i.id_campanha == campanha.id_campanha);
+                  %>
+                  <%= itensCampanha.length || 0 %>
+                </td>
+                <td>
+                  <span class="status-badge <%= campanha.status == 1 ? 'status-active' : 'status-inactive' %>">
                     <%= campanha.status == 1 ? 'Ativa' : 'Inativa' %>
                   </span>
                 </td>
@@ -165,20 +187,20 @@
                     <i class="fas fa-edit"></i> Editar
                   </button>
                   <% if (campanha.status == 1) { %>
-                  <button class="btn btn-warning btn-sm" onclick="desativarCampanha(<%= campanha.id_campanha %>, '<%= campanha.nome_campanha %>')">
+                  <a href="/admin_edit_campanha/deactivate/<%= campanha.id_campanha %>" class="btn btn-warning btn-sm" onclick="return confirm('Tem certeza que deseja desativar esta campanha?')">
                     <i class="fas fa-ban"></i> Desativar
-                  </button>
+                  </a>
                   <% } else { %>
-                  <button class="btn btn-success btn-sm" onclick="ativarCampanha(<%= campanha.id_campanha %>, '<%= campanha.nome_campanha %>')">
+                  <a href="/admin_edit_campanha/activate/<%= campanha.id_campanha %>" class="btn btn-success btn-sm" onclick="return confirm('Tem certeza que deseja ativar esta campanha?')">
                     <i class="fas fa-check"></i> Ativar
-                  </button>
+                  </a>
                   <% } %>
                 </td>
               </tr>
               <% }); %>
               <% } else { %>
               <tr>
-                <td colspan="7" style="text-align: center;">Nenhuma campanha cadastrada</td>
+                <td colspan="8" style="text-align: center;">Nenhuma campanha cadastrada</td>
               </tr>
               <% } %>
             </tbody>
@@ -192,107 +214,64 @@
     </footer>
   </div>
 
-  <!-- Modal para Editar Campanha -->
-  <div id="editModal" class="modal">
+  <!-- Modal para Criar Item -->
+  <div id="createItemModal" class="modal">
     <div class="modal-content">
-      <span class="close" onclick="fecharModal()">&times;</span>
-      <h2>Editar Campanha</h2>
-      <form id="editForm" action="/admin_edit_campanha/update" method="POST">
-        <input type="hidden" id="edit_id" name="ID_CAMPANHA">
-
+      <span class="close" onclick="closeModal('createItemModal')">&times;</span>
+      <h2>Novo Item</h2>
+      <form id="createItemForm" action="/admin_edit_campanha/create/itens" method="POST">
         <div class="form-group">
-          <label class="form-label" for="edit_nome">Nome da Campanha:</label>
-          <input type="text" id="edit_nome" name="NOME_CAMPANHA" class="form-control" required>
+          <label class="form-label" for="nome_item">Nome do Item:</label>
+          <input type="text" id="nome_item" name="nome_item" class="form-control" placeholder="Ex: Agasalho" required>
         </div>
-
         <div class="form-group">
-          <label class="form-label" for="edit_dt_inicial">Data Inicial:</label>
-          <input type="date" id="edit_dt_inicial" name="DT_INICIAL" class="form-control" required>
+          <label class="form-label" for="pontos">Pontos:</label>
+          <input type="number" id="pontos" name="pontos" class="form-control" placeholder="Ex: 10" required>
         </div>
-
         <div class="form-group">
-          <label class="form-label" for="edit_dt_final">Data Final:</label>
-          <input type="date" id="edit_dt_final" name="DT_FINAL" class="form-control" required>
-        </div>
-
-        <div class="form-group">
-          <label class="form-label" for="edit_status">Status:</label>
-          <select id="edit_status" name="STATUS_SALA" class="form-control" required>
-            <option value="1">Ativa</option>
-            <option value="0">Inativa</option>
+          <label class="form-label" for="item_status">Status:</label>
+          <select id="item_status" name="status" class="form-control" required>
+            <option value="1">Ativo</option>
+            <option value="0">Inativo</option>
           </select>
         </div>
-
         <button type="submit" class="btn btn-success">
-          <i class="fas fa-save"></i> Salvar Alterações
+          <i class="fas fa-save"></i> Salvar Item
         </button>
       </form>
     </div>
   </div>
 
   <script>
-    // Função para adicionar novo item
- 
-      const nomeItem = document.getElementById('novo_item').value;
-      const pontosItem = document.getElementById('pontos').value;
-      const status = document.getElementById('status').value;
-
-      if (!nomeItem || !pontosItem) {
-        alert('Por favor, preencha o nome e os pontos do item.');
-        return;
-      }
-
-      alert(`Item "${nomeItem}" com ${pontosItem} pontos será adicionado à campanha.`);
-
-      // Limpar os campos
-      document.getElementById('novo_item').value = '';
-      document.getElementById('pontos_item').value = '';
-    }
-
     // Funções para modais
-    function abrirModal(modalId) {
+    function openModal(modalId) {
       document.getElementById(modalId).style.display = 'block';
     }
 
-    function fecharModal() {
-      document.getElementById('editModal').style.display = 'none';
+    function closeModal(modalId) {
+      document.getElementById(modalId).style.display = 'none';
     }
 
-    // Fechar modais ao clicar fora deles
+    // Fechar modal ao clicar fora
     window.onclick = function(event) {
       if (event.target.classList.contains('modal')) {
         event.target.style.display = 'none';
       }
     }
 
-    // Função para editar campanha
-    function editarCampanha(id) {
-
-      abrirModal('editModal');
-    }
-
-    // Função para confirmar desativação de campanha
-    function desativarCampanha(id, nome) {
-      if (confirm(`Tem certeza que deseja desativar a campanha "${nome}"?`)) {
-        window.location.href = `/admin_edit_campanha/deactivate/${id}`;
-      }
-    }
-
-    // Função para confirmar ativação de campanha
-    function ativarCampanha(id, nome) {
-      if (confirm(`Tem certeza que deseja ativar a campanha "${nome}"?`)) {
-        window.location.href = `/admin_edit_campanha/activate/${id}`;
-      }
-    }
-
-    // Definir data mínima para os campos de data (hoje)
+    // Definir data mínima para campos de data
     document.addEventListener('DOMContentLoaded', function() {
       const today = new Date().toISOString().split('T')[0];
-      document.getElementById('dt_inicial');
-      document.getElementById('dt_final').min = today;
+      const dtInicial = document.getElementById('dt_inicial');
+      const dtFinal = document.getElementById('dt_final');
+      
+      if (dtInicial) dtInicial.min = today;
+      if (dtFinal) dtFinal.min = today;
     });
   </script>
+
   <style>
+    
     :root {
       --primary: #3498db;
       --secondary: #e74c3c;
@@ -332,8 +311,7 @@
       padding: 20px;
     }
 
-    /* Header */
-    header {
+ header {
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -393,17 +371,18 @@
     .user-info {
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 15px;
       background: rgba(255, 255, 255, 0.1);
       padding: 8px 15px;
       border-radius: 20px;
+      margin: 10px;
+    
     }
 
     .user-info i {
       font-size: 1.2rem;
     }
 
-    /* Main Content */
     .main-content {
       display: flex;
       flex-direction: column;
@@ -439,7 +418,7 @@
       margin: 0;
     }
 
-    .btn {
+        .btn {
       padding: 10px 20px;
       border-radius: 8px;
       border: none;
@@ -462,12 +441,12 @@
     }
 
     .btn-success {
-      background: #3498db;;
+      background: #3498db;
       color: white;
     }
 
     .btn-success:hover {
-      background: #2980b9;
+      background: #362196;
       transform: translateY(-2px);
     }
 
@@ -496,7 +475,6 @@
       font-size: 0.9rem;
     }
 
-    /* Form Styles */
     .form-container {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -541,16 +519,6 @@
       box-shadow: 0 0 0 3px rgba(243, 156, 18, 0.3);
     }
 
-    .form-select {
-      width: 100%;
-      padding: 12px;
-      border-radius: 8px;
-      border: 1px solid rgba(255, 255, 255, 0.3);
-      background: rgba(0, 0, 0, 0.2);
-      color: white;
-      font-size: 1rem;
-    }
-
     .checkbox-group {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
@@ -569,17 +537,6 @@
       height: 18px;
     }
 
-    .item-form {
-      display: flex;
-      gap: 10px;
-      margin-bottom: 15px;
-    }
-
-    .item-form input {
-      flex: 1;
-    }
-
-    /* Table Styles */
     .table-responsive {
       overflow-x: auto;
     }
@@ -590,8 +547,7 @@
       margin-top: 15px;
     }
 
-    th,
-    td {
+    th, td {
       padding: 12px 15px;
       text-align: left;
       border-bottom: 1px solid rgba(255, 255, 255, 0.1);
@@ -615,16 +571,15 @@
     }
 
     .status-active {
-      background-color: rgba(46, 204, 113, 0.2);
-      color: #27ae60;
-    }
-
-    .status-inactive {
       background-color: rgba(0, 55, 255, 0.2);
       color: #bec9ff;
     }
 
-    /* Modal Styles */
+    .status-inactive {
+      background-color: rgba(231, 76, 60, 0.2);
+      color: #e74c3c;
+    }
+
     .modal {
       display: none;
       position: fixed;
@@ -643,7 +598,7 @@
       padding: 25px;
       border-radius: 15px;
       width: 80%;
-      max-width: 600px;
+      max-width: 500px;
       box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
       position: relative;
     }
@@ -662,7 +617,6 @@
       color: white;
     }
 
-    /* Footer */
     footer {
       text-align: center;
       padding: 30px 0;
@@ -678,7 +632,6 @@
       text-decoration: none;
       font-weight: 600;
       transition: all 0.3s ease;
-      margin-top: -10px;
     }
 
     .logout-btn:hover {
@@ -707,32 +660,27 @@
       margin-bottom: 20px;
     }
 
-    input[type="date"]::-webkit-calendar-picker-indicator {
-      opacity: 0;
-    }
-
-    /* Responsividade */
     @media (max-width: 768px) {
       .form-container {
         grid-template-columns: 1fr;
       }
-
+      
       .card-header {
         flex-direction: column;
         align-items: flex-start;
         gap: 15px;
       }
-
+      
       nav ul {
         flex-direction: column;
         gap: 15px;
       }
-
+      
       header {
         flex-direction: column;
         gap: 20px;
       }
-
+      
       .modal-content {
         width: 95%;
         margin: 10% auto;
@@ -740,5 +688,4 @@
     }
   </style>
 </body>
-
 </html>

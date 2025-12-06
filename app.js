@@ -45,7 +45,8 @@ app.get("/doar", (req, res) => {
 app.post("/login", (req, res) => {
   console.log("POST /login");
   const { nome_usuario, senha } = req.body;
-  const query = "SELECT * FROM USUARIOS WHERE nome_usuario = ? AND senha = ? AND status = 1";
+  const query =
+    "SELECT * FROM USUARIOS WHERE nome_usuario = ? AND senha = ? AND status = 1";
 
   db.get(query, [nome_usuario, senha], (err, row) => {
     if (err) {
@@ -162,7 +163,8 @@ app.get("/aluno/select_campanha", (req, res) => {
 });
 
 app.get("/aluno/campanha/:id", (req, res) => {
-  const queryCampanhas = "SELECT id_campanha, nome_campanha FROM CAMPANHAS WHERE STATUS = 1";
+  const queryCampanhas =
+    "SELECT id_campanha, nome_campanha FROM CAMPANHAS WHERE STATUS = 1";
   const idCampanha = req.params.id;
   console.log("GET /aluno");
   if (!req.session.loggedin || req.session.user.role !== "aluno") {
@@ -192,8 +194,6 @@ SELECT
    WHERE d.id_campanha = ?;
 `;
     console.log("Requisição:", idCampanha);
-
-
 
     const allTurmasQuery =
       "SELECT id_turma, nome_turma || ' - ' || docente AS turma_docente FROM turmas";
@@ -510,7 +510,9 @@ app.get(
       function (err) {
         if (err) {
           console.error(err);
-          return res.redirect("/admin_edit_turmas?error=Erro ao desativar turma");
+          return res.redirect(
+            "/admin_edit_turmas?error=Erro ao desativar turma"
+          );
         }
 
         res.redirect("/admin_edit_turmas?success=Turma desativada com sucesso");
@@ -582,20 +584,23 @@ app.get("/admin_edit_usuarios/create", requireAuth("sAdmin"), (req, res) => {
 
 // Atualizar usuário
 app.get("/admin_edit_usuarios/update", requireAuth("sAdmin"), (req, res) => {
-  const { id_usuario, nome_usuario, role, senha, status,  } =
-    req.body;
+  const { id_usuario, nome_usuario, role, senha, status } = req.body;
 
   db.run(
     `UPDATE USUARIOS SET nome_usuario = ?, role = ?, senha = ?, status = ?  
      WHERE id_usuario = ?`,
-    [id_usuario, nome_usuario, senha, role, status,  ],
+    [id_usuario, nome_usuario, senha, role, status],
     function (err) {
       if (err) {
         console.error(err);
-        return res.redirect("/admin_edit_usuarios?error=Erro ao atualizar usuário");
+        return res.redirect(
+          "/admin_edit_usuarios?error=Erro ao atualizar usuário"
+        );
       }
 
-      res.redirect("/admin_edit_usuarios?success=Usuario atualizada com sucesso");
+      res.redirect(
+        "/admin_edit_usuarios?success=Usuario atualizada com sucesso"
+      );
     }
   );
 });
@@ -613,10 +618,14 @@ app.get(
       function (err) {
         if (err) {
           console.error(err);
-          return res.redirect("/admin_edit_usuarios?error=Erro ao desativar usuário");
+          return res.redirect(
+            "/admin_edit_usuarios?error=Erro ao desativar usuário"
+          );
         }
 
-        res.redirect("/admin_edit_usuarios?success=Usuário desativada com sucesso");
+        res.redirect(
+          "/admin_edit_usuarios?success=Usuário desativada com sucesso"
+        );
       }
     );
   }
@@ -635,10 +644,14 @@ app.get(
       function (err) {
         if (err) {
           console.error(err);
-          return res.redirect("/admin_edit_usuarios?error=Erro ao ativar usuário");
+          return res.redirect(
+            "/admin_edit_usuarios?error=Erro ao ativar usuário"
+          );
         }
 
-        res.redirect("/admin_edit_usuarios?success=Usuário ativado com sucesso");
+        res.redirect(
+          "/admin_edit_usuarios?success=Usuário ativado com sucesso"
+        );
       }
     );
   }
@@ -689,13 +702,12 @@ app.post("/admin_edit_itens/create", requireAuth("sAdmin"), (req, res) => {
 
 // Atualizar turma
 app.post("/admin_edit_itens/update", requireAuth("sAdmin"), (req, res) => {
-  const { id_item, id_campanha, nome_item, pontos, status } =
-    req.body;
+  const { id_item, id_campanha, nome_item, pontos, status } = req.body;
 
   db.run(
     `UPDATE ITENS SET id_campanha = ?, nome_item = ?, pontos = ?, status = ? 
      WHERE id_item = ?`,
-    [id_item, id_campanha, nome_item, pontos, status ],
+    [id_item, id_campanha, nome_item, pontos, status],
     function (err) {
       if (err) {
         console.error(err);
@@ -708,7 +720,10 @@ app.post("/admin_edit_itens/update", requireAuth("sAdmin"), (req, res) => {
 });
 
 // Desativar turma
-app.get("/admin_edit_itens/deactivate/:id", requireAuth("sAdmin"), (req, res) => {
+app.get(
+  "/admin_edit_itens/deactivate/:id",
+  requireAuth("sAdmin"),
+  (req, res) => {
     const id = req.params.id;
 
     db.run(
@@ -728,22 +743,17 @@ app.get("/admin_edit_itens/deactivate/:id", requireAuth("sAdmin"), (req, res) =>
 
 // Ativar turma
 app.get("/admin_edit_itens/activate/:id", requireAuth("sAdmin"), (req, res) => {
-    const id = req.params.id;
+  const id = req.params.id;
 
-    db.run(
-      "UPDATE ITENS SET status = 1 WHERE id_item = ?",
-      [id],
-      function (err) {
-        if (err) {
-          console.error(err);
-          return res.redirect("/admin_edit_itens?error=Erro ao ativar item");
-        }
+  db.run("UPDATE ITENS SET status = 1 WHERE id_item = ?", [id], function (err) {
+    if (err) {
+      console.error(err);
+      return res.redirect("/admin_edit_itens?error=Erro ao ativar item");
+    }
 
-        res.redirect("/admin_edit_itens?success=Item ativado com sucesso");
-      }
-    );
-  }
-);
+    res.redirect("/admin_edit_itens?success=Item ativado com sucesso");
+  });
+});
 // Rota para gerenciar campanhas
 app.get("/admin_edit_campanha", requireAuth("sAdmin"), (req, res) => {
   // Buscar campanhas
@@ -798,6 +808,24 @@ app.get("/admin_edit_campanha", requireAuth("sAdmin"), (req, res) => {
   });
 });
 
+app.post("/admin_edit_campanha/create/itens", requireAuth("sAdmin"), (req, res) => {
+  const { id_campanha, nome_item, pontos, status } = req.body;
+
+  db.run(
+    `INSERT INTO ITENS (id_campanha, nome_item, pontos, status) 
+     VALUES (?, ?, ?, ?)`,
+    [id_campanha, nome_item, pontos, status || 1],
+    function (err) {
+      if (err) {
+        console.error(err);
+        return res.redirect("/admin_edit_campanha?error=Erro ao criar item");
+      }
+
+      res.redirect("/admin_edit_campanha?success=Item criado com sucesso");
+    }
+  );
+});
+
 // Rota para processar a criação de campanhas
 app.post("/admin_edit_campanha/create", requireAuth("sAdmin"), (req, res) => {
   console.log("POST /admin_edit_campanha/create - Dados:", req.body);
@@ -807,7 +835,9 @@ app.post("/admin_edit_campanha/create", requireAuth("sAdmin"), (req, res) => {
     dt_inicial,
     dt_final,
     nome_item,
+    id_campanha,
     pontos,
+    status,
     turmas_selecionadas,
   } = req.body;
 
@@ -837,43 +867,41 @@ app.post("/admin_edit_campanha/create", requireAuth("sAdmin"), (req, res) => {
         console.log("Campanha criada com ID:", id_campanha);
 
         // 2. Criar o item associado à campanha
+
         db.run(
-          `INSERT INTO ITENS (nome_item, id_campanha, pontos) 
-           VALUES (?, ?, ?)`,
-          [nome_item, id_campanha, pontos],
+          `INSERT INTO ITENS (id_campanha, nome_item, pontos, status) 
+     VALUES (?, ?, ?, ?)`,
+          [id_campanha, nome_item, pontos, status || 1],
           function (err) {
             if (err) {
-              console.error("Erro ao criar item:", err);
-              return res.redirect(
-                "/admin_edit_campanha?error=Erro ao criar item"
-              );
+              console.error(err);
+              return res.redirect("/admin_edit_itens?error=Erro ao criar item");
             }
-            console.log("Item criado com ID:", this.lastID);
-
-            // 3. Associar turmas à campanha (se houver)
-            if (turmas_selecionadas) {
-              const turmasArray = Array.isArray(turmas_selecionadas)
-                ? turmas_selecionadas
-                : [turmas_selecionadas];
-
-              turmasArray.forEach((id_turma) => {
-                db.run(
-                  `INSERT INTO CAMPANHA_TURMAS (id_campanha, id_turma) VALUES (?, ?)`,
-                  [id_campanha, id_turma],
-                  function (err) {
-                    if (err) console.error("Erro ao associar turma:", err);
-                  }
-                );
-              });
-            }
-
-            res.redirect(
-              "/admin_edit_campanha?success=Campanha criada com sucesso"
-            );
+            id_campanha = this.lastID;
+            res.redirect("/admin_edit_itens?success=Item criado com sucesso");
           }
         );
       }
     );
+
+    // 3. Associar turmas à campanha (se houver)
+    if (turmas_selecionadas) {
+      const turmasArray = Array.isArray(turmas_selecionadas)
+        ? turmas_selecionadas
+        : [turmas_selecionadas];
+
+      turmasArray.forEach((id_turma) => {
+        db.run(
+          `INSERT INTO CAMPANHA_TURMAS (id_campanha, id_turma) VALUES (?, ?)`,
+          [id_campanha, id_turma],
+          function (err) {
+            if (err) console.error("Erro ao associar turma:", err);
+          }
+        );
+      });
+    }
+
+    res.redirect("/admin_edit_campanha?success=Campanha criada com sucesso");
   });
 });
 
@@ -919,10 +947,10 @@ app.get("/admin/turmas", requireAuth("admin"), (req, res) => {
     SELECT
       t.id_turma,
       t.turma || ' - ' || t.docente AS turma_docente,
-      COALESCE(SUM(r.pontuacao * d.quantidade), 0) AS total_pontos
+      COALESCE(SUM(i.pontuacao * d.quantidade), 0) AS total_pontos
     FROM turmas t
     LEFT JOIN doacoes d ON t.id = d.turma_id
-    LEFT JOIN roupas r ON d.roupa_id = r.id
+    LEFT JOIN itens i ON d.id_item = i.id_item
     GROUP BY t.id
     ORDER BY total_pontos DESC
     LIMIT 3;
