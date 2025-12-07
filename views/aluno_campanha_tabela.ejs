@@ -114,6 +114,15 @@
     </table>
   </div>
 <% }}); %>
+
+<div class="itens-disponiveis">
+  <h3>Itens Aceitos na Campanha</h3>
+  <ul>
+    <% itensCampanha.forEach(item => { %>
+      <li><%= item.nome_item %> - <%= item.pontos %> pontos</li>
+    <% }); %>
+  </ul>
+</div>
           </div>
 
           <!-- Footer -->

@@ -98,30 +98,30 @@ app.get("/admin", (req, res) => {
     req.session.user &&
     req.session.user.role === "admin"
   ) {
-    const queryTurma = `SELECT id_turma, nome_turma, docente FROM TURMAS WHERE status = 1`;
     const queryItens = `SELECT * FROM ITENS WHERE status = 1`;
     const queryCampanhas = `SELECT * FROM CAMPANHAS WHERE status = 1`;
 
     db.serialize(() => {
-      // Buscar turmas
-      db.all(queryTurma, (err, turmas) => {
+      // Buscar itens
+      db.all(queryItens, (err, itens) => {
         if (err) {
           console.error(err);
-          return res.redirect("/admin?error=Erro ao carregar turmas");
+          return res.redirect("/admin?error=Erro ao carregar itens");
         }
 
-        // Buscar itens
-        db.all(queryItens, (err, itens) => {
+        // Buscar campanhas
+        db.all(queryCampanhas, (err, campanhas) => {
           if (err) {
             console.error(err);
-            return res.redirect("/admin?error=Erro ao carregar itens");
+            return res.redirect("/admin?error=Erro ao carregar campanhas");
           }
 
-          // Buscar campanhas
-          db.all(queryCampanhas, (err, campanhas) => {
+          // Inicialmente, buscar todas as turmas ativas
+          const queryTurma = `SELECT id_turma, nome_turma, docente FROM TURMAS WHERE status = 1`;
+          db.all(queryTurma, (err, turmas) => {
             if (err) {
               console.error(err);
-              return res.redirect("/admin?error=Erro ao carregar campanhas");
+              return res.redirect("/admin?error=Erro ao carregar turmas");
             }
 
             res.render("admin", {
@@ -139,6 +139,71 @@ app.get("/admin", (req, res) => {
   } else {
     res.redirect("/login?error=Acesso negado");
   }
+});
+
+// Rota para obter turmas filtradas por campanha
+app.get("/admin/campanha/:id/turmas", requireAuth("admin"), (req, res) => {
+  const idCampanha = req.params.id;
+
+  const query = `
+    SELECT t.id_turma, t.nome_turma, t.docente 
+    FROM TURMAS t
+    INNER JOIN CAMPANHA_TURMAS ct ON t.id_turma = ct.id_turma
+    WHERE ct.id_campanha = ? AND t.status = 1
+    ORDER BY t.nome_turma;
+  `;
+
+  db.all(query, [idCampanha], (err, turmas) => {
+    if (err) {
+      console.error(err);
+      return res.status(500).json({ error: "Erro ao buscar turmas" });
+    }
+    res.json(turmas);
+  });
+});
+
+// Rota para obter todas as turmas (fallback)
+app.get("/admin/todas-turmas", requireAuth("admin"), (req, res) => {
+  const query = `SELECT id_turma, nome_turma, docente FROM TURMAS WHERE status = 1 ORDER BY nome_turma`;
+
+  db.all(query, (err, turmas) => {
+    if (err) {
+      console.error(err);
+      return res.status(500).json({ error: "Erro ao buscar turmas" });
+    }
+    res.json(turmas);
+  });
+});
+app.get("/admin/campanha/:id/itens", requireAuth("admin"), (req, res) => {
+  const idCampanha = req.params.id;
+
+  const query = `
+    SELECT i.id_item, i.nome_item, i.pontos, i.id_campanha
+    FROM ITENS i
+    WHERE (i.id_campanha = ? OR i.id_campanha IS NULL) AND i.status = 1
+    ORDER BY i.nome_item;
+  `;
+
+  db.all(query, [idCampanha], (err, itens) => {
+    if (err) {
+      console.error(err);
+      return res.status(500).json({ error: "Erro ao buscar itens" });
+    }
+    res.json(itens);
+  });
+});
+
+// Rota para obter todos os itens (fallback)
+app.get("/admin/todos-itens", requireAuth("admin"), (req, res) => {
+  const query = `SELECT id_item, nome_item, pontos FROM ITENS WHERE status = 1 ORDER BY nome_item`;
+  
+  db.all(query, (err, itens) => {
+    if (err) {
+      console.error(err);
+      return res.status(500).json({ error: 'Erro ao buscar itens' });
+    }
+    res.json(itens);
+  });
 });
 
 app.get("/aluno/select_campanha", (req, res) => {
@@ -195,8 +260,13 @@ SELECT
 `;
     console.log("Requisição:", idCampanha);
 
-    const allTurmasQuery =
-      "SELECT id_turma, nome_turma || ' - ' || docente AS turma_docente FROM turmas";
+    const allTurmasQuery = `
+  SELECT t.id_turma, t.nome_turma || ' - ' || t.docente AS turma_docente 
+  FROM TURMAS t
+  INNER JOIN CAMPANHA_TURMAS ct ON t.id_turma = ct.id_turma
+  WHERE ct.id_campanha = ? AND t.status = 1
+  ORDER BY t.nome_turma;
+`;
 
     // Consulta para pontuação total por turma (top 3)
     const turmasQuery = `
@@ -226,11 +296,26 @@ SELECT
     GROUP BY t.id_turma, i.id_item
     ORDER BY t.id_turma, i.nome_item;
   `;
+
+  const itensCampanhaQuery = `
+  SELECT id_item, nome_item, pontos
+  FROM ITENS
+  WHERE (id_campanha = ? OR id_campanha IS NULL) AND status = 1
+  ORDER BY nome_item;
+`;
     console.log("Requisição:", itensQuery);
+  
+  db.all(itensCampanhaQuery, [idCampanha], (err, itensCampanha) => {
+  if (err) {
+    console.error("Erro ao buscar itens da campanha:", err);
+    return res.redirect(
+      "/aluno/select_campanha?error=Erro ao carregar itens"
+    );
+  }
 
     db.serialize(() => {
       // Busca todas as turmas
-      db.all(allTurmasQuery, (err, allTurmas) => {
+      db.all(allTurmasQuery, [idCampanha], (err, allTurmas) => {
         if (err) return console.error(err);
         console.log("Requisição:", allTurmasQuery);
         console.log("Requisição:", allTurmas);
@@ -266,13 +351,15 @@ SELECT
               itensPorTurma[item.id_turma].push(item);
             });
 
-            res.render("aluno_campanha_tabela", {
-              turmas,
-              itensPorTurma,
-              allTurmas, // Envia todas as turmas para o front-end
-              user: req.session.user,
-              campanhas: campanhas,
-            });
+  res.render("aluno_campanha_tabela", {
+    turmas, // Pega as turmas do aluno
+    itensPorTurma, // Filtra os itens por turma
+    allTurmas, // Pega todas as turmas
+    itensCampanha, // itens disponíveis na campanha
+    user: req.session.user,
+    campanhas: campanhas,
+  })
+})
           });
         });
       });
@@ -281,32 +368,62 @@ SELECT
 });
 
 app.get("/admin/turmas", (req, res) => {
-  console.log("GET /admin/turmas");
-  if (!req.session.loggedin || req.session.user.role !== "admin") {
+  const queryCampanhas =
+    "SELECT id_campanha, nome_campanha FROM CAMPANHAS WHERE STATUS = 1";
+  const idCampanha = req.params.id;
+  console.log("GET /aluno");
+  if (!req.session.loggedin || req.session.user.role !== "aluno") {
     console.log("Acesso negado - usuário não autenticado");
     return res.redirect("/login?error=Acesso negado");
   }
-  // Consulta para todas as turmas (não apenas as top 3)
-  const allTurmasQuery =
-    "SELECT id_turma, nome_turma || ' - ' || docente AS turma_docente FROM turmas";
+  db.all(queryCampanhas, (err, campanhas) => {
+    if (err) {
+      console.error(err);
+      return res.redirect("/admin?error=Erro ao carregar campanhas");
+    }
 
-  // Consulta para pontuação total por turma (top 3)
-  const turmasQuery = `
+    // Consulta para todas as turmas (não apenas as top 3)
+    `
+SELECT
+     d.id_campanha,
+     d.id_turma,
+     d.id_item,
+     d.quantidade,
+     d.pontos_total
+   FROM DOACOES d
+   LEFT JOIN CAMPANHAS c ON d.id_campanha = c.id_campanha
+   LEFT JOIN TURMAS t ON d.id_turma = t.id_turma
+   LEFT JOIN ITENS i ON d.id_item = i.id_item
+   GROUP BY d.id_turma
+   ORDER BY d.pontos_total DESC
+   WHERE d.id_campanha = ?;
+`;
+    console.log("Requisição:", idCampanha);
+
+    const allTurmasQuery = `
+  SELECT t.id_turma, t.nome_turma || ' - ' || t.docente AS turma_docente 
+  FROM TURMAS t
+  INNER JOIN CAMPANHA_TURMAS ct ON t.id_turma = ct.id_turma
+  WHERE ct.id_campanha = ? AND t.status = 1
+  ORDER BY t.nome_turma;
+`;
+
+    // Consulta para pontuação total por turma (top 3)
+    const turmasQuery = `
     SELECT 
       t.id_turma,
       t.nome_turma || ' - ' || t.docente AS turma_docente,
       COALESCE(SUM(i.pontos * d.quantidade), 0) AS total_pontos
     FROM TURMAS t
-    LEFT JOIN DOACOES d ON t.id_turma = d.id_turma
+    LEFT JOIN DOACOES d ON t.id_turma = d.id_turma AND d.id_campanha = ?
     LEFT JOIN ITENS i ON d.id_item = i.id_item
     GROUP BY t.id_turma
     ORDER BY total_pontos DESC
     LIMIT 3;
   `;
-  console.log("Resultado da requisição:", turmasQuery);
 
-  // Consulta para itens doados por turma
-  const itensQuery = `
+    // Consulta para itens doados por turma
+    const itensQuery = `
     SELECT 
       t.id_turma,
       i.nome_item,
@@ -314,47 +431,101 @@ app.get("/admin/turmas", (req, res) => {
       COALESCE(SUM(d.quantidade), 0) AS quantidade_total,
       COALESCE(SUM(i.pontos * d.quantidade), 0) AS pontos_total
     FROM TURMAS t
-    LEFT JOIN DOACOES d ON t.id_turma = d.id_turma
+    LEFT JOIN DOACOES d ON t.id_turma = d.id_turma AND d.id_campanha = ?
     LEFT JOIN ITENS i ON d.id_item = i.id_item
     GROUP BY t.id_turma, i.id_item
     ORDER BY t.id_turma, i.nome_item;
   `;
-  console.log("Resultado da requisição:", itensQuery);
 
-  db.serialize(() => {
-    // Busca todas as turmas
-    db.all(allTurmasQuery, (err, allTurmas) => {
-      if (err) return console.error(err);
+  const itensCampanhaQuery = `
+  SELECT id_item, nome_item, pontos
+  FROM ITENS
+  WHERE (id_campanha = ? OR id_campanha IS NULL) AND status = 1
+  ORDER BY nome_item;
+`;
+    console.log("Requisição:", itensQuery);
+  
+  db.all(itensCampanhaQuery, [idCampanha], (err, itensCampanha) => {
+  if (err) {
+    console.error("Erro ao buscar itens da campanha:", err);
+    return res.redirect(
+      "/aluno/select_campanha?error=Erro ao carregar itens"
+    );
+  }
 
-      // Busca top 3 turmas
-      db.all(turmasQuery, (err, turmas) => {
+    db.serialize(() => {
+      // Busca todas as turmas
+      db.all(allTurmasQuery, [idCampanha], (err, allTurmas) => {
         if (err) return console.error(err);
+        console.log("Requisição:", allTurmasQuery);
+        console.log("Requisição:", allTurmas);
 
-        // Busca itens por turma
-        db.all(itensQuery, (err, itens) => {
-          if (err) return console.error(err);
+        // Busca top 3 turmas
+        db.all(turmasQuery, [idCampanha], (err, turmas) => {
+          if (err) {
+            console.error("Erro ao buscar ranking:", err);
+            return res.redirect(
+              "/aluno/select_campanha?error=Erro ao carregar ranking"
+            );
+          }
+          console.log("Requisição:", turmasQuery);
+          console.log("Resultado:", turmas);
 
-          // Organiza itens por turma
-          const itensPorTurma = {};
-          itens.forEach((item) => {
-            if (!itensPorTurma[item.id_turma]) {
-              itensPorTurma[item.id_turma] = [];
+          // Busca itens por turma
+          db.all(itensQuery, [idCampanha], (err, itens) => {
+            if (err) {
+              console.error("Erro ao buscar itens:", err);
+              return res.redirect(
+                "/aluno/select_campanha?error=Erro ao carregar itens"
+              );
             }
-            itensPorTurma[item.id_turma].push(item);
-          });
+            console.log("Requisição:", itensQuery);
+            console.log("Requisição:", itens);
 
-          res.render("admin_campanha_tabela", {
-            turmas,
-            itensPorTurma,
-            allTurmas, // Envia todas as turmas para o front-end
-            user: req.session.user,
+            // Organiza itens por turma
+            const itensPorTurma = {};
+            itens.forEach((item) => {
+              if (!itensPorTurma[item.id_turma]) {
+                itensPorTurma[item.id_turma] = [];
+              }
+              itensPorTurma[item.id_turma].push(item);
+            });
+
+  res.render("admin_campanha_tabela", {
+    turmas, // Pega as turmas do aluno
+    itensPorTurma, // Filtra os itens por turma
+    allTurmas, // Pega todas as turmas
+    itensCampanha, // itens disponíveis na campanha
+    user: req.session.user,
+    campanhas: campanhas,
+  })
+})
           });
         });
       });
     });
   });
 });
+app.get("/admin/select_campanha", (req, res) => {
+  console.log("GET /aluno/select_campanha");
+  if (!req.session.loggedin || req.session.user.role !== "aluno") {
+    console.log("Acesso negado - usuário não autenticado");
+    return res.redirect("/login?error=Acesso negado");
+  }
 
+  // Consulta para todas as campanhas ativas MOURIS
+  const allCampanhasQuery =
+    "SELECT id_campanha, nome_campanha FROM CAMPANHAS WHERE STATUS = 1";
+
+  db.all(allCampanhasQuery, (err, campanhas) => {
+    if (err) return console.error(err);
+    console.log(campanhas);
+    res.render("admin_turmas", {
+      campanhas: campanhas,
+      user: req.session.user,
+    });
+  });
+});
 // Registra nova doação
 app.post("/doacao", (req, res) => {
   console.log("POST /doacao recebido");
@@ -761,35 +932,35 @@ app.get("/admin_edit_campanha", requireAuth("sAdmin"), (req, res) => {
     if (err) {
       console.error("Erro ao buscar campanhas:", err);
       return res.render("admin_edit_campanha", {
-        campanhas: campanhas,
-        turmas: turmas,
-        itens: itens,
+        campanhas: [],
+        turmas: [],
+        itens: [],
         error: "Erro ao carregar campanhas",
         user: req.session.user,
       });
     }
 
-    // Buscar turmas para associar à campanha
+    // Buscar turmas
     db.all("SELECT * FROM TURMAS WHERE status = 1", (err, turmas) => {
       if (err) {
         console.error("Erro ao buscar turmas:", err);
         return res.render("admin_edit_campanha", {
           campanhas: campanhas,
-          turmas: turmas,
-          itens: itens,
+          turmas: [],
+          itens: [],
           error: "Erro ao carregar turmas",
           user: req.session.user,
         });
       }
 
-      // Buscar itens
+      // Buscar todos os itens (inclusive os sem campanha específica)
       db.all("SELECT * FROM ITENS WHERE status = 1", (err, itens) => {
         if (err) {
           console.error("Erro ao buscar itens:", err);
           return res.render("admin_edit_campanha", {
             campanhas: campanhas,
-            turmas: itens,
-            itens: itens,
+            turmas: turmas,
+            itens: [],
             error: "Erro ao carregar itens",
             user: req.session.user,
           });
@@ -808,23 +979,27 @@ app.get("/admin_edit_campanha", requireAuth("sAdmin"), (req, res) => {
   });
 });
 
-app.post("/admin_edit_campanha/create/itens", requireAuth("sAdmin"), (req, res) => {
-  const { id_campanha, nome_item, pontos, status } = req.body;
+app.post(
+  "/admin_edit_campanha/create/itens",
+  requireAuth("sAdmin"),
+  (req, res) => {
+    const { id_campanha, nome_item, pontos, status } = req.body;
 
-  db.run(
-    `INSERT INTO ITENS (id_campanha, nome_item, pontos, status) 
+    db.run(
+      `INSERT INTO ITENS (id_campanha, nome_item, pontos, status) 
      VALUES (?, ?, ?, ?)`,
-    [id_campanha, nome_item, pontos, status || 1],
-    function (err) {
-      if (err) {
-        console.error(err);
-        return res.redirect("/admin_edit_campanha?error=Erro ao criar item");
-      }
+      [id_campanha, nome_item, pontos, status || 1],
+      function (err) {
+        if (err) {
+          console.error(err);
+          return res.redirect("/admin_edit_campanha?error=Erro ao criar item");
+        }
 
-      res.redirect("/admin_edit_campanha?success=Item criado com sucesso");
-    }
-  );
-});
+        res.redirect("/admin_edit_campanha?success=Item criado com sucesso");
+      }
+    );
+  }
+);
 
 // Rota para processar a criação de campanhas
 app.post("/admin_edit_campanha/create", requireAuth("sAdmin"), (req, res) => {
@@ -835,14 +1010,14 @@ app.post("/admin_edit_campanha/create", requireAuth("sAdmin"), (req, res) => {
     dt_inicial,
     dt_final,
     nome_item,
-    id_campanha,
     pontos,
     status,
     turmas_selecionadas,
+    itens_selecionados // Novo: para associar itens existentes
   } = req.body;
 
   // Validar campos obrigatórios
-  if (!nome_campanha || !dt_inicial || !dt_final || !nome_item || !pontos) {
+  if (!nome_campanha || !dt_inicial || !dt_final) {
     console.error("Campos obrigatórios faltando:", req.body);
     return res.redirect(
       "/admin_edit_campanha?error=Todos os campos são obrigatórios"
@@ -866,42 +1041,57 @@ app.post("/admin_edit_campanha/create", requireAuth("sAdmin"), (req, res) => {
         const id_campanha = this.lastID;
         console.log("Campanha criada com ID:", id_campanha);
 
-        // 2. Criar o item associado à campanha
-
-        db.run(
-          `INSERT INTO ITENS (id_campanha, nome_item, pontos, status) 
-     VALUES (?, ?, ?, ?)`,
-          [id_campanha, nome_item, pontos, status || 1],
-          function (err) {
-            if (err) {
-              console.error(err);
-              return res.redirect("/admin_edit_itens?error=Erro ao criar item");
+        // 2. Criar um novo item para a campanha (se fornecido)
+        if (nome_item && pontos) {
+          db.run(
+            `INSERT INTO ITENS (id_campanha, nome_item, pontos, status) 
+             VALUES (?, ?, ?, ?)`,
+            [id_campanha, nome_item, pontos, status || 1],
+            function (err) {
+              if (err) {
+                console.error("Erro ao criar item:", err);
+              }
             }
-            id_campanha = this.lastID;
-            res.redirect("/admin_edit_itens?success=Item criado com sucesso");
-          }
-        );
+          );
+        }
+
+        // 3. Associar itens existentes à campanha (se fornecidos)
+        if (itens_selecionados) {
+          const itensArray = Array.isArray(itens_selecionados)
+            ? itens_selecionados
+            : [itens_selecionados];
+
+          itensArray.forEach((id_item) => {
+            db.run(
+              `UPDATE ITENS SET id_campanha = ? WHERE id_item = ?`,
+              [id_campanha, id_item],
+              function (err) {
+                if (err) console.error("Erro ao associar item existente:", err);
+              }
+            );
+          });
+        }
+
+        // 4. Associar turmas à campanha
+        if (turmas_selecionadas) {
+          const turmasArray = Array.isArray(turmas_selecionadas)
+            ? turmas_selecionadas
+            : [turmas_selecionadas];
+
+          turmasArray.forEach((id_turma) => {
+            db.run(
+              `INSERT INTO CAMPANHA_TURMAS (id_campanha, id_turma) VALUES (?, ?)`,
+              [id_campanha, id_turma],
+              function (err) {
+                if (err) console.error("Erro ao associar turma:", err);
+              }
+            );
+          });
+        }
+
+        res.redirect("/admin_edit_campanha?success=Campanha criada com sucesso");
       }
     );
-
-    // 3. Associar turmas à campanha (se houver)
-    if (turmas_selecionadas) {
-      const turmasArray = Array.isArray(turmas_selecionadas)
-        ? turmas_selecionadas
-        : [turmas_selecionadas];
-
-      turmasArray.forEach((id_turma) => {
-        db.run(
-          `INSERT INTO CAMPANHA_TURMAS (id_campanha, id_turma) VALUES (?, ?)`,
-          [id_campanha, id_turma],
-          function (err) {
-            if (err) console.error("Erro ao associar turma:", err);
-          }
-        );
-      });
-    }
-
-    res.redirect("/admin_edit_campanha?success=Campanha criada com sucesso");
   });
 });
 
