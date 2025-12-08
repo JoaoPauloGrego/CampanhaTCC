@@ -459,7 +459,7 @@ app.get("/admin/select_campanha", requireAuth("admin"), (req, res) => {
   console.log("GET /admin/select_campanha");
   console.log("Sessão do usuário:", req.session.user);
 
-  const allCampanhasQuery = "SELECT id_campanha, nome_campanha FROM CAMPANHAS WHERE STATUS = 1";
+  const allCampanhasQuery = "SELECT id_campanha, nome_campanha FROM CAMPANHAS";
 
   db.all(allCampanhasQuery, (err, campanhas) => {
     if (err) {
@@ -1066,6 +1066,47 @@ app.get("/admin_edit_campanha", requireAuth("sAdmin"), (req, res) => {
     });
   });
 });
+app.get(
+  "/admin_edit_campanha/deactivate/:id",
+  requireAuth("sAdmin"),
+  (req, res) => {
+    const id = req.params.id;
+
+    db.run(
+      "UPDATE CAMPANHAS SET status = 0 WHERE id_campanha = ?",
+      [id],
+      function (err) {
+        if (err) {
+          console.error(err);
+          return res.redirect("/admin_edit_campanha?error=Erro ao desativar campanha");
+        }
+
+        res.redirect("/admin_edit_campanha?success=Campanha desativada com sucesso");
+      }
+    );
+  }
+);
+
+app.get(
+  "/admin_edit_campanha/activate/:id",
+  requireAuth("sAdmin"),
+  (req, res) => {
+    const id = req.params.id;
+
+    db.run(
+      "UPDATE CAMPANHAS SET status = 1 WHERE id_campanha = ?",
+      [id],
+      function (err) {
+        if (err) {
+          console.error(err);
+          return res.redirect("/admin_edit_campanha?error=Erro ao ativar campanha");
+        }
+
+        res.redirect("/admin_edit_campanha?success=Campanha ativada com sucesso");
+      }
+    );
+  }
+);
 
 app.post(
   "/admin_edit_campanha/create/itens",
