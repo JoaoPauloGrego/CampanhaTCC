@@ -16,7 +16,7 @@ app.use(
     resave: true,
     saveUninitialized: true,
     cookie: {
-      maxAge: 24 * 60 * 60 * 1000, // 1 dia
+      maxAge: 5 * 60 * 1000, // 5 minutos
     },
   })
 );
@@ -960,12 +960,12 @@ app.post("/admin_edit_itens/create", requireAuth("sAdmin"), (req, res) => {
 
 // Atualizar turma
 app.post("/admin_edit_itens/update", requireAuth("sAdmin"), (req, res) => {
-  const { id_item, id_campanha, nome_item, pontos, status } = req.body;
+  const { id, id_campanha, nome_item, pontos, status } = req.body;
 
   db.run(
     `UPDATE ITENS SET id_campanha = ?, nome_item = ?, pontos = ?, status = ? 
      WHERE id_item = ?`,
-    [id_item, id_campanha, nome_item, pontos, status],
+    [id, id_campanha, nome_item, pontos, status],
     function (err) {
       if (err) {
         console.error(err);

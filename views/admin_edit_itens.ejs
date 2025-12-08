@@ -196,14 +196,15 @@
       <h2>Editar Item</h2>
       <form id="editForm" action="/admin_edit_itens/update" method="POST">
         <input type="hidden" id="edit_id" name="id_item">
+          <div class="form-group">
+          <label class="form-label" for="admin_edit_campanha">ID da Campanha:</label>
+          <input type="number" id="edit_campanha" name="id_campanha" class="form-control" required>
+        </div>
         <div class="form-group">
           <label class="form-label" for="edit_nome_item">Nome do Item:</label>
           <input type="text" id="edit_nome_item" name="nome_item" class="form-control" required>
         </div>
-        <div class="form-group">
-          <label class="form-label" for="admin_edit_campanha">ID da Campanha:</label>
-          <input type="number" id="edit_campanha" name="id_campanha" class="form-control" required>
-        </div>
+
         <div class="form-group">
           <label class="form-label" for="edit_pontos">Pontos:</label>
           <input type="number" id="edit_pontos" name="pontos" class="form-control" required>
@@ -241,8 +242,8 @@
 
     // Função para abrir modal de edição com dados do item
     function openEditModal(id, id_campanha, nome_item, pontos, status) {
-      document.getElementById('edit_nome_item').value = nome_item;
       document.getElementById('edit_campanha').value = id_campanha;
+      document.getElementById('edit_nome_item').value = nome_item;
       document.getElementById('edit_pontos').value = pontos;
       document.getElementById('edit_status').value = status;
       openModal('editModal');
