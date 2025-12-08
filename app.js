@@ -15,6 +15,7 @@ app.use(
     secret: "secret-key",
     resave: true,
     saveUninitialized: true,
+    rolling: true,
     cookie: {
       maxAge: 5 * 60 * 1000, // 5 minutos
     },
