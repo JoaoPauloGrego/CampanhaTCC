@@ -224,7 +224,7 @@ app.get("/aluno/select_campanha", (req, res) => {
 
   // Consulta para todas as campanhas ativas MOURIS
   const allCampanhasQuery =
-    "SELECT id_campanha, nome_campanha FROM CAMPANHAS WHERE STATUS = 1";
+    "SELECT id_campanha, nome_campanha FROM CAMPANHAS";
 
   db.all(allCampanhasQuery, (err, campanhas) => {
     if (err) return console.error(err);
@@ -476,7 +476,7 @@ app.get("/admin/select_campanha", requireAuth("admin"), (req, res) => {
 
 app.get("/admin/campanha/:id", (req, res) => {
   const queryCampanhas =
-    "SELECT id_campanha, nome_campanha FROM CAMPANHAS WHERE STATUS = 1";
+    "SELECT id_campanha, nome_campanha FROM CAMPANHAS";
   const idCampanha = req.params.id;
   console.log("GET /admin");
   if (!req.session.loggedin || req.session.user.role !== "admin") {
