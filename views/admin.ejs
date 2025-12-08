@@ -4,9 +4,7 @@
   <title>Painel Admin</title>
   <link rel="icon" href="/logo.png" type="image/x-icon">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link
-    href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Montserrat:wght@700;800&display=swap"
-    rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Montserrat:wght@700;800&display=swap" rel="stylesheet">
 </head>
 
 <body>
@@ -42,18 +40,18 @@
 
         <div class="messages">
           <% if(typeof success !=='undefined' ) { %>
-            <div class="success-message">
-              <i class="fas fa-check-circle"></i>
-              <%= success %>
-            </div>
-            <% } %>
+          <div class="success-message">
+            <i class="fas fa-check-circle"></i>
+            <%= success %>
+          </div>
+          <% } %>
 
-              <% if(typeof error !=='undefined' ) { %>
-                <div class="error-message">
-                  <i class="fas fa-exclamation-circle"></i>
-                  <%= error %>
-                </div>
-                <% } %>
+          <% if(typeof error !=='undefined' ) { %>
+          <div class="error-message">
+            <i class="fas fa-exclamation-circle"></i>
+            <%= error %>
+          </div>
+          <% } %>
         </div>
 
         <form action="/doacao" method="POST">
@@ -63,10 +61,10 @@
             <select name="id_campanha" id="id_campanha" required>
               <option value="">Selecione uma campanha</option>
               <% CAMPANHAS.forEach(campanha=> { %>
-                <option value="<%= campanha.id_campanha %>">
-                  <%= campanha.nome_campanha %> (ID: <%= campanha.id_campanha %>)
-                </option>
-                <% }); %>
+              <option value="<%= campanha.id_campanha %>">
+                <%= campanha.nome_campanha %> (ID: <%= campanha.id_campanha %>)
+              </option>
+              <% }); %>
             </select>
           </div>
 
@@ -75,10 +73,10 @@
             <select name="id_turma" id="id_turma" required>
               <option value="">Selecione uma turma</option>
               <% TURMAS.forEach(turma=> { %>
-                <option value="<%= turma.id_turma %>">
-                  <%= turma.nome_turma %> - <%= turma.docente %> (ID: <%= turma.id_turma %>)
-                </option>
-                <% }); %>
+              <option value="<%= turma.id_turma %>">
+                <%= turma.nome_turma %> - <%= turma.docente %> (ID: <%= turma.id_turma %>)
+              </option>
+              <% }); %>
             </select>
           </div>
 
@@ -87,16 +85,16 @@
             <select name="id_item" id="id_item" required>
               <option value="">Selecione um item</option>
               <% ITENS.forEach(item=> { %>
-                <option value="<%= item.id_item %>" data-pontos="<%= item.pontos %>">
-                  <%= item.nome_item %> (<%= item.pontos %> pontos)
-                </option>
-                <% }); %>
+              <option value="<%= item.id_item %>" data-pontos="<%= item.pontos %>">
+                <%= item.nome_item %> (<%= item.pontos %> pontos)
+              </option>
+              <% }); %>
             </select>
           </div>
 
           <div class="form-group">
             <label for="quantidade"><i class="fas fa-calculator"></i> Quantidade:</label>
-            <input type="number" name="quantidade" id="quantidade" min="1" required>
+            <input type="number" name="quantidade" id="quantidade" min="1" required placeholder="Selecione a quantidade do item escolhido">
           </div>
 
           <div class="form-group">
@@ -158,14 +156,14 @@
 
   <script>
     // Definir a data atual como padrão
-    document.addEventListener('DOMContentLoaded', function () {
+    document.addEventListener('DOMContentLoaded', function() {
       const today = new Date();
       const formattedDate = today.toISOString().split('T')[0];
       document.getElementById('data_doacao').value = formattedDate;
 
       // Debug: verificar envio do formulário
       const form = document.querySelector('form');
-      form.addEventListener('submit', function (e) {
+      form.addEventListener('submit', function(e) {
         console.log('Formulário enviado');
         console.log('Campanha ID:', document.getElementById('id_campanha').value);
         console.log('Turma ID:', document.getElementById('id_turma').value);
@@ -183,109 +181,109 @@
       });
     });
 
-// Função para carregar turmas e itens baseados na campanha selecionada
-document.getElementById('id_campanha').addEventListener('change', function() {
-  const campanhaId = this.value;
-  const turmaSelect = document.getElementById('id_turma');
-  const itemSelect = document.getElementById('id_item');
-  
-  // Limpar opções atuais, mantendo apenas a primeira
-  while (turmaSelect.options.length > 1) {
-    turmaSelect.remove(1);
-  }
-  
-  while (itemSelect.options.length > 1) {
-    itemSelect.remove(1);
-  }
-  
-  if (!campanhaId) {
-    // Se nenhuma campanha selecionada, mostrar todas as turmas e todos os itens
-    carregarTodasTurmas();
-    carregarTodosItens();
-    return;
-  }
-  
-  // Fazer requisições paralelas para obter turmas e itens da campanha selecionada
-  Promise.all([
-    fetch(`/admin/campanha/${campanhaId}/turmas`),
-    fetch(`/admin/campanha/${campanhaId}/itens`)
-  ])
-  .then(responses => Promise.all(responses.map(res => res.json())))
-  .then(([turmas, itens]) => {
-    // Preencher turmas
-    if (turmas.length > 0) {
-      turmas.forEach(turma => {
-        const option = document.createElement('option');
-        option.value = turma.id_turma;
-        option.textContent = `${turma.nome_turma} - ${turma.docente} (ID: ${turma.id_turma})`;
-        turmaSelect.appendChild(option);
-      });
-    } else {
-      const option = document.createElement('option');
-      option.value = "";
-      option.textContent = "Nenhuma turma associada a esta campanha";
-      option.disabled = true;
-      option.selected = true;
-      turmaSelect.appendChild(option);
-    }
-    
-    // Preencher itens
-    if (itens.length > 0) {
-      itens.forEach(item => {
-        const option = document.createElement('option');
-        option.value = item.id_item;
-        option.textContent = `${item.nome_item} (${item.pontos} pontos)`;
-        option.setAttribute('data-pontos', item.pontos);
-        itemSelect.appendChild(option);
-      });
-    } else {
-      const option = document.createElement('option');
-      option.value = "";
-      option.textContent = "Nenhum item disponível para esta campanha";
-      option.disabled = true;
-      option.selected = true;
-      itemSelect.appendChild(option);
-    }
-  })
-  .catch(error => {
-    console.error('Erro ao carregar turmas ou itens:', error);
-    carregarTodasTurmas();
-    carregarTodosItens();
-  });
-});
-
-// Função para carregar todas as turmas (fallback)
-function carregarTodasTurmas() {
-  fetch('/admin/todas-turmas')
-    .then(response => response.json())
-    .then(turmas => {
+    // Função para carregar turmas e itens baseados na campanha selecionada
+    document.getElementById('id_campanha').addEventListener('change', function() {
+      const campanhaId = this.value;
       const turmaSelect = document.getElementById('id_turma');
-      turmas.forEach(turma => {
-        const option = document.createElement('option');
-        option.value = turma.id_turma;
-        option.textContent = `${turma.nome_turma} - ${turma.docente} (ID: ${turma.id_turma})`;
-        turmaSelect.appendChild(option);
-      });
-    })
-    .catch(error => console.error('Erro ao carregar todas as turmas:', error));
-}
-
-// Função para carregar todos os itens (fallback)
-function carregarTodosItens() {
-  fetch('/admin/todos-itens')
-    .then(response => response.json())
-    .then(itens => {
       const itemSelect = document.getElementById('id_item');
-      itens.forEach(item => {
-        const option = document.createElement('option');
-        option.value = item.id_item;
-        option.textContent = `${item.nome_item} (${item.pontos} pontos)`;
-        option.setAttribute('data-pontos', item.pontos);
-        itemSelect.appendChild(option);
-      });
-    })
-    .catch(error => console.error('Erro ao carregar todos os itens:', error));
-}
+
+      // Limpar opções atuais, mantendo apenas a primeira
+      while (turmaSelect.options.length > 1) {
+        turmaSelect.remove(1);
+      }
+
+      while (itemSelect.options.length > 1) {
+        itemSelect.remove(1);
+      }
+
+      if (!campanhaId) {
+        // Se nenhuma campanha selecionada, mostrar todas as turmas e todos os itens
+        carregarTodasTurmas();
+        carregarTodosItens();
+        return;
+      }
+
+      // Fazer requisições paralelas para obter turmas e itens da campanha selecionada
+      Promise.all([
+          fetch(`/admin/campanha/${campanhaId}/turmas`),
+          fetch(`/admin/campanha/${campanhaId}/itens`)
+        ])
+        .then(responses => Promise.all(responses.map(res => res.json())))
+        .then(([turmas, itens]) => {
+          // Preencher turmas
+          if (turmas.length > 0) {
+            turmas.forEach(turma => {
+              const option = document.createElement('option');
+              option.value = turma.id_turma;
+              option.textContent = `${turma.nome_turma} - ${turma.docente} (ID: ${turma.id_turma})`;
+              turmaSelect.appendChild(option);
+            });
+          } else {
+            const option = document.createElement('option');
+            option.value = "";
+            option.textContent = "Nenhuma turma associada a esta campanha";
+            option.disabled = true;
+            option.selected = true;
+            turmaSelect.appendChild(option);
+          }
+
+          // Preencher itens
+          if (itens.length > 0) {
+            itens.forEach(item => {
+              const option = document.createElement('option');
+              option.value = item.id_item;
+              option.textContent = `${item.nome_item} (${item.pontos} pontos)`;
+              option.setAttribute('data-pontos', item.pontos);
+              itemSelect.appendChild(option);
+            });
+          } else {
+            const option = document.createElement('option');
+            option.value = "";
+            option.textContent = "Nenhum item disponível para esta campanha";
+            option.disabled = true;
+            option.selected = true;
+            itemSelect.appendChild(option);
+          }
+        })
+        .catch(error => {
+          console.error('Erro ao carregar turmas ou itens:', error);
+          carregarTodasTurmas();
+          carregarTodosItens();
+        });
+    });
+
+    // Função para carregar todas as turmas (fallback)
+    function carregarTodasTurmas() {
+      fetch('/admin/todas-turmas')
+        .then(response => response.json())
+        .then(turmas => {
+          const turmaSelect = document.getElementById('id_turma');
+          turmas.forEach(turma => {
+            const option = document.createElement('option');
+            option.value = turma.id_turma;
+            option.textContent = `${turma.nome_turma} - ${turma.docente} (ID: ${turma.id_turma})`;
+            turmaSelect.appendChild(option);
+          });
+        })
+        .catch(error => console.error('Erro ao carregar todas as turmas:', error));
+    }
+
+    // Função para carregar todos os itens (fallback)
+    function carregarTodosItens() {
+      fetch('/admin/todos-itens')
+        .then(response => response.json())
+        .then(itens => {
+          const itemSelect = document.getElementById('id_item');
+          itens.forEach(item => {
+            const option = document.createElement('option');
+            option.value = item.id_item;
+            option.textContent = `${item.nome_item} (${item.pontos} pontos)`;
+            option.setAttribute('data-pontos', item.pontos);
+            itemSelect.appendChild(option);
+          });
+        })
+        .catch(error => console.error('Erro ao carregar todos os itens:', error));
+    }
   </script>
 
   <style>
@@ -605,6 +603,11 @@ function carregarTodosItens() {
       No Firefox, por exemplo, seria necessário outro ajuste (::-moz-...).*/
 
       opacity: 0;
+    }
+
+    input::placeholder {
+      color: white;
+      /* cor desejada */
     }
 
     /* Responsividade */

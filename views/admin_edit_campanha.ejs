@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,6 +9,7 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Montserrat:wght@700;800&display=swap" rel="stylesheet">
 </head>
+
 <body>
   <div class="container">
     <!-- Header -->
@@ -27,7 +29,7 @@
           <li><a href="/sAdmin"><i class="fas fa-arrow-left"></i> Voltar</a></li>
           <li><a href="/admin_edit_turmas"><i class="fas fa-users"></i> Gerenciar Turmas</a></li>
           <li><a href="/admin_edit_itens"><i class="fas fa-box"></i> Gerenciar Itens</a></li>
-          <li><a href="/logout" class="logout-btn">
+          <li><a href="/logout" class="logout-btn" style="margin-right: 2.5rem;">
               <i class="fas fa-sign-out-alt"></i> Sair
             </a></li>
         </ul>
@@ -102,12 +104,12 @@
 
           <div class="form-section">
             <h4 class="form-section-title">Itens da Campanha</h4>
-            
+
             <!-- Botão para adicionar itens -->
             <button type="button" class="btn btn-primary" onclick="openModal('createItemModal')">
               <i class="fas fa-plus"></i> Adicionar Item à Campanha
             </button>
-            
+
             <div class="form-group" style="margin-top: 15px;">
               <label class="form-label">Itens disponíveis para esta campanha:</label>
               <div class="checkbox-group">
@@ -264,14 +266,13 @@
       const today = new Date().toISOString().split('T')[0];
       const dtInicial = document.getElementById('dt_inicial');
       const dtFinal = document.getElementById('dt_final');
-      
+
       if (dtInicial) dtInicial.min = today;
       if (dtFinal) dtFinal.min = today;
     });
   </script>
 
   <style>
-    
     :root {
       --primary: #3498db;
       --secondary: #e74c3c;
@@ -311,7 +312,7 @@
       padding: 20px;
     }
 
- header {
+    header {
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -376,7 +377,7 @@
       padding: 8px 15px;
       border-radius: 20px;
       margin: 10px;
-    
+
     }
 
     .user-info i {
@@ -418,7 +419,7 @@
       margin: 0;
     }
 
-        .btn {
+    .btn {
       padding: 10px 20px;
       border-radius: 8px;
       border: none;
@@ -547,7 +548,8 @@
       margin-top: 15px;
     }
 
-    th, td {
+    th,
+    td {
       padding: 12px 15px;
       text-align: left;
       border-bottom: 1px solid rgba(255, 255, 255, 0.1);
@@ -660,27 +662,31 @@
       margin-bottom: 20px;
     }
 
+    input::placeholder {
+      color: white;
+    }
+
     @media (max-width: 768px) {
       .form-container {
         grid-template-columns: 1fr;
       }
-      
+
       .card-header {
         flex-direction: column;
         align-items: flex-start;
         gap: 15px;
       }
-      
+
       nav ul {
         flex-direction: column;
         gap: 15px;
       }
-      
+
       header {
         flex-direction: column;
         gap: 20px;
       }
-      
+
       .modal-content {
         width: 95%;
         margin: 10% auto;
@@ -688,4 +694,5 @@
     }
   </style>
 </body>
+
 </html>
